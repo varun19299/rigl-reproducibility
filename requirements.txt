@@ -1,0 +1,9 @@
+black
+hydra-ax-sweeper
+hydra-joblib-launcher
+hydra-core
+hydra_colorlog
+matplotlib
+numpy
+tqdm
+wandb

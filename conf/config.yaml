@@ -1,0 +1,38 @@
+defaults:
+  - masking: SNFS
+  - dataset: MNIST
+  - optimizer: SGD
+  - hydra
+  - hydra/job_logging: colorlog
+  - hydra/hydra_logging: colorlog
+  - hydra/launcher: joblib
+# Uncomment the next line
+# for Ax Hyperparam sweep
+#  - hydra/sweeper: ax
+
+exp_name: ${masking.name}
+seed: 0
+model: lenet5
+
+# Train args
+device: cuda # cpu or cuda
+mixed_precision: False
+benchmark: False
+
+# Logging, Saving, Resuming
+log_interval: 100
+ckpt_dir: ckpts
+ckpt_interval: 5
+resume: True
+save_features: False
+
+# W&B
+use_wandb: True
+wandb_api_key: ${hydra:runtime.cwd}/wandb_api.key
+
+# Variants
+# See conf/masking
+
+
+
+

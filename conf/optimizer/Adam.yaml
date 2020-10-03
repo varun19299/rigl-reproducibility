@@ -1,0 +1,6 @@
+# @package _group_
+name: Adam
+epochs: 100
+lr: 1e-2 # Learning rate
+weight_decay: 5e-4
+decay_frequency: 25000

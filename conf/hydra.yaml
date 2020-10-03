@@ -1,0 +1,41 @@
+# @package _group_
+# Hydra configs
+hydra:
+  run:
+    dir: ./outputs/${exp_name}/${hydra.job.override_dirname}
+  sweep:
+    dir: ./outputs/${exp_name}/${hydra.job.override_dirname}
+  job_logging:
+    root:
+      handlers:
+        - file
+  job:
+    config:
+      override_dirname:
+        exclude_keys:
+          - exp_name
+#  sweeper:
+#   ax_config:
+#     # max_trials is application-specific. Tune it for your use case
+#     max_trials: 8
+#     experiment:
+#       # Default to minimize, set to false to maximize
+#       minimize: false
+#     early_stop:
+#       # Number of epochs without a significant improvement from
+#       # the currently known best parameters
+#       # An Epoch is defined as a batch of trials executed in parallel
+#       max_epochs_without_improvement: 10
+  launcher:
+    _target_: hydra_plugins.hydra_joblib_launcher.joblib_launcher.JoblibLauncher
+    n_jobs: 5
+    backend: null
+    prefer: processes
+    require: null
+    verbose: 0
+    timeout: null
+    pre_dispatch: 2*n_jobs
+    batch_size: auto
+    temp_folder: null
+    max_nbytes: null
+    mmap_mode: r

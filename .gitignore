@@ -1,0 +1,16 @@
+outputs/*
+wandb/*
+#wandb_api.key
+__pycache__/*
+*/__pycache__/*
+*/*/__pycache__/*
+*idea*
+.vscode/*
+
+# Datasets
+datasets/*
+
+Icon*
+*Icon*
+*.pth
+*.key

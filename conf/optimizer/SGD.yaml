@@ -1,0 +1,7 @@
+# @package _group_
+name: SGD
+epochs: 100
+lr: 0.1 # Learning rate
+momentum: 0.9 # SGD momentum
+weight_decay: 5e-4
+decay_frequency: 25000
