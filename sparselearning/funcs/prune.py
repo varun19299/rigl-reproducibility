@@ -33,28 +33,28 @@ def magnitude_prune(masking, mask, weight, name):
                     weights. Can be modified in-place or newly
                     constructed
 
-    Accessable global statistics:
+    Accessible global statistics:
 
     Layer statistics:
         Non-zero count of layer:
-            masking.name2nonzeros[name]
+            masking.stats.nonzeros_dict[name]
         Zero count of layer:
-            masking.name2zeros[name]
+            masking.stats.zeros_dict[name]
         Redistribution proportion:
-            masking.name2variance[name]
+            masking.stats.variance_dict[name]
         Number of items removed through pruning:
-            masking.name2removed[name]
+            masking.stats.removed_dict[name]
 
     Network statistics:
         Total number of nonzero parameter in the network:
-            masking.total_nonzero = 0
+            masking.stats.total_nonzero = 0
         Total number of zero-valued parameter in the network:
-            masking.total_zero = 0
+            masking.stats.total_zero = 0
         Total number of parameters removed in pruning:
-            masking.total_removed = 0
+            masking.stats.total_removed = 0
     """
-    num_remove = math.ceil(masking.name2prune_rate[name] * masking.name2nonzeros[name])
-    num_zeros = masking.name2zeros[name]
+    num_remove = math.ceil(masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name])
+    num_zeros = masking.stats.zeros_dict[name]
     k = math.ceil(num_zeros + num_remove)
     if num_remove == 0.0:
         return weight.data != 0.0
@@ -81,7 +81,7 @@ def global_magnitude_prune(masking):
                 if name not in masking.masks:
                     continue
                 remain = (torch.abs(weight.data) > masking.prune_threshold).sum().item()
-                total_removed += masking.name2nonzeros[name] - remain
+                total_removed += masking.stats.nonzeros_dict[name] - remain
 
         if prev_removed == total_removed:
             break
@@ -103,11 +103,11 @@ def global_magnitude_prune(masking):
 
 
 def magnitude_and_negativity_prune(masking, mask, weight, name):
-    num_remove = math.ceil(masking.name2prune_rate[name] * masking.name2nonzeros[name])
+    num_remove = math.ceil(masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name])
     if num_remove == 0.0:
         return weight.data != 0.0
 
-    num_zeros = masking.name2zeros[name]
+    num_zeros = masking.stats.zeros_dict[name]
     k = math.ceil(num_zeros + (num_remove / 2.0))
 
     # remove all weights which absolute value is smaller than threshold
@@ -150,9 +150,9 @@ def magnitude_variance_pruning(masking, mask, weight, name):
         )
     iv_adam_sumsq = 1.0 / torch.sqrt(masking.optimizer.state[weight]["exp_avg_sq"])
 
-    num_remove = math.ceil(masking.name2prune_rate[name] * masking.name2nonzeros[name])
+    num_remove = math.ceil(masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name])
 
-    num_zeros = masking.name2zeros[name]
+    num_zeros = masking.stats.zeros_dict[name]
     k = math.ceil(num_zeros + num_remove)
     if num_remove == 0.0:
         return weight.data != 0.0

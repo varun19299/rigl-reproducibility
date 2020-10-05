@@ -46,34 +46,50 @@ def momentum_growth(masking, name, new_mask, total_regrowth, weight):
     Access to momentum/Adam update:
         masking.get_momentum_for_weight(weight)
 
-    Accessable global statistics:
+    Accessible global statistics:
 
     Layer statistics:
         Non-zero count of layer:
-            masking.name2nonzeros[name]
+            masking.stats.nonzeros_dict[name]
         Zero count of layer:
-            masking.name2zeros[name]
+            masking.stats.zeros_dict[name]
         Redistribution proportion:
-            masking.name2variance[name]
+            masking.stats.variance_dict[name]
         Number of items removed through pruning:
-            masking.name2removed[name]
+            masking.stats.removed_dict[name]
 
     Network statistics:
         Total number of nonzero parameter in the network:
-            masking.total_nonzero = 0
+            masking.stats.total_nonzero = 0
         Total number of zero-valued parameter in the network:
-            masking.total_zero = 0
+            masking.stats.total_zero = 0
         Total number of parameters removed in pruning:
-            masking.total_removed = 0
+            masking.stats.total_removed = 0
     """
-    grad = masking.get_momentum_for_weight(weight)
-    if grad.dtype == torch.float16:
-        grad = grad * (new_mask == 0).half()
+    momentum = masking.get_momentum_for_weight(weight)
+    if momentum.dtype == torch.float16:
+        momentum = momentum * (new_mask == 0).half()
     else:
-        grad = grad * (new_mask == 0).float()
-    y, idx = torch.sort(torch.abs(grad).flatten(), descending=True)
+        momentum = momentum * (new_mask == 0).float()
+    y, idx = torch.sort(torch.abs(momentum).flatten(), descending=True)
     new_mask.data.view(-1)[idx[:total_regrowth]] = 1.0
 
+    return new_mask
+
+
+def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
+    """Grows weights in places where the abs(grad) is largest.
+    """
+    abs_grad = torch.abs(weight.grad)
+    if abs_grad.dtype == torch.float16:
+        abs_grad = abs_grad * (new_mask == 0).half()
+    else:
+        abs_grad = abs_grad * (new_mask == 0).float()
+    y, idx = torch.sort(torch.abs(abs_grad).flatten(), descending=True)
+    new_mask.data.view(-1)[idx[:total_regrowth]] = 1.0
+
+    # Do we need to release gradients etc?
+    # For controllable FLOPs
     return new_mask
 
 
@@ -168,6 +184,7 @@ def global_momentum_growth(masking, total_regrowth):
 
 
 registry = {
+    "absolute_gradient": abs_grad_growth(),
     "global_momentum_growth": global_momentum_growth,
     "momentum": momentum_growth,
     "momentum_neuron": momentum_neuron_growth,

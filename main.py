@@ -249,7 +249,7 @@ def main(cfg: DictConfig):
             and cfg.masking.apply_when == "epoch_end"
             and epoch < cfg.masking.epochs
         ):
-            mask.at_end_of_epoch()
+            mask.update_connections()
 
     test_loss, test_accuracy = evaluate(model, test_loader, epoch, device, test_pbar)
 

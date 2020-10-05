@@ -28,6 +28,26 @@ def momentum_redistribution(masking, name, weight, mask):
 
     The calculation of redistribution statistics is the first
     step in this sparse learning library.
+
+    Accessible global statistics:
+
+    Layer statistics:
+        Non-zero count of layer:
+            masking.stats.nonzeros_dict[name]
+        Zero count of layer:
+            masking.stats.zeros_dict[name]
+        Redistribution proportion:
+            masking.stats.variance_dict[name]
+        Number of items removed through pruning:
+            masking.stats.removed_dict[name]
+
+    Network statistics:
+        Total number of nonzero parameter in the network:
+            masking.stats.total_nonzero = 0
+        Total number of zero-valued parameter in the network:
+            masking.stats.total_zero = 0
+        Total number of parameters removed in pruning:
+            masking.stats.total_removed = 0
     """
     grad = masking.get_momentum_for_weight(weight)
     mean_magnitude = torch.abs(grad[mask.bool()]).mean().item()
