@@ -184,7 +184,7 @@ def global_momentum_growth(masking, total_regrowth):
 
 
 registry = {
-    "absolute_gradient": abs_grad_growth(),
+    "absolute_gradient": abs_grad_growth,
     "global_momentum_growth": global_momentum_growth,
     "momentum": momentum_growth,
     "momentum_neuron": momentum_neuron_growth,

@@ -1,7 +1,7 @@
 # @package _group_
-name: "MNIST"
+name: MNIST
 root: ${hydra:runtime.cwd}/datasets/MNIST/
 batch_size: 64
-test_batch_size: ${batch_size}
+test_batch_size: ${dataset.batch_size}
 max_threads: 3
 validation_split: 0.1

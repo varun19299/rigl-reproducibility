@@ -99,6 +99,8 @@ class Masking(object):
 
         self.steps = 0
 
+        self.stats = LayerStats()
+
     """
     Code flow:
     
@@ -118,9 +120,7 @@ class Masking(object):
             * 
         * print_nonzero_counts() [if verbose]
         
-    Unclear: calc_growth_redistribution
-    
-    Redundant: at_end_of_epoch
+    Unclear: calc_growth_redistribution    
     """
 
     def add_module(self, module, density, sparse_init="constant"):
@@ -155,10 +155,6 @@ class Masking(object):
                 if name not in self.masks:
                     continue
 
-                # TODO: removing as redundant
-                # Once we reproduce SNFS, delete em!
-                # if name not in self.name2prune_rate:
-                #     self.name2prune_rate[name] = self.prune_rate
                 self.name2prune_rate[name] = self.prune_rate
 
                 sparsity = self.stats.zeros_dict[name] / self.masks[name].numel()
@@ -185,16 +181,34 @@ class Masking(object):
                     tensor.data = tensor.data * self.masks[name]
 
     def calc_growth_redistribution(self):
-        mean_residual = 0
         name2regrowth = {}
-        i = 0
+        # prune_rate_ll = torch.tensor(list(self.name2prune_rate.values()))
+        # zero_ll = torch.tensor(list(self.stats.zeros_dict.values()))
+        # nonzero_ll = torch.tensor(list(self.stats.nonzeros_dict.values()))
+        # remove_ll = torch.ceil(prune_rate_ll * nonzero_ll)
+        #
+        # # Upper bound on total new connections
+        # max_regrowth_ll = zero_ll + remove_ll
+        #
+        # # Estimated layer wise via the variance
+        # # If variance is 1.0,
+        # variance_ll = torch.tensor(list(self.stats.variance_dict.values()))
+        # regrowth_ll = torch.ceil(
+        #     variance_ll * (self.stats.total_removed + self.adjusted_growth)
+        # )
+        # residual_ll = regrowth_ll - 0.99 * max_regrowth_ll
+        # regrowth_ll[regrowth_ll > 0.99 * max_regrowth_ll] = 0.99 * max_regrowth_ll
+        # mean_residual = residual_ll.mean()
+        #
+        # assert mean_residual
 
-        for i in range(1000):
+        mean_residual = 0
+
+        for i in range(1001):
             residual = 0
             for name in self.stats.variance_dict:
                 prune_rate = self.name2prune_rate[name]
                 num_remove = math.ceil(prune_rate * self.stats.nonzeros_dict[name])
-                num_nonzero = self.stats.nonzeros_dict[name]
                 num_zero = self.stats.zeros_dict[name]
                 max_regrowth = num_zero + num_remove
 
@@ -217,15 +231,13 @@ class Masking(object):
             else:
                 mean_residual = residual / len(name2regrowth)
 
-            # Negative residual
-            if residual < 0:
+            # Non-positive residual
+            if residual <= 0:
                 break
 
         if i == 1000:
             logging.info(
-                "Error resolving the residual! Layers are too full! Residual left over: {0}".format(
-                    residual
-                )
+                f"Error resolving the residual! Layers are too full! Residual left over: {residual}"
             )
 
         for module in self.modules:
@@ -443,9 +455,15 @@ class Masking(object):
                 mask = self.masks[name]
                 num_nonzeros = (mask != 0).sum().item()
 
-                log_str = f"{name}: {self.stats.nonzeros_dict[name]}->{num_nonzeros}, density: {num_nonzeros / float(mask.numel()):.3f}"
                 if name in self.stats.variance_dict:
-                    log_str += ", proportion: {4:.4f}"
+                    log_str = (
+                        f"{name}: {self.stats.nonzeros_dict[name]}->{num_nonzeros}, "
+                        f"density: {num_nonzeros / float(mask.numel()):.3f}, "
+                        f"proportion: {self.stats.variance_dict[name]:.4f}"
+                    )
+
+                else:
+                    log_str = f"{name}: {num_nonzeros}"
                 logging.info(log_str)
 
         logging.info(f"Prune rate: {self.prune_rate}.")
@@ -598,9 +616,8 @@ class Masking(object):
         )
         if self.stats.total_nonzero > 0 and self.verbose:
             logging.info(
-                "Nonzero before/after: {0}/{1}. Growth adjustment: {2:.2f}.".format(
-                    self.stats.total_nonzero, total_nonzero_new, self.adjusted_growth
-                )
+                f"Nonzero before/after: {self.stats.total_nonzero}/{total_nonzero_new}. "
+                f"Growth adjustment: {self.adjusted_growth:.2f}."
             )
 
     def update_connections(self):

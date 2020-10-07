@@ -27,7 +27,7 @@ resume: True
 save_features: False
 
 # W&B
-use_wandb: True
+use_wandb: False
 wandb_api_key: ${hydra:runtime.cwd}/wandb_api.key
 
 # Variants

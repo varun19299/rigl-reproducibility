@@ -9,6 +9,7 @@ hydra:
     root:
       handlers:
         - file
+        - console
   job:
     config:
       override_dirname:

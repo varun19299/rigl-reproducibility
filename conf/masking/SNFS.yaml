@@ -1,5 +1,5 @@
 # @package _group_
-name: SNFS
+name: RigL
 growth_mode: momentum  # Growth mode. Choose from: momentum, random, and momentum_neuron.
 prune_mode: magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.
 redistribution_mode: momentum  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
@@ -10,4 +10,4 @@ verbose: True  # status of pruning/growth algorithms.
 
 decay_schedule: cosine # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
 apply_when: epoch_end # or step_end
-epochs: ${optimizer.epochs -1} # Epochs till which mask updates are applied
+epochs: 99 # Epochs till which mask updates are applied

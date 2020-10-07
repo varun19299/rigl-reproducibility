@@ -40,7 +40,6 @@ def train(
     use_wandb: bool = False,
 ):
     model.train()
-    pbar.write(f"Starting Epoch {epoch}...")
 
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
@@ -80,9 +79,6 @@ def train(
             if use_wandb:
                 wandb.log({"train_loss": loss}, step=step)
 
-    pbar.refresh()
-    pbar.reset()
-
 
 def evaluate(
     model: "nn.Module",
@@ -113,14 +109,14 @@ def evaluate(
 
             n += target.shape[0]
 
+            pbar.update(1)
+
     accuracy = correct / n
 
     val_or_test = "val" if not is_test_set else "test"
     pbar.set_description(
-        f"{val_or_test.capitalize()} Epoch {epoch} {val_or_test} loss {loss.item():.6f} accuracy {accuracy:.4f}"
+        f"{val_or_test.capitalize()} Epoch {epoch} {val_or_test} loss {loss:.6f} accuracy {accuracy:.4f}"
     )
-    pbar.refresh()
-    pbar.reset()
 
     return loss, accuracy
 
@@ -128,8 +124,6 @@ def evaluate(
 @hydra.main(config_name="config", config_path="conf")
 def main(cfg: DictConfig):
     print(OmegaConf.to_yaml(cfg))
-
-    breakpoint()
 
     # Manual seeds
     torch.manual_seed(cfg.seed)
@@ -190,20 +184,20 @@ def main(cfg: DictConfig):
             optimizer,
             decay,
             prune_rate=cfg.masking.prune_rate,
-            prune_mode=cfg.masking.prune,
-            growth_mode=cfg.masking.growth,
-            redistribution_mode=cfg.masking.redistribution,
+            prune_mode=cfg.masking.prune_mode,
+            growth_mode=cfg.masking.growth_mode,
+            redistribution_mode=cfg.masking.redistribution_mode,
             verbose=cfg.masking.verbose,
         )
-        mask.add_module(model, density=False)
-
-    # pbar
-    train_pbar = tqdm(total=len(train_loader), dynamic_ncols=True)
-    val_pbar = tqdm(total=len(val_loader), dynamic_ncols=True)
-    test_pbar = tqdm(total=len(test_loader), dynamic_ncols=True)
+        mask.add_module(model, density=cfg.masking.density)
 
     # Train model
     for epoch in range(start_epoch, cfg.optimizer.epochs):
+
+        # pbars
+        train_pbar = tqdm(total=len(train_loader), dynamic_ncols=True)
+        val_pbar = tqdm(total=len(val_loader), dynamic_ncols=True)
+
         train(
             model,
             mask,
@@ -215,10 +209,12 @@ def main(cfg: DictConfig):
             train_pbar,
             mixed_precision_scalar,
             log_interval=cfg.log_interval,
-            use_wandb=cfg.use_wanb,
+            use_wandb=cfg.use_wandb,
         )
 
-        val_loss, val_accuracy = evaluate(model, val_loader, epoch, device, val_pbar,)
+        val_loss, val_accuracy = evaluate(
+            model, val_loader, epoch + 1, device, val_pbar,
+        )
 
         # Validation loss, accuracy
         if cfg.use_wandb:
@@ -238,7 +234,7 @@ def main(cfg: DictConfig):
                 optimizer,
                 val_loss,
                 step,
-                epoch,
+                epoch + 1,
                 ckpt_dir=cfg.ckpt_dir,
                 is_min=is_min,
             )
@@ -251,6 +247,8 @@ def main(cfg: DictConfig):
         ):
             mask.update_connections()
 
+    # pbar
+    test_pbar = tqdm(total=len(test_loader), dynamic_ncols=True)
     test_loss, test_accuracy = evaluate(model, test_loader, epoch, device, test_pbar)
 
     # Validation loss, accuracy

@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 import torch
 import torch.nn.functional as F
+from torch import optim
 from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms
 
@@ -174,13 +175,13 @@ def save_weights(
     # Gen
     state_dict = {
         "step": step,
-        "epoch": epoch + 1,
+        "epoch": epoch,
         "state_dict": model.state_dict(),
         "optimizer": optimizer.state_dict(),
         "val_loss": val_loss,
     }
 
-    model_path = f"model_best_epoch_{epoch+1}.pth" if is_min else f"epoch_{epoch+1}.pth"
+    model_path = f"model_best_epoch_{epoch}.pth" if is_min else f"epoch_{epoch}.pth"
     model_path = Path(ckpt_dir) / model_path
 
     torch.save(state_dict, model_path)
@@ -194,17 +195,17 @@ def load_weights(
 
     pth_files = list(ckpt_dir.glob("*.pth"))
 
-    # Extract latest epoch
-    latest_epoch = max([int(re.findall("\d+", s)[-1]) for s in pth_files.name])
-
     # Defaults
     epoch = 0
     step = 0
     best_val_loss = 1e6
 
-    if not latest_epoch:
+    if not pth_files:
         logging.info(f"No checkpoint found  at {ckpt_dir}.")
         return model, optimizer, step, epoch, best_val_loss
+
+    # Extract latest epoch
+    latest_epoch = max([int(re.findall("\d+", file.name)[-1]) for file in pth_files])
 
     # Extract latest model
     model_path = list(ckpt_dir.glob(f"*_{latest_epoch}.pth"))[0]
