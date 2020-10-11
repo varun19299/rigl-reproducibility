@@ -53,11 +53,13 @@ def magnitude_prune(masking, mask, weight, name):
         Total number of parameters removed in pruning:
             masking.stats.total_removed = 0
     """
-    num_remove = math.ceil(masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name])
+    num_remove = math.ceil(
+        masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name]
+    )
     num_zeros = masking.stats.zeros_dict[name]
     k = math.ceil(num_zeros + num_remove)
     if num_remove == 0.0:
-        return weight.data != 0.0
+        return mask
 
     x, idx = torch.sort(torch.abs(weight.data.view(-1)))
     mask.data.view(-1)[idx[:k]] = 0.0
@@ -103,7 +105,9 @@ def global_magnitude_prune(masking):
 
 
 def magnitude_and_negativity_prune(masking, mask, weight, name):
-    num_remove = math.ceil(masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name])
+    num_remove = math.ceil(
+        masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name]
+    )
     if num_remove == 0.0:
         return weight.data != 0.0
 
@@ -150,7 +154,9 @@ def magnitude_variance_pruning(masking, mask, weight, name):
         )
     iv_adam_sumsq = 1.0 / torch.sqrt(masking.optimizer.state[weight]["exp_avg_sq"])
 
-    num_remove = math.ceil(masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name])
+    num_remove = math.ceil(
+        masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name]
+    )
 
     num_zeros = masking.stats.zeros_dict[name]
     k = math.ceil(num_zeros + num_remove)

@@ -1,4 +1,5 @@
 import hydra
+import logging
 from omegaconf import DictConfig, OmegaConf
 import os
 
@@ -23,6 +24,8 @@ from utils.train_helper import (
     save_weights,
 )
 
+from utils.tqdm_logging import TqdmStream
+
 import wandb
 
 
@@ -32,13 +35,18 @@ def train(
     train_loader: "DataLoader",
     optimizer: "optim",
     lr_scheduler: "lr_scheduler",
+    global_step: int,
     epoch: int,
     device: torch.device,
     pbar: "tqdm",
     mixed_precision_scalar: "GradScaler" = None,
     log_interval: int = 10,
     use_wandb: bool = False,
+    masking_apply_when: str = "epoch_end",
+    masking_interval: int = 1,
+    masking_epochs: int = -1,
 ):
+    assert masking_apply_when in ["step_end", "epoch_end"]
     model.train()
 
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -65,28 +73,33 @@ def train(
         else:
             stepper.step()
 
+        # Apply mask
+        if mask and masking_apply_when == "step_end" and epoch < masking_epochs:
+            if global_step % masking_interval == 0:
+                mask.update_connections()
+
         # Lr scheduler
         lr_scheduler.step()
         pbar.update(1)
+        global_step += target.shape[0]  # Batchsize
 
         if batch_idx % log_interval == 0:
-            pbar.set_description(f"Train Epoch {epoch} train loss {loss.item():.6f}")
-            step = (
-                epoch * len(train_loader.dataset)
-                + batch_idx * train_loader.batch_size
-                + 1
+            pbar.set_description(
+                f"Train Epoch {epoch} Global Step {global_step} train loss {loss.item():.6f}"
             )
             if use_wandb:
-                wandb.log({"train_loss": loss}, step=step)
+                wandb.log({"train_loss": loss}, step=global_step)
 
 
 def evaluate(
     model: "nn.Module",
     loader: "DataLoader",
+    global_step: int,
     epoch: int,
     device: torch.device,
     pbar: "tqdm",
     is_test_set: bool = False,
+    use_wandb: bool = False,
 ) -> "Union[float, float]":
     model.eval()
 
@@ -115,14 +128,21 @@ def evaluate(
 
     val_or_test = "val" if not is_test_set else "test"
     pbar.set_description(
-        f"{val_or_test.capitalize()} Epoch {epoch} {val_or_test} loss {loss:.6f} accuracy {accuracy:.4f}"
+        f"{val_or_test.capitalize()} Epoch {epoch} Global Step {global_step} {val_or_test} loss {loss:.6f} accuracy {accuracy:.4f}"
     )
+
+    # Log loss, accuracy
+    if use_wandb:
+        wandb.log({f"{val_or_test}_loss": loss}, step=global_step)
+        wandb.log({f"{val_or_test}_accuracy": accuracy}, step=global_step)
 
     return loss, accuracy
 
 
 @hydra.main(config_name="config", config_path="conf")
 def main(cfg: DictConfig):
+    logging.basicConfig(stream=TqdmStream)
+
     print(OmegaConf.to_yaml(cfg))
 
     # Manual seeds
@@ -193,7 +213,6 @@ def main(cfg: DictConfig):
 
     # Train model
     for epoch in range(start_epoch, cfg.optimizer.epochs):
-
         # pbars
         train_pbar = tqdm(total=len(train_loader), dynamic_ncols=True)
         val_pbar = tqdm(total=len(val_loader), dynamic_ncols=True)
@@ -204,23 +223,27 @@ def main(cfg: DictConfig):
             train_loader,
             optimizer,
             lr_scheduler,
+            step,
             epoch + 1,
             device,
             train_pbar,
             mixed_precision_scalar,
             log_interval=cfg.log_interval,
             use_wandb=cfg.use_wandb,
+            masking_apply_when=cfg.masking.apply_when,
+            masking_interval=cfg.masking.interval,
+            masking_epochs=cfg.masking.epochs,
         )
 
-        val_loss, val_accuracy = evaluate(
-            model, val_loader, epoch + 1, device, val_pbar,
+        val_loss, _ = evaluate(
+            model,
+            val_loader,
+            step,
+            epoch + 1,
+            device,
+            val_pbar,
+            use_wandb=cfg.use_wandb,
         )
-
-        # Validation loss, accuracy
-        if cfg.use_wandb:
-            step = epoch * len(train_loader.dataset) + 1
-            wandb.log({"val_loss": val_loss}, step=step)
-            wandb.log({"val_accuracy": val_accuracy}, step=step)
 
         # Save weights
         if (epoch + 1) % cfg.ckpt_interval == 0:
@@ -228,6 +251,8 @@ def main(cfg: DictConfig):
             if val_loss < best_val_loss:
                 is_min = True
                 best_val_loss = val_loss
+            else:
+                is_min = False
 
             save_weights(
                 model,
@@ -245,17 +270,22 @@ def main(cfg: DictConfig):
             and cfg.masking.apply_when == "epoch_end"
             and epoch < cfg.masking.epochs
         ):
-            mask.update_connections()
+            if epoch % cfg.masking.interval == 0:
+                mask.update_connections()
 
     # pbar
     test_pbar = tqdm(total=len(test_loader), dynamic_ncols=True)
-    test_loss, test_accuracy = evaluate(model, test_loader, epoch, device, test_pbar)
 
-    # Validation loss, accuracy
-    if cfg.use_wandb:
-        step = epoch * len(train_loader.dataset) + 1
-        wandb.log({"test_loss": test_loss}, step=step)
-        wandb.log({"test_accuracy": test_accuracy}, step=step)
+    evaluate(
+        model,
+        test_loader,
+        step,
+        epoch + 1,
+        device,
+        test_pbar,
+        is_test_set=True,
+        use_wandb=cfg.use_wandb,
+    )
 
 
 if __name__ == "__main__":

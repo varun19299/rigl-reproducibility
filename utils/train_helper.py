@@ -149,7 +149,7 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, lr_scheduler]":
             lr=lr,
             momentum=kwargs["momentum"],
             weight_decay=weight_decay,
-            nesterov=True,
+            nesterov=kwargs["use_nesterov"],
         )
     elif name == "Adam":
         optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
@@ -197,7 +197,7 @@ def load_weights(
 
     # Defaults
     epoch = 0
-    step = 0
+    step = 1
     best_val_loss = 1e6
 
     if not pth_files:
@@ -216,7 +216,7 @@ def load_weights(
     load_state_dict(model, ckpt["state_dict"])
 
     epoch = ckpt.get("epoch", 1) - 1
-    step = ckpt.get("step", 1) - 1
+    step = ckpt.get("step", 1)
     val_loss = ckpt.get("val_loss", "not stored")
     logging.info(f"Model has val loss of {val_loss}.")
 

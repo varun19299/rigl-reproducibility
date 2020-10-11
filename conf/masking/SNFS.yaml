@@ -11,3 +11,4 @@ verbose: True  # status of pruning/growth algorithms.
 decay_schedule: cosine # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
 apply_when: epoch_end # or step_end
 epochs: 99 # Epochs till which mask updates are applied
+interval: 1 # Which epochs or steps to apply at
