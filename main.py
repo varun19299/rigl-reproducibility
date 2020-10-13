@@ -44,13 +44,14 @@ def train(
     use_wandb: bool = False,
     masking_apply_when: str = "epoch_end",
     masking_interval: int = 1,
-    masking_epochs: int = -1,
-):
+    masking_end_when: int = -1,
+) -> "Union[float,int]":
     assert masking_apply_when in ["step_end", "epoch_end"]
     model.train()
 
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
+        batch_size = target.shape[0]
         optimizer.zero_grad()
 
         if mixed_precision_scalar:
@@ -74,14 +75,16 @@ def train(
             stepper.step()
 
         # Apply mask
-        if mask and masking_apply_when == "step_end" and epoch < masking_epochs:
-            if global_step % masking_interval == 0:
+        if mask and masking_apply_when == "step_end":
+            if (global_step < (masking_end_when * batch_size)) and (
+                global_step % (masking_interval * batch_size)
+            ) == 0:
                 mask.update_connections()
 
         # Lr scheduler
         lr_scheduler.step()
         pbar.update(1)
-        global_step += target.shape[0]  # Batchsize
+        global_step += batch_size  # Batchsize
 
         if batch_idx % log_interval == 0:
             pbar.set_description(
@@ -89,6 +92,8 @@ def train(
             )
             if use_wandb:
                 wandb.log({"train_loss": loss}, step=global_step)
+
+    return loss.item(), global_step
 
 
 def evaluate(
@@ -178,6 +183,19 @@ def main(cfg: DictConfig):
         )
         wandb.watch(model)
 
+    # Training multiplier
+    training_multiplier = cfg.optimizer.training_multiplier
+    if training_multiplier != 1:
+        cfg.optimizer.decay_frequency *= training_multiplier
+        cfg.optimizer.epochs *= training_multiplier
+
+        cfg.masking.end_when *= training_multiplier
+        cfg.masking.end_when = int(cfg.masking.end_when)
+
+        if cfg.masking.apply_when == "step_end":
+            cfg.masking.interval *= training_multiplier
+            cfg.masking.interval = int(cfg.masking.interval)
+
     # Setup optimizers, lr schedulers
     optimizer, lr_scheduler = get_optimizer(model, **cfg.optimizer)
 
@@ -186,7 +204,7 @@ def main(cfg: DictConfig):
 
     # Load from checkpoint
     model, optimizer, step, start_epoch, best_val_loss = load_weights(
-        model, optimizer, ckpt_dir=cfg.ckpt_dir
+        model, optimizer, ckpt_dir=cfg.ckpt_dir, resume=cfg.resume
     )
 
     # Setup mask
@@ -203,13 +221,15 @@ def main(cfg: DictConfig):
         mask = Masking(
             optimizer,
             decay,
+            density=cfg.masking.density,
+            sparse_init=cfg.masking.sparse_init,
             prune_rate=cfg.masking.prune_rate,
             prune_mode=cfg.masking.prune_mode,
             growth_mode=cfg.masking.growth_mode,
             redistribution_mode=cfg.masking.redistribution_mode,
             verbose=cfg.masking.verbose,
         )
-        mask.add_module(model, density=cfg.masking.density)
+        mask.add_module(model)
 
     # Train model
     for epoch in range(start_epoch, cfg.optimizer.epochs):
@@ -217,7 +237,7 @@ def main(cfg: DictConfig):
         train_pbar = tqdm(total=len(train_loader), dynamic_ncols=True)
         val_pbar = tqdm(total=len(val_loader), dynamic_ncols=True)
 
-        train(
+        _, step = train(
             model,
             mask,
             train_loader,
@@ -232,7 +252,7 @@ def main(cfg: DictConfig):
             use_wandb=cfg.use_wandb,
             masking_apply_when=cfg.masking.apply_when,
             masking_interval=cfg.masking.interval,
-            masking_epochs=cfg.masking.epochs,
+            masking_end_when=cfg.masking.end_when,
         )
 
         val_loss, _ = evaluate(
@@ -268,7 +288,7 @@ def main(cfg: DictConfig):
         if (
             mask
             and cfg.masking.apply_when == "epoch_end"
-            and epoch < cfg.masking.epochs
+            and epoch < cfg.masking.end_when
         ):
             if epoch % cfg.masking.interval == 0:
                 mask.update_connections()
@@ -286,6 +306,8 @@ def main(cfg: DictConfig):
         is_test_set=True,
         use_wandb=cfg.use_wandb,
     )
+
+    return val_loss
 
 
 if __name__ == "__main__":

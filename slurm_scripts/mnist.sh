@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 #SBATCH --job-name=mnist-test    # create a short name for your job
 
 #SBATCH --partition=wacc         # use batch_default, or wacc for quick (< 30 min) ones

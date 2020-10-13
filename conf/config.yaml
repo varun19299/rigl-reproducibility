@@ -30,9 +30,6 @@ save_features: False
 use_wandb: False
 wandb_api_key: ${hydra:runtime.cwd}/wandb_api.key
 
-# Variants
-# See conf/masking
-
 
 
 

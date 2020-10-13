@@ -1,14 +1,16 @@
 # @package _group_
 name: RigL
+density: 0.05  # The density of the overall sparse network.
+sparse_init: erdos_renyi
+
 growth_mode: absolute_gradient  # Growth mode. Choose from: momentum, random, and momentum_neuron.
 prune_mode: magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.
 redistribution_mode: none  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
-density: 0.05  # The density of the overall sparse network.
 dense: False  # Enable dense mode. Default: False.
 verbose: True  # status of pruning/growth algorithms.
 
-prune_rate: 0.5  # The pruning rate / prune rate.
+prune_rate: 0.3  # The pruning rate / prune rate.
 decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
-apply_when: epoch_end  # or step_end
-epochs: 75 # Epochs till which mask updates are applied
-interval: 1 # Which epochs or steps to apply at
+apply_when: step_end  # or step_end
+end_when: 75000 # Epochs / Training Step till which mask updates are applied (set to 75% total steps)
+interval: 100 # Which epochs or steps to apply at

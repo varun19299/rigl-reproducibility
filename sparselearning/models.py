@@ -16,7 +16,7 @@ class SparseSpeedupBench(object):
         self.bench = SparseSpeedupBench()
         self.conv_layer1 = nn.Conv2(3, 96, 3)
 
-        if self.bench is not None:
+        if self.bench:
             outputs = self.bench.forward(self.conv_layer1, inputs, layer_id='conv_layer1')
         else:
             outputs = self.conv_layer1(inputs)
@@ -37,7 +37,7 @@ class SparseSpeedupBench(object):
         return (x.data != 0.0).sum().item() / x.numel()
 
     def forward(self, layer, x, layer_id):
-        if self.layer_0_idx is None:
+        if not self.layer_0_idx:
             self.layer_0_idx = layer_id
         if layer_id == self.layer_0_idx:
             self.iter_idx += 1
@@ -169,7 +169,11 @@ class AlexNet(nn.Module):
     """
 
     def __init__(
-        self, config="s", num_classes=1000, save_features=False, bench_model=False
+        self,
+        config="s",
+        num_classes=1000,
+        save_features: bool = False,
+        bench_model: bool = False,
     ):
         super(AlexNet, self).__init__()
         self.save_features = save_features
@@ -207,7 +211,7 @@ class AlexNet(nn.Module):
 
     def forward(self, x):
         for layer_id, layer in enumerate(self.features):
-            if self.bench is not None and isinstance(layer, nn.Conv2d):
+            if self.bench and isinstance(layer, nn.Conv2d):
                 x = self.bench.forward(layer, x, layer_id)
             else:
                 x = layer(x)
@@ -232,7 +236,7 @@ class LeNet_300_100(nn.Module):
     by Milad Alizadeh.
     """
 
-    def __init__(self, save_features=None, bench_model=False):
+    def __init__(self, save_features: bool = None, bench_model: bool = False):
         super(LeNet_300_100, self).__init__()
         self.fc1 = nn.Linear(28 * 28, 300, bias=True)
         self.fc2 = nn.Linear(300, 100, bias=True)
@@ -257,7 +261,7 @@ class LeNet_5_Caffe(nn.Module):
     by Milad Alizadeh.
     """
 
-    def __init__(self, save_features=None, bench_model=False):
+    def __init__(self, save_features: bool=None, bench_model: bool=False):
         super().__init__()
         self.conv1 = nn.Conv2d(1, 20, 5, padding=0, bias=True)
         self.conv2 = nn.Conv2d(20, 50, 5, bias=True)
@@ -406,7 +410,7 @@ class VGG16(nn.Module):
 
     def forward(self, x):
         for layer_id, layer in enumerate(self.features):
-            if self.bench is not None and isinstance(layer, nn.Conv2d):
+            if self.bench and isinstance(layer, nn.Conv2d):
                 x = self.bench.forward(layer, x, layer_id)
             else:
                 x = layer(x)
@@ -431,13 +435,20 @@ class WideResNet(nn.Module):
 
     def __init__(
         self,
-        depth,
-        widen_factor,
-        num_classes=10,
-        dropRate=0.3,
-        save_features=False,
-        bench_model=False,
+        depth: int,
+        widen_factor: int,
+        num_classes: int = 10,
+        dropRate: float = 0.3,
+        save_features: bool = False,
+        bench_model: bool = False,
     ):
+        """
+        depth, widen_factor as described by the paper.
+        droprate: float = dropout rate to apply
+        save_features: bool = store activations in self.feats,
+            densities in self.densities
+        bench_model: bool = benchmark model speedup (due to sparsity).
+        """
         super(WideResNet, self).__init__()
         nChannels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]
         assert (depth - 4) % 6 == 0
@@ -447,7 +458,7 @@ class WideResNet(nn.Module):
         self.conv1 = nn.Conv2d(
             3, nChannels[0], kernel_size=3, stride=1, padding=1, bias=False
         )
-        self.bench = None if not bench_model else SparseSpeedupBench()
+        self.bench = SparseSpeedupBench() if bench_model else None
         # 1st block
         self.block1 = NetworkBlock(
             n,
@@ -501,7 +512,7 @@ class WideResNet(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        if self.bench is not None:
+        if self.bench:
             out = self.bench.forward(self.conv1, x, "conv1")
         else:
             out = self.conv1(x)
@@ -541,12 +552,12 @@ class BasicBlock(nn.Module):
 
     def __init__(
         self,
-        in_planes,
-        out_planes,
-        stride,
-        dropRate=0.0,
-        save_features=False,
-        bench=None,
+        in_planes: int,
+        out_planes: int,
+        stride: int,
+        dropRate: float =0.0,
+        save_features: bool=False,
+        bench: bool=None,
     ):
         super(BasicBlock, self).__init__()
         self.bn1 = nn.BatchNorm2d(in_planes)
@@ -676,6 +687,7 @@ registry = {
     "vgg-d": (VGG16, ["D", 10]),
     "vgg-like": (VGG16, ["like", 10]),
     "wrn-28-2": (WideResNet, [28, 2, 10, 0.3]),
+    "wrn-22-2": (WideResNet, [22, 2, 10, 0.3]),
     "wrn-22-8": (WideResNet, [22, 8, 10, 0.3]),
     "wrn-16-8": (WideResNet, [16, 8, 10, 0.3]),
     "wrn-16-10": (WideResNet, [16, 10, 10, 0.3]),

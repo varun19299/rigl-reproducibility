@@ -67,6 +67,10 @@ class Masking(object):
 
     optimizer: "optim"
     prune_rate_decay: "Decay"
+
+    density: float  # Sparsity = 1 - density
+    sparse_init: str = "random"  # or erdos_renyi
+
     prune_rate: float = 0.5
     prune_mode: str = "magnitude"
     growth_mode: str = "momentum"
@@ -123,7 +127,7 @@ class Masking(object):
     Unclear: calc_growth_redistribution    
     """
 
-    def add_module(self, module, density, sparse_init="constant"):
+    def add_module(self, module):
         """
         Store dict of parameters to mask
         """
@@ -144,7 +148,7 @@ class Masking(object):
         self.remove_type(nn.BatchNorm1d)
 
         # Call init
-        self.init(mode=sparse_init, density=density)
+        self.init()
 
     def adjust_prune_rate(self):
         """
@@ -258,32 +262,38 @@ class Masking(object):
 
         return name2regrowth
 
-    def init(self, mode="constant", density=0.05):
-        self.sparsity = density
+    def init(self, mode="random", density=0.05):
 
         # Number of params originally non-zero
         # Total params * inital density
         self.baseline_nonzero = 0
 
-        if mode == "constant":
-            # initializes each layer with a constant percentage of dense weights
+        if self.sparse_init == "random":
+            # initializes each layer with a random percentage of dense weights
             # each layer will have weight.numel()*density weights.
             # weight.numel()*density == weight.numel()*(1.0-sparsity)
 
             for module in self.modules:
-                for name, weight in module.named_parameters():
+                for e, (name, weight) in enumerate(module.named_parameters()):
+                    # In random init, skip first layer
+                    if e == 0:
+                        self.remove_weight(name)
+                        continue
+
                     # Skip modules we arent masking
                     if name not in self.masks:
                         continue
 
                     device = self.masks[name].device
                     self.masks[name] = (
-                        (torch.rand(weight.shape) < density).float().data.to(device)
+                        (torch.rand(weight.shape) < self.density)
+                        .float()
+                        .data.to(device)
                     )
-                    self.baseline_nonzero += weight.numel() * density
+                    self.baseline_nonzero += weight.numel() * self.density
             self.apply_mask()
 
-        elif mode == "resume":
+        elif self.sparse_init == "resume":
             # Initializes the mask according to the weights
             # which are currently zero-valued. This is required
             # if you want to resume a sparse model but did not
@@ -297,10 +307,10 @@ class Masking(object):
                     logging.info((weight != 0.0).sum().item())
                     device = weight.device
                     self.masks[name] = (weight != 0.0).float().data.to(device)
-                    self.baseline_nonzero += weight.numel() * density
+                    self.baseline_nonzero += weight.numel() * self.density
             self.apply_mask()
 
-        elif mode in ["linear", "ER"]:
+        elif self.sparse_init == "erdos_renyi":
             # Same as Erdos Renyi with modification for conv
             # initialization used in sparse evolutionary training
             # scales the number of non-zero weights linearly proportional
@@ -314,9 +324,9 @@ class Masking(object):
                     if name not in self.masks:
                         continue
                     total_params += weight.numel()
-                    self.baseline_nonzero += weight.numel() * density
+                    self.baseline_nonzero += weight.numel() * self.density
 
-            target_params = total_params * density
+            target_params = total_params * self.density
             tolerance = 5
             current_params = 0
             # TODO: is the below needed
@@ -370,7 +380,7 @@ class Masking(object):
             total_size += weight.numel()
         logging.info(f"Total parameters after removed layers: {total_size}.")
         logging.info(
-            f"Total parameters under sparsity level of {density}: {density * total_size}"
+            f"Total parameters under sparsity level of {self.density}: {self.density * total_size}"
         )
 
     def gather_statistics(self):
@@ -624,5 +634,3 @@ class Masking(object):
         self.truncate_weights()
         if self.verbose:
             self.print_nonzero_counts()
-
-    # TODO: implement __str__, __repr__

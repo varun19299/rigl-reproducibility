@@ -54,6 +54,8 @@ def get_dataloaders(
 ):
     """Creates augmented train, validation, and test data loaders."""
 
+    assert name in ["CIFAR10", "MNIST"]
+
     if name == "CIFAR10":
         normalize = transforms.Normalize(
             (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
@@ -61,13 +63,7 @@ def get_dataloaders(
 
         train_transform = transforms.Compose(
             [
-                transforms.ToTensor(),
-                transforms.Lambda(
-                    lambda x: F.pad(
-                        x.unsqueeze(0), (4, 4, 4, 4), mode="reflect"
-                    ).squeeze()
-                ),
-                transforms.ToPILImage(),
+                transforms.Pad(4, padding_mode="reflect"),
                 transforms.RandomCrop(32),
                 transforms.RandomHorizontalFlip(),
                 transforms.ToTensor(),
@@ -78,10 +74,10 @@ def get_dataloaders(
         test_transform = transforms.Compose([transforms.ToTensor(), normalize])
 
         full_dataset = datasets.CIFAR10(
-            root, train=True, target_transform=train_transform, download=True
+            root, train=True, transform=train_transform, download=True
         )
         test_dataset = datasets.CIFAR10(
-            root, train=False, target_transform=test_transform, download=False
+            root, train=False, transform=test_transform, download=False
         )
     elif name == "MNIST":
         normalize = transforms.Normalize((0.1307,), (0.3081,))
@@ -103,7 +99,7 @@ def get_dataloaders(
 
     # Split into train and val
     valid_loader = None
-    if validation_split > 0.0:
+    if validation_split:
         split = int(floor((1.0 - validation_split) * len(full_dataset)))
         train_dataset = DatasetSplitter(full_dataset, split_end=split)
         val_dataset = DatasetSplitter(full_dataset, split_start=split)
@@ -118,6 +114,7 @@ def get_dataloaders(
             val_dataset, test_batch_size, num_workers=val_threads, pin_memory=True
         )
     else:
+        train_dataset = full_dataset
         train_loader = DataLoader(
             full_dataset,
             batch_size,
@@ -125,6 +122,7 @@ def get_dataloaders(
             pin_memory=True,
             shuffle=True,
         )
+        val_dataset = []
 
     test_loader = DataLoader(
         test_dataset, test_batch_size, shuffle=False, num_workers=1, pin_memory=True,
@@ -132,7 +130,7 @@ def get_dataloaders(
 
     logging.info(f"Train dataset length {len(train_dataset)}")
     logging.info(f"Val dataset length {len(val_dataset)}")
-    logging.info(f"Train dataset length {len(test_dataset)}")
+    logging.info(f"Test dataset length {len(test_dataset)}")
 
     return train_loader, valid_loader, test_loader
 
@@ -142,6 +140,7 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, lr_scheduler]":
     lr = kwargs["lr"]
     weight_decay = kwargs["weight_decay"]
     decay_frequency = kwargs["decay_frequency"]
+    decay_factor = kwargs["decay_factor"]
 
     if name == "SGD":
         optimizer = optim.SGD(
@@ -156,7 +155,9 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, lr_scheduler]":
     else:
         raise Exception("Unknown optimizer.")
 
-    lr_scheduler = optim.lr_scheduler.StepLR(optimizer, decay_frequency, gamma=0.1)
+    lr_scheduler = optim.lr_scheduler.StepLR(
+        optimizer, decay_frequency, gamma=decay_factor
+    )
 
     return optimizer, lr_scheduler
 
@@ -188,7 +189,7 @@ def save_weights(
 
 
 def load_weights(
-    model: "nn.Module", optimizer: "optim", ckpt_dir: str,
+    model: "nn.Module", optimizer: "optim", ckpt_dir: str, resume: bool = True
 ) -> "Union[nn.Module, optim, int, int, float]":
     ckpt_dir = Path(ckpt_dir)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -197,10 +198,10 @@ def load_weights(
 
     # Defaults
     epoch = 0
-    step = 1
+    step = 0
     best_val_loss = 1e6
 
-    if not pth_files:
+    if not resume or not pth_files:
         logging.info(f"No checkpoint found  at {ckpt_dir}.")
         return model, optimizer, step, epoch, best_val_loss
 
@@ -215,8 +216,8 @@ def load_weights(
     ckpt = torch.load(model_path, map_location=torch.device("cpu"))
     load_state_dict(model, ckpt["state_dict"])
 
-    epoch = ckpt.get("epoch", 1) - 1
-    step = ckpt.get("step", 1)
+    epoch = ckpt.get("epoch", 0)
+    step = ckpt.get("step", 0)
     val_loss = ckpt.get("val_loss", "not stored")
     logging.info(f"Model has val loss of {val_loss}.")
 
