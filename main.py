@@ -48,10 +48,10 @@ def train(
 ) -> "Union[float,int]":
     assert masking_apply_when in ["step_end", "epoch_end"]
     model.train()
+    _mask_update_counter = 0
 
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
-        batch_size = target.shape[0]
         optimizer.zero_grad()
 
         if mixed_precision_scalar:
@@ -76,19 +76,20 @@ def train(
 
         # Apply mask
         if mask and masking_apply_when == "step_end":
-            if (global_step < (masking_end_when * batch_size)) and (
-                global_step % (masking_interval * batch_size)
+            if (global_step < masking_end_when) and (
+                global_step % masking_interval
             ) == 0:
                 mask.update_connections()
+                _mask_update_counter += 1
 
         # Lr scheduler
         lr_scheduler.step()
         pbar.update(1)
-        global_step += batch_size  # Batchsize
+        global_step += 1
 
         if batch_idx % log_interval == 0:
             pbar.set_description(
-                f"Train Epoch {epoch} Global Step {global_step} train loss {loss.item():.6f}"
+                f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} train loss {loss.item():.6f}"
             )
             if use_wandb:
                 wandb.log({"train_loss": loss}, step=global_step)
@@ -133,7 +134,7 @@ def evaluate(
 
     val_or_test = "val" if not is_test_set else "test"
     pbar.set_description(
-        f"{val_or_test.capitalize()} Epoch {epoch} Global Step {global_step} {val_or_test} loss {loss:.6f} accuracy {accuracy:.4f}"
+        f"{val_or_test.capitalize()} Epoch {epoch} Iters {global_step} {val_or_test} loss {loss:.6f} accuracy {accuracy:.4f}"
     )
 
     # Log loss, accuracy
@@ -210,24 +211,24 @@ def main(cfg: DictConfig):
     # Setup mask
     mask = None
     if not cfg.masking.dense:
+        max_iter = (
+            cfg.masking.end_when
+            if cfg.masking.apply_when == "step_end"
+            else cfg.masking.end_when * len(train_loader)
+        )
+
         if cfg.masking.decay_schedule == "cosine":
-            decay = CosineDecay(
-                cfg.masking.prune_rate, len(train_loader) * (cfg.optimizer.epochs)
-            )
+            decay = CosineDecay(cfg.masking.prune_rate, max_iter)
         elif cfg.masking.decay_schedule == "linear":
-            decay = LinearDecay(
-                cfg.masking.prune_rate, len(train_loader) * (cfg.optimizer.epochs)
-            )
+            decay = LinearDecay(cfg.masking.prune_rate, max_iter)
         mask = Masking(
             optimizer,
             decay,
             density=cfg.masking.density,
             sparse_init=cfg.masking.sparse_init,
-            prune_rate=cfg.masking.prune_rate,
             prune_mode=cfg.masking.prune_mode,
             growth_mode=cfg.masking.growth_mode,
             redistribution_mode=cfg.masking.redistribution_mode,
-            verbose=cfg.masking.verbose,
         )
         mask.add_module(model)
 
@@ -237,6 +238,7 @@ def main(cfg: DictConfig):
         train_pbar = tqdm(total=len(train_loader), dynamic_ncols=True)
         val_pbar = tqdm(total=len(val_loader), dynamic_ncols=True)
 
+        # step here is training iters not global steps
         _, step = train(
             model,
             mask,
@@ -267,7 +269,6 @@ def main(cfg: DictConfig):
 
         # Save weights
         if (epoch + 1) % cfg.ckpt_interval == 0:
-            step = epoch * len(train_loader.dataset) + 1
             if val_loss < best_val_loss:
                 is_min = True
                 best_val_loss = val_loss

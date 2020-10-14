@@ -9,7 +9,7 @@ class Decay(object):
     def step(self):
         raise NotImplementedError
 
-    def get_dr(self, prune_rate):
+    def get_dr(self):
         raise NotImplementedError
 
 
@@ -19,8 +19,12 @@ class CosineDecay(Decay):
     This class is just a wrapper around PyTorch's CosineAnnealingLR.
     """
 
-    def __init__(self, prune_rate, T_max, eta_min=0.005, last_epoch=-1):
+    def __init__(
+        self, prune_rate: float, T_max: int, eta_min: float = 0.0, last_epoch: int = -1
+    ):
         super().__init__()
+        self._step = 0
+        self.T_max = T_max
 
         self.sgd = optim.SGD(
             torch.nn.ParameterList([torch.nn.Parameter(torch.zeros(1))]), lr=prune_rate
@@ -30,9 +34,11 @@ class CosineDecay(Decay):
         )
 
     def step(self):
-        self.cosine_stepper.step()
+        if self._step < self.T_max:
+            self.cosine_stepper.step()
+            self._step += 1
 
-    def get_dr(self, prune_rate):
+    def get_dr(self):
         return self.sgd.param_groups[0]["lr"]
 
 
@@ -42,13 +48,16 @@ class LinearDecay(Decay):
     def __init__(self, prune_rate, T_max):
         super().__init__()
 
-        self.steps = 0
+        self._step = 0
+        self.T_max = T_max
+
         self.decrement = prune_rate / float(T_max)
         self.current_prune_rate = prune_rate
 
     def step(self):
-        self.steps += 1
-        self.current_prune_rate -= self.decrement
+        if self._step < self.T_max:
+            self.current_prune_rate -= self.decrement
+            self._step += 1
 
-    def get_dr(self, prune_rate):
+    def get_dr(self):
         return self.current_prune_rate

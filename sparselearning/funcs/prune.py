@@ -1,6 +1,6 @@
 import math
 import torch
-
+import logging
 
 def magnitude_prune(masking, mask, weight, name):
     """Prunes the weights with smallest magnitude.
@@ -56,10 +56,10 @@ def magnitude_prune(masking, mask, weight, name):
     num_remove = math.ceil(
         masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name]
     )
-    num_zeros = masking.stats.zeros_dict[name]
-    k = math.ceil(num_zeros + num_remove)
     if num_remove == 0.0:
         return mask
+    num_zeros = masking.stats.zeros_dict[name]
+    k = num_zeros + num_remove
 
     x, idx = torch.sort(torch.abs(weight.data.view(-1)))
     mask.data.view(-1)[idx[:k]] = 0.0

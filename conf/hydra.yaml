@@ -2,9 +2,9 @@
 # Hydra configs
 hydra:
   run:
-    dir: ./outputs/${exp_name}/${hydra.job.override_dirname}
+    dir: ./outputs/${dataset.name}/${exp_name}/${hydra.job.override_dirname}
   sweep:
-    dir: ./outputs/${exp_name}/${hydra.job.override_dirname}
+    dir: ./outputs/${dataset.name}/${exp_name}/${hydra.job.override_dirname}
   job_logging:
     root:
       handlers:
@@ -15,6 +15,7 @@ hydra:
       override_dirname:
         exclude_keys:
           - exp_name
+          - hydra.verbose
 #  sweeper:
 #   ax_config:
 #     # max_trials is application-specific. Tune it for your use case

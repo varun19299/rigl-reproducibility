@@ -67,8 +67,8 @@ def nonzero_redistribution(masking, name, weight, mask):
 def no_redistribution(masking, name, weight, mask):
     num_params = masking.baseline_nonzero
     n = weight.numel()
-    return n / float(num_params)
-
+    # return n / float(num_params)
+    return 1
 
 def variance_redistribution(masking, name, weight, mask):
     """Return the mean variance of existing weights.

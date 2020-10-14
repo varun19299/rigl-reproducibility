@@ -71,18 +71,14 @@ class Masking(object):
     density: float  # Sparsity = 1 - density
     sparse_init: str = "random"  # or erdos_renyi
 
-    prune_rate: float = 0.5
     prune_mode: str = "magnitude"
     growth_mode: str = "momentum"
     redistribution_mode: str = "momentum"
-    # Print param counts etc after each mask update
-    verbose: bool = False
 
     # Apply growth or prune func to entire module
     # Instead of layer wise
     global_growth: bool = False
     global_prune: bool = False
-
     # global growth/prune state
     prune_threshold: float = 0.001
     growth_threshold: float = 0.001
@@ -90,20 +86,18 @@ class Masking(object):
     increment: float = 0.2
     tolerance: float = 0.02
 
-    def __post_init__(self):
-        self.masks = {}
-        self.modules = []
-        self.names = []
+    # mask & module
+    masks: "Dict[str, Tensor]" = field(default_factory=dict)
+    module: "nn.Module" = None  # Pytorch module
 
-        self.adjusted_growth = 0
-        self.adjustments = []
+    # Growth adjustment
+    adjusted_growth: float = 0
+    adjustments: "List[float]" = field(default_factory=list)
 
-        # stats
-        self.name2prune_rate = {}
-
-        self.steps = 0
-
-        self.stats = LayerStats()
+    # stats
+    steps: int = 0
+    name2prune_rate: "Dict[str, float]" = field(default_factory=dict)
+    stats: "LayerStats" = LayerStats()
 
     """
     Code flow:
@@ -131,9 +125,8 @@ class Masking(object):
         """
         Store dict of parameters to mask
         """
-        self.modules.append(module)
-        for name, tensor in module.named_parameters():
-            self.names.append(name)
+        self.module = module
+        for name, tensor in self.module.named_parameters():
             device = tensor.device
             self.masks[name] = torch.zeros_like(
                 tensor, dtype=torch.float32, requires_grad=False
@@ -154,72 +147,51 @@ class Masking(object):
         """
         Modify prune rate for layers with low sparsity
         """
-        for module in self.modules:
-            for name, weight in module.named_parameters():
-                if name not in self.masks:
-                    continue
+        for name in self.names:
+            self.name2prune_rate[name] = self.prune_rate
 
-                self.name2prune_rate[name] = self.prune_rate
+            sparsity = self.stats.zeros_dict[name] / self.masks[name].numel()
+            if sparsity < 0.2:
+                # determine if matrix is relatively dense but still growing
+                expected_variance = 1.0 / len(self.stats.variance_dict.keys())
+                actual_variance = self.stats.variance_dict[name]
+                expected_vs_actual = expected_variance / actual_variance
 
-                sparsity = self.stats.zeros_dict[name] / self.masks[name].numel()
-                if sparsity < 0.2:
-                    # determine if matrix is relatively dense but still growing
-                    expected_variance = 1.0 / len(self.stats.variance_dict.keys())
-                    actual_variance = self.stats.variance_dict[name]
-                    expected_vs_actual = expected_variance / actual_variance
-
-                    # if weights arent steady yet, i.e., can change significantly
-                    if expected_vs_actual < 1.0:
-                        # growing
-                        self.name2prune_rate[name] = min(
-                            sparsity, self.name2prune_rate[name]
-                        )
+                # if weights arent steady yet, i.e., can change significantly
+                if expected_vs_actual < 1.0:
+                    # growing
+                    self.name2prune_rate[name] = min(
+                        sparsity, self.name2prune_rate[name]
+                    )
 
     def apply_mask(self):
         """
         Applies boolean mask to modules
         """
-        for module in self.modules:
-            for name, tensor in module.named_parameters():
-                if name in self.masks:
-                    tensor.data = tensor.data * self.masks[name]
+        for name, tensor in self.module.named_parameters():
+            if name in self.masks:
+                tensor.data = tensor.data * self.masks[name]
 
     def calc_growth_redistribution(self):
-        name2regrowth = {}
-        # prune_rate_ll = torch.tensor(list(self.name2prune_rate.values()))
-        # zero_ll = torch.tensor(list(self.stats.zeros_dict.values()))
-        # nonzero_ll = torch.tensor(list(self.stats.nonzeros_dict.values()))
-        # remove_ll = torch.ceil(prune_rate_ll * nonzero_ll)
-        #
-        # # Upper bound on total new connections
-        # max_regrowth_ll = zero_ll + remove_ll
-        #
-        # # Estimated layer wise via the variance
-        # # If variance is 1.0,
-        # variance_ll = torch.tensor(list(self.stats.variance_dict.values()))
-        # regrowth_ll = torch.ceil(
-        #     variance_ll * (self.stats.total_removed + self.adjusted_growth)
-        # )
-        # residual_ll = regrowth_ll - 0.99 * max_regrowth_ll
-        # regrowth_ll[regrowth_ll > 0.99 * max_regrowth_ll] = 0.99 * max_regrowth_ll
-        # mean_residual = residual_ll.mean()
-        #
-        # assert mean_residual
-
+        residual = 9999
         mean_residual = 0
-
-        for i in range(1001):
+        name2regrowth = {}
+        i = 0
+        expected_var = 1.0 / len(self.stats.variance_dict)
+        while residual > 0 and i < 1000:
             residual = 0
             for name in self.stats.variance_dict:
                 prune_rate = self.name2prune_rate[name]
-                num_remove = math.ceil(prune_rate * self.stats.nonzeros_dict[name])
+                # num_remove = math.ceil(prune_rate * self.stats.nonzeros_dict[name])
+                num_remove = self.stats.removed_dict[name]
+                num_nonzero = self.stats.nonzeros_dict[name]
                 num_zero = self.stats.zeros_dict[name]
                 max_regrowth = num_zero + num_remove
 
                 if name in name2regrowth:
                     regrowth = name2regrowth[name]
                 else:
-                    regrowth = math.ceil(
+                    regrowth = round(
                         self.stats.variance_dict[name]
                         * (self.stats.total_removed + self.adjusted_growth)
                     )
@@ -234,31 +206,23 @@ class Masking(object):
                 mean_residual = 0
             else:
                 mean_residual = residual / len(name2regrowth)
-
-            # Non-positive residual
-            if residual <= 0:
-                break
+            i += 1
 
         if i == 1000:
-            logging.info(
+            print(
                 f"Error resolving the residual! Layers are too full! Residual left over: {residual}"
             )
 
-        for module in self.modules:
-            for name, weight in module.named_parameters():
-                if name not in self.masks:
-                    continue
-                if self.prune_mode == "global_magnitude":
-                    expected_removed = (
-                        self.baseline_nonzero * self.name2prune_rate[name]
+        if self.prune_mode == "global_magnitude":
+            for name in self.masks:
+                expected_removed = self.baseline_nonzero * self.name2prune_rate[name]
+                if expected_removed == 0.0:
+                    name2regrowth[name] = 0.0
+                else:
+                    expected_vs_actual = self.stats.total_removed / expected_removed
+                    name2regrowth[name] = math.floor(
+                        expected_vs_actual * name2regrowth[name]
                     )
-                    if expected_removed == 0.0:
-                        name2regrowth[name] = 0.0
-                    else:
-                        expected_vs_actual = self.stats.total_removed / expected_removed
-                        name2regrowth[name] = math.floor(
-                            expected_vs_actual * name2regrowth[name]
-                        )
 
         return name2regrowth
 
@@ -273,24 +237,22 @@ class Masking(object):
             # each layer will have weight.numel()*density weights.
             # weight.numel()*density == weight.numel()*(1.0-sparsity)
 
-            for module in self.modules:
-                for e, (name, weight) in enumerate(module.named_parameters()):
-                    # In random init, skip first layer
-                    if e == 0:
-                        self.remove_weight(name)
-                        continue
+            for e, (name, weight) in enumerate(self.module.named_parameters()):
+                # In random init, skip first layer
+                if e == 0:
+                    self.remove_weight(name)
+                    continue
 
-                    # Skip modules we arent masking
-                    if name not in self.masks:
-                        continue
+                # Skip modules we arent masking
+                if name not in self.masks:
+                    continue
 
-                    device = self.masks[name].device
-                    self.masks[name] = (
-                        (torch.rand(weight.shape) < self.density)
-                        .float()
-                        .data.to(device)
-                    )
-                    self.baseline_nonzero += weight.numel() * self.density
+                device = self.masks[name].device
+                self.masks[name] = (
+                    (torch.rand(weight.shape) < self.density).float().data.to(device)
+                )
+                # self.baseline_nonzero += weight.numel() * self.density
+                self.baseline_nonzero += self.masks[name].sum().int().item()
             self.apply_mask()
 
         elif self.sparse_init == "resume":
@@ -298,16 +260,16 @@ class Masking(object):
             # which are currently zero-valued. This is required
             # if you want to resume a sparse model but did not
             # save the mask.
-            for module in self.modules:
-                for name, weight in module.named_parameters():
-                    # Skip modules we arent masking
-                    if name not in self.masks:
-                        continue
+            for name, weight in self.module.named_parameters():
+                # Skip modules we arent masking
+                if name not in self.masks:
+                    continue
 
-                    logging.info((weight != 0.0).sum().item())
-                    device = weight.device
-                    self.masks[name] = (weight != 0.0).float().data.to(device)
-                    self.baseline_nonzero += weight.numel() * self.density
+                logging.info((weight != 0.0).sum().item())
+                device = weight.device
+                self.masks[name] = (weight != 0.0).float().data.to(device)
+                # self.baseline_nonzero += weight.numel() * self.density
+                self.baseline_nonzero += self.masks[name].sum().int().item()
             self.apply_mask()
 
         elif self.sparse_init == "erdos_renyi":
@@ -319,12 +281,11 @@ class Masking(object):
             # layers.
 
             total_params = 0
-            for module in self.modules:
-                for name, weight in module.named_parameters():
-                    if name not in self.masks:
-                        continue
-                    total_params += weight.numel()
-                    self.baseline_nonzero += weight.numel() * self.density
+            for name, weight in self.module.named_parameters():
+                if name not in self.masks:
+                    continue
+                total_params += weight.numel()
+                # self.baseline_nonzero += weight.numel() * self.density
 
             target_params = total_params * self.density
             tolerance = 5
@@ -338,7 +299,7 @@ class Masking(object):
             # searching for the right epsilon for a specific sparsity level
             while abs(current_params - target_params) < tolerance:
                 new_nonzeros = 0.0
-                for name, weight in module.named_parameters():
+                for name, weight in self.module.named_parameters():
                     if name not in self.masks:
                         continue
                     # original SET formulation for fully connected weights: num_weights = epsilon * (noRows + noCols)
@@ -352,7 +313,7 @@ class Masking(object):
                     epsilon *= 1.0 + growth_factor
                 growth_factor *= 0.95
 
-            for name, weight in module.named_parameters():
+            for name, weight in self.module.named_parameters():
                 if name not in self.masks:
                     continue
                 growth = epsilon * sum(weight.shape)
@@ -362,12 +323,13 @@ class Masking(object):
                 self.masks[name] = (
                     (torch.rand(weight.shape) < prob).float().data.to(device)
                 )
+                self.baseline_nonzero += (self.masks[name] != 0).sum().int().item()
             self.apply_mask()
 
         self.print_nonzero_counts()
 
         total_size = 0
-        for name, module in self.modules[0].named_modules():
+        for name, module in self.module.named_modules():
             if hasattr(module, "weight"):
                 total_size += module.weight.numel()
             if hasattr(module, "bias"):
@@ -384,52 +346,40 @@ class Masking(object):
         )
 
     def gather_statistics(self):
-        name2variance = {}
-        name2nonzeros = {}
-        name2zeros = {}
-        name2removed = {}
+        variance_dict = {}
+        nonzeros_dict = {}
+        zeros_dict = {}
 
         total_variance = 0.0
-        total_removed = 0
         total_nonzero = 0
-        total_zero = 0.0
-        for module in self.modules:
-            for name, weight in module.named_parameters():
-                if name not in self.masks:
-                    continue
-                mask = self.masks[name]
+        total_zero = 0
+        for name, weight in self.module.named_parameters():
+            if name not in self.masks:
+                continue
+            mask = self.masks[name]
 
-                # redistribution
-                name2variance[name] = self.redistribution_func(self, name, weight, mask)
+            # redistribution
+            variance_dict[name] = self.redistribution_func(self, name, weight, mask)
 
-                if not np.isnan(name2variance[name]):
-                    total_variance += name2variance[name]
-                name2nonzeros[name] = mask.sum().item()
-                name2zeros[name] = mask.numel() - name2nonzeros[name]
+            if not np.isnan(variance_dict[name]):
+                total_variance += variance_dict[name]
+            nonzeros_dict[name] = (mask != 0).sum().int().item()
+            zeros_dict[name] = (mask == 0).sum().int().item()
 
-                sparsity = name2zeros[name] / float(self.masks[name].numel())
-                total_nonzero += name2nonzeros[name]
-                total_zero += name2zeros[name]
+            total_nonzero += nonzeros_dict[name]
+            total_zero += zeros_dict[name]
 
-        for name in name2variance:
-            if total_variance != 0.0:
-                name2variance[name] /= total_variance
-            else:
-                logging.info("Total variance was zero!")
-                logging.info(self.growth_func)
-                logging.info(self.prune_func)
-                logging.info(self.redistribution_func)
-                logging.info(name2variance)
+        assert total_variance, "Total variance is zero!"
+        for name in variance_dict:
+            variance_dict[name] /= total_variance
 
         self.stats = LayerStats(
-            variance_dict=name2variance,
-            nonzeros_dict=name2nonzeros,
-            zeros_dict=name2zeros,
-            removed_dict=name2removed,
+            variance_dict=variance_dict,
+            nonzeros_dict=nonzeros_dict,
+            zeros_dict=zeros_dict,
             total_variance=total_variance,
             total_nonzero=total_nonzero,
             total_zero=total_zero,
-            total_removed=total_removed,
         )
 
     @property
@@ -457,26 +407,29 @@ class Masking(object):
 
         return momentum
 
+    @property
+    def names(self) -> "List[str]":
+        """
+        Names of each masked layer
+        """
+        return list(self.masks.keys())
+
     def print_nonzero_counts(self):
-        for module in self.modules:
-            for name, tensor in module.named_parameters():
-                if name not in self.masks:
-                    continue
-                mask = self.masks[name]
-                num_nonzeros = (mask != 0).sum().item()
+        for name, mask in self.masks.items():
+            num_nonzeros = (mask != 0).sum().item()
 
-                if name in self.stats.variance_dict:
-                    log_str = (
-                        f"{name}: {self.stats.nonzeros_dict[name]}->{num_nonzeros}, "
-                        f"density: {num_nonzeros / float(mask.numel()):.3f}, "
-                        f"proportion: {self.stats.variance_dict[name]:.4f}"
-                    )
+            if name in self.stats.variance_dict:
+                log_str = (
+                    f"{name}: {self.stats.nonzeros_dict[name]}->{num_nonzeros}, "
+                    f"density: {num_nonzeros / float(mask.numel()):.3f}, "
+                    f"proportion: {self.stats.variance_dict[name]:.4f}"
+                )
 
-                else:
-                    log_str = f"{name}: {num_nonzeros}"
-                logging.info(log_str)
+            else:
+                log_str = f"{name}: {num_nonzeros}"
+            logging.debug(log_str)
 
-        logging.info(f"Prune rate: {self.prune_rate}.")
+        logging.debug(f"Prune rate: {self.prune_rate}.")
 
     @property
     def prune_func(self):
@@ -492,6 +445,13 @@ class Masking(object):
         if "global" in self.prune_mode:
             self.global_prune = True
         return prune_registry[self.prune_mode]
+
+    @property
+    def prune_rate(self) -> float:
+        """
+        Get prune rate from the decay object
+        """
+        return self.prune_rate_decay.get_dr()
 
     @property
     def redistribution_func(self):
@@ -511,49 +471,40 @@ class Masking(object):
         Remove weight by complete name
         """
         if name in self.masks:
-            if self.verbose:
-                logging.info(
-                    f"Removing {name} of size {self.masks[name].shape} = {self.masks[name].numel()} parameters."
-                )
+            logging.debug(
+                f"Removing {name} of size {self.masks[name].shape} = {self.masks[name].numel()} parameters."
+            )
             self.masks.pop(name)
         elif name + ".weight" in self.masks:
-            if self.verbose:
-                logging.info(
-                    f"Removing {name} of size {self.masks[name + '.weight'].shape} = {self.masks[name + '.weight'].numel()} parameters."
-                )
+            logging.debug(
+                f"Removing {name} of size {self.masks[name + '.weight'].shape} = {self.masks[name + '.weight'].numel()} parameters."
+            )
             self.masks.pop(name + ".weight")
         else:
-            if self.verbose:
-                logging.info(f"ERROR {name} not found.")
+            logging.error(f"ERROR {name} not found.")
 
     def remove_weight_partial_name(self, partial_name: str):
         """
         Remove module by partial name (eg: conv).
         """
-        removed = set()
+        _removed = 0
         for name in list(self.masks.keys()):
             if partial_name in name:
-                if self.verbose:
-                    logging.info(
-                        f"Removing {name} of size {self.masks[name].shape} with {self.masks[name].numel()} parameters."
-                    )
-                removed.add(name)
+                logging.debug(
+                    f"Removing {name} of size {self.masks[name].shape} with {self.masks[name].numel()} parameters."
+                )
+                _removed += 1
                 self.masks.pop(name)
 
-        # Update names
-        self.names = [name for name in self.names if name not in removed]
-
-        if self.verbose:
-            logging.info(f"Removed {len(removed)} layers.")
+        logging.debug(f"Removed {_removed} layers.")
 
     def remove_type(self, nn_type):
         """
         Remove module by type (eg: nn.Linear, nn.Conv2d, etc.)
         """
-        for module in self.modules:
-            for name, module in module.named_modules():
-                if isinstance(module, nn_type):
-                    self.remove_weight(name)
+        for name, module in self.module.named_modules():
+            if isinstance(module, nn_type):
+                self.remove_weight(name)
 
     def step(self):
         """
@@ -564,7 +515,6 @@ class Masking(object):
 
         # Get updated prune rate
         self.prune_rate_decay.step()
-        self.prune_rate = self.prune_rate_decay.get_dr(self.prune_rate)
 
         self.steps += 1
 
@@ -579,58 +529,73 @@ class Masking(object):
         if self.global_prune:
             self.stats.total_removed = self.prune_func(self)
         else:
-            for module in self.modules:
-                for name, weight in module.named_parameters():
-                    if name not in self.masks:
-                        continue
-                    mask = self.masks[name]
+            for name, weight in self.module.named_parameters():
+                # Skip modules we arent masking
+                if name not in self.masks:
+                    continue
 
-                    # prune
-                    new_mask = self.prune_func(self, mask, weight, name)
-                    removed = self.stats.nonzeros_dict[name] - new_mask.sum().item()
-                    self.stats.total_removed += removed
-                    self.stats.removed_dict[name] = removed
-                    self.masks[name] = new_mask
+                mask = self.masks[name]
 
-        name2regrowth = self.calc_growth_redistribution()
+                # prune
+                new_mask = self.prune_func(self, mask, weight, name)
+                removed = self.stats.nonzeros_dict[name] - int(new_mask.sum().item())
+                # logging.debug(f"{name}_remove_{removed}")
+                self.stats.total_removed += removed
+                self.stats.removed_dict[name] = removed
+                self.masks[name] = new_mask
+
+
         if self.global_growth:
             total_nonzero_new = self.growth_func(
                 self, self.stats.total_removed + self.adjusted_growth
             )
         else:
-            for module in self.modules:
-                for name, weight in module.named_parameters():
-                    if name not in self.masks:
-                        continue
-                    new_mask = self.masks[name].data.bool()
+            if self.redistribution_mode not in ["nonzero", "none"]:
+                name2regrowth = self.calc_growth_redistribution()
 
-                    # growth
-                    new_mask = self.growth_func(
-                        self, name, new_mask, math.floor(name2regrowth[name]), weight
-                    )
-                    new_nonzero = new_mask.sum().item()
+            for name, weight in self.module.named_parameters():
+                # Skip modules we arent masking
+                if name not in self.masks:
+                    continue
 
-                    # exchanging masks
-                    self.masks.pop(name)
-                    self.masks[name] = new_mask.float()
-                    total_nonzero_new += new_nonzero
+                new_mask = self.masks[name].data.bool()
+
+                # growth
+                if self.redistribution_mode not in ["nonzero", "none"]:
+                    num_growth = name2regrowth[name]
+                else:
+                    num_growth = self.stats.removed_dict[name]
+
+                new_mask = self.growth_func(self, name, new_mask, num_growth, weight)
+                # new_mask = self.growth_func(
+                #     self, name, new_mask, self.stats.removed_dict[name], weight,
+                # )
+                new_nonzero = new_mask.sum().item()
+
+                # exchanging masks
+                self.masks.pop(name)
+                self.masks[name] = new_mask.float()
+                total_nonzero_new += new_nonzero
         self.apply_mask()
 
         # Some growth techniques and redistribution are probablistic and we might not grow enough weights or too much weights
         # Here we run an exponential smoothing over (prune-growth) residuals to adjust future growth
-        self.adjustments.append(self.baseline_nonzero - total_nonzero_new)
+        self.adjustments.append(
+            self.baseline_nonzero - total_nonzero_new
+        )  # will be zero if deterministic
         self.adjusted_growth = (
             0.25 * self.adjusted_growth
-            + (0.75 * (self.baseline_nonzero - total_nonzero_new))
+            + (0.75 * self.adjustments[-1])
             + np.mean(self.adjustments)
         )
-        if self.stats.total_nonzero > 0 and self.verbose:
-            logging.info(
+        if self.stats.total_nonzero > 0:
+            logging.debug(
                 f"Nonzero before/after: {self.stats.total_nonzero}/{total_nonzero_new}. "
                 f"Growth adjustment: {self.adjusted_growth:.2f}."
             )
 
     def update_connections(self):
         self.truncate_weights()
-        if self.verbose:
+        if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
+            # debug logged
             self.print_nonzero_counts()

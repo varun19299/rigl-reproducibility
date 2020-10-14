@@ -1,3 +1,4 @@
+import logging
 import math
 import torch
 
@@ -78,18 +79,17 @@ def momentum_growth(masking, name, new_mask, total_regrowth, weight):
 
 
 def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
-    """Grows weights in places where the abs(grad) is largest.
+    """Grows weights in places where the abs(grad) is largest. (among present zero'ed weights)
     """
-    abs_grad = torch.abs(weight.grad)
-    if abs_grad.dtype == torch.float16:
-        abs_grad = abs_grad * (new_mask == 0).half()
+    # logging.debug(f"{name}_grow_{total_regrowth}")
+    grad = weight.grad
+    if grad.dtype == torch.float16:
+        grad = grad * (new_mask == 0).half()
     else:
-        abs_grad = abs_grad * (new_mask == 0).float()
-    y, idx = torch.sort(torch.abs(abs_grad).flatten(), descending=True)
+        grad = grad * (new_mask == 0).float()
+    y, idx = torch.sort(torch.abs(grad).flatten(), descending=True)
     new_mask.data.view(-1)[idx[:total_regrowth]] = 1.0
 
-    # Do we need to release gradients etc?
-    # For controllable FLOPs
     return new_mask
 
 
