@@ -3,10 +3,9 @@ import logging
 from omegaconf import DictConfig, OmegaConf
 import os
 
-import sparselearning
-from sparselearning.core import Masking, CosineDecay, LinearDecay
+from sparselearning.core import Masking
 from sparselearning.models import registry as model_registry
-
+from sparselearning.funcs.decay import CosineDecay, LinearDecay
 
 import torch
 import torch.nn.functional as F
@@ -22,9 +21,8 @@ from utils.train_helper import (
     get_optimizer,
     load_weights,
     save_weights,
+    SmoothenValue,
 )
-
-from utils.tqdm_logging import TqdmStream
 
 import wandb
 
@@ -38,7 +36,6 @@ def train(
     global_step: int,
     epoch: int,
     device: torch.device,
-    pbar: "tqdm",
     mixed_precision_scalar: "GradScaler" = None,
     log_interval: int = 10,
     use_wandb: bool = False,
@@ -49,6 +46,8 @@ def train(
     assert masking_apply_when in ["step_end", "epoch_end"]
     model.train()
     _mask_update_counter = 0
+    _loss_collector = SmoothenValue()
+    pbar = tqdm(total=len(train_loader), dynamic_ncols=True)
 
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
@@ -65,6 +64,10 @@ def train(
             output = model(data)
             loss = F.nll_loss(output, target)
             loss.backward()
+            # L2 Regularization
+
+            # Exp avg collection
+            _loss_collector.add_value(loss.item())
 
         # Mask the gradient step
         stepper = mask if mask else optimizer
@@ -88,13 +91,15 @@ def train(
         global_step += 1
 
         if batch_idx % log_interval == 0:
-            pbar.set_description(
-                f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} train loss {loss.item():.6f}"
-            )
+            msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f}"
+            pbar.set_description(msg)
             if use_wandb:
                 wandb.log({"train_loss": loss}, step=global_step)
 
-    return loss.item(), global_step
+    msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f} Prune Rate {mask.prune_rate if mask else 0:.5f}"
+    logging.info(msg)
+
+    return _loss_collector.smooth, global_step
 
 
 def evaluate(
@@ -103,7 +108,6 @@ def evaluate(
     global_step: int,
     epoch: int,
     device: torch.device,
-    pbar: "tqdm",
     is_test_set: bool = False,
     use_wandb: bool = False,
 ) -> "Union[float, float]":
@@ -112,6 +116,7 @@ def evaluate(
     loss = 0
     correct = 0
     n = 0
+    pbar = tqdm(total=len(loader), dynamic_ncols=True)
 
     with torch.no_grad():
         for data, target in loader:
@@ -131,11 +136,12 @@ def evaluate(
             pbar.update(1)
 
     accuracy = correct / n
+    loss /= len(loader)
 
     val_or_test = "val" if not is_test_set else "test"
-    pbar.set_description(
-        f"{val_or_test.capitalize()} Epoch {epoch} Iters {global_step} {val_or_test} loss {loss:.6f} accuracy {accuracy:.4f}"
-    )
+    msg = f"{val_or_test.capitalize()} Epoch {epoch} Iters {global_step} {val_or_test} loss {loss:.6f} accuracy {accuracy:.4f}"
+    pbar.set_description(msg)
+    logging.info(msg)
 
     # Log loss, accuracy
     if use_wandb:
@@ -147,8 +153,6 @@ def evaluate(
 
 @hydra.main(config_name="config", config_path="conf")
 def main(cfg: DictConfig):
-    logging.basicConfig(stream=TqdmStream)
-
     print(OmegaConf.to_yaml(cfg))
 
     # Manual seeds
@@ -204,7 +208,7 @@ def main(cfg: DictConfig):
     mixed_precision_scalar = GradScaler() if cfg.mixed_precision else None
 
     # Load from checkpoint
-    model, optimizer, step, start_epoch, best_val_loss = load_weights(
+    model, optimizer, step, start_epoch, best_val_loss, resume_mask = load_weights(
         model, optimizer, ckpt_dir=cfg.ckpt_dir, resume=cfg.resume
     )
 
@@ -221,11 +225,13 @@ def main(cfg: DictConfig):
             decay = CosineDecay(cfg.masking.prune_rate, max_iter)
         elif cfg.masking.decay_schedule == "linear":
             decay = LinearDecay(cfg.masking.prune_rate, max_iter)
+
+        sparse_init = "resume" if resume_mask else cfg.masking.sparse_init
         mask = Masking(
             optimizer,
             decay,
             density=cfg.masking.density,
-            sparse_init=cfg.masking.sparse_init,
+            sparse_init=sparse_init,
             prune_mode=cfg.masking.prune_mode,
             growth_mode=cfg.masking.growth_mode,
             redistribution_mode=cfg.masking.redistribution_mode,
@@ -234,10 +240,6 @@ def main(cfg: DictConfig):
 
     # Train model
     for epoch in range(start_epoch, cfg.optimizer.epochs):
-        # pbars
-        train_pbar = tqdm(total=len(train_loader), dynamic_ncols=True)
-        val_pbar = tqdm(total=len(val_loader), dynamic_ncols=True)
-
         # step here is training iters not global steps
         _, step = train(
             model,
@@ -248,7 +250,6 @@ def main(cfg: DictConfig):
             step,
             epoch + 1,
             device,
-            train_pbar,
             mixed_precision_scalar,
             log_interval=cfg.log_interval,
             use_wandb=cfg.use_wandb,
@@ -258,13 +259,7 @@ def main(cfg: DictConfig):
         )
 
         val_loss, _ = evaluate(
-            model,
-            val_loader,
-            step,
-            epoch + 1,
-            device,
-            val_pbar,
-            use_wandb=cfg.use_wandb,
+            model, val_loader, step, epoch + 1, device, use_wandb=cfg.use_wandb,
         )
 
         # Save weights
@@ -294,16 +289,12 @@ def main(cfg: DictConfig):
             if epoch % cfg.masking.interval == 0:
                 mask.update_connections()
 
-    # pbar
-    test_pbar = tqdm(total=len(test_loader), dynamic_ncols=True)
-
     evaluate(
         model,
         test_loader,
         step,
         epoch + 1,
         device,
-        test_pbar,
         is_test_set=True,
         use_wandb=cfg.use_wandb,
     )

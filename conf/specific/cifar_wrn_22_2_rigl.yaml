@@ -11,13 +11,13 @@ masking:
   prune_rate: 0.3  # The pruning rate / prune rate.
   decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
   apply_when: step_end  # or step_end
-  epochs: 75000 # Epochs till which mask updates are applied
   interval: 100 # Which epochs or steps to apply at
   verbose: true
 
 dataset:
   batch_size: 128
   max_threads: 4
+  validation_split: 0.0
 
 optimizer:
   epochs: 250

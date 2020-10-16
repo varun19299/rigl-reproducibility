@@ -5,7 +5,6 @@ import math
 import numpy as np
 
 # Sparse learning funcs
-from sparselearning.funcs.decay import CosineDecay, LinearDecay
 from sparselearning.funcs.grow import registry as grow_registry
 from sparselearning.funcs.prune import registry as prune_registry
 from sparselearning.funcs.redistribute import registry as redistribute_registry
@@ -109,16 +108,14 @@ class Masking(object):
         
     2. step():
         * apply_mask()
-        (why? because gradients will also modify non-zero weights)
-        * step prune_rate_decay()
+        * prune_rate_decay()
             
     3. update_connections():
         * truncate_weights()
-            * 
-            * 
+            * prune
+            * redistribute (optional)
+            * grow
         * print_nonzero_counts() [if verbose]
-        
-    Unclear: calc_growth_redistribution    
     """
 
     def add_module(self, module):
@@ -168,23 +165,22 @@ class Masking(object):
         """
         Applies boolean mask to modules
         """
-        for name, tensor in self.module.named_parameters():
+        for name, weight in self.module.named_parameters():
             if name in self.masks:
-                tensor.data = tensor.data * self.masks[name]
+                weight.data = weight.data * self.masks[name]
 
     def calc_growth_redistribution(self):
         residual = 9999
         mean_residual = 0
         name2regrowth = {}
         i = 0
-        expected_var = 1.0 / len(self.stats.variance_dict)
         while residual > 0 and i < 1000:
             residual = 0
             for name in self.stats.variance_dict:
-                prune_rate = self.name2prune_rate[name]
+                # prune_rate = self.name2prune_rate[name]
                 # num_remove = math.ceil(prune_rate * self.stats.nonzeros_dict[name])
                 num_remove = self.stats.removed_dict[name]
-                num_nonzero = self.stats.nonzeros_dict[name]
+                # num_nonzero = self.stats.nonzeros_dict[name]
                 num_zero = self.stats.zeros_dict[name]
                 max_regrowth = num_zero + num_remove
 
@@ -226,7 +222,7 @@ class Masking(object):
 
         return name2regrowth
 
-    def init(self, mode="random", density=0.05):
+    def init(self):
 
         # Number of params originally non-zero
         # Total params * inital density
@@ -253,7 +249,6 @@ class Masking(object):
                 )
                 # self.baseline_nonzero += weight.numel() * self.density
                 self.baseline_nonzero += self.masks[name].sum().int().item()
-            self.apply_mask()
 
         elif self.sparse_init == "resume":
             # Initializes the mask according to the weights
@@ -270,7 +265,6 @@ class Masking(object):
                 self.masks[name] = (weight != 0.0).float().data.to(device)
                 # self.baseline_nonzero += weight.numel() * self.density
                 self.baseline_nonzero += self.masks[name].sum().int().item()
-            self.apply_mask()
 
         elif self.sparse_init == "erdos_renyi":
             # Same as Erdos Renyi with modification for conv
@@ -324,7 +318,8 @@ class Masking(object):
                     (torch.rand(weight.shape) < prob).float().data.to(device)
                 )
                 self.baseline_nonzero += (self.masks[name] != 0).sum().int().item()
-            self.apply_mask()
+
+        self.apply_mask()
 
         self.print_nonzero_counts()
 
@@ -576,6 +571,7 @@ class Masking(object):
                 self.masks.pop(name)
                 self.masks[name] = new_mask.float()
                 total_nonzero_new += new_nonzero
+
         self.apply_mask()
 
         # Some growth techniques and redistribution are probablistic and we might not grow enough weights or too much weights

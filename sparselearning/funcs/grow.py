@@ -90,6 +90,9 @@ def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
     y, idx = torch.sort(torch.abs(grad).flatten(), descending=True)
     new_mask.data.view(-1)[idx[:total_regrowth]] = 1.0
 
+    # init new weights to 0
+    weight.data.view(-1)[idx[:total_regrowth]] = 0.0
+
     return new_mask
 
 

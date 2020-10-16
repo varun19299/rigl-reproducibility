@@ -42,4 +42,8 @@ fi
 
 # Start Job here
 # Note: we're using the same GPU
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_rigl seed=$SLURM_ARRAY_TASK_ID
+#python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_rigl seed=$SLURM_ARRAY_TASK_ID optimizer.weight_decay=1e-3 exp_name="L2_puzzle_solved" &
+
+python main.py dataset=CIFAR10 optimizer=SGD masking=Dense +specific=cifar_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID optimizer.weight_decay=5e-4 &
+
+wait

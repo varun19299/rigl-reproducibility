@@ -5,6 +5,7 @@ import numpy as np
 from pathlib import Path
 import re
 import torch
+from torch import nn
 import torch.nn.functional as F
 from torch import optim
 from torch.utils.data import Dataset, DataLoader
@@ -99,6 +100,7 @@ def get_dataloaders(
 
     # Split into train and val
     valid_loader = None
+    val_dataset = []
     if validation_split:
         split = int(floor((1.0 - validation_split) * len(full_dataset)))
         train_dataset = DatasetSplitter(full_dataset, split_end=split)
@@ -122,15 +124,17 @@ def get_dataloaders(
             pin_memory=True,
             shuffle=True,
         )
-        val_dataset = []
 
     test_loader = DataLoader(
         test_dataset, test_batch_size, shuffle=False, num_workers=1, pin_memory=True,
     )
-
     logging.info(f"Train dataset length {len(train_dataset)}")
     logging.info(f"Val dataset length {len(val_dataset)}")
     logging.info(f"Test dataset length {len(test_dataset)}")
+
+    if not valid_loader:
+        logging.info("Running periodic eval on test data.")
+        valid_loader = test_loader
 
     return train_loader, valid_loader, test_loader
 
@@ -143,8 +147,16 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, lr_scheduler]":
     decay_factor = kwargs["decay_factor"]
 
     if name == "SGD":
+        # Pytorch weight decay erroneously includes
+        # biases and batchnorms
+        if weight_decay:
+            logging.info("Excluding bias and batchnorm layers from weight decay.")
+            parameters = add_weight_decay(model, weight_decay)
+            weight_decay = 0
+        else:
+            parameters = model.parameters()
         optimizer = optim.SGD(
-            model.parameters(),
+            parameters,
             lr=lr,
             momentum=kwargs["momentum"],
             weight_decay=weight_decay,
@@ -160,6 +172,22 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, lr_scheduler]":
     )
 
     return optimizer, lr_scheduler
+
+
+def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
+    decay = []
+    no_decay = []
+    for name, param in model.named_parameters():
+        if not param.requires_grad:
+            continue
+        if len(param.shape) == 1 or name in skip_list:
+            no_decay.append(param)
+        else:
+            decay.append(param)
+    return [
+        {"params": no_decay, "weight_decay": 0.0},
+        {"params": decay, "weight_decay": weight_decay},
+    ]
 
 
 def save_weights(
@@ -190,7 +218,7 @@ def save_weights(
 
 def load_weights(
     model: "nn.Module", optimizer: "optim", ckpt_dir: str, resume: bool = True
-) -> "Union[nn.Module, optim, int, int, float]":
+) -> "Union[nn.Module, optim, int, int, float, bool]":
     ckpt_dir = Path(ckpt_dir)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
@@ -203,7 +231,7 @@ def load_weights(
 
     if not resume or not pth_files:
         logging.info(f"No checkpoint found  at {ckpt_dir}.")
-        return model, optimizer, step, epoch, best_val_loss
+        return model, optimizer, step, epoch, best_val_loss, False
 
     # Extract latest epoch
     latest_epoch = max([int(re.findall("\d+", file.name)[-1]) for file in pth_files])
@@ -228,7 +256,20 @@ def load_weights(
         best_val_loss = ckpt.get("val_loss", "not stored")
         logging.info(f"Best model has val loss of {best_val_loss}.")
 
-    return model, optimizer, step, epoch, best_val_loss
+    return model, optimizer, step, epoch, best_val_loss, True
+
+
+class SmoothenValue(object):
+    "Create a smooth moving average for a value (loss, etc) using `beta`."
+
+    def __init__(self, beta: float = 0.9):
+        self.beta, self.n, self.mov_avg = beta, 0, 0
+
+    def add_value(self, val: float) -> None:
+        "Add `val` to calculate updated smoothed value."
+        self.n += 1
+        self.mov_avg = self.beta * self.mov_avg + (1 - self.beta) * val
+        self.smooth = self.mov_avg / (1 - self.beta ** self.n)
 
 
 def plot_class_feature_histograms(args, model, device, test_loader, optimizer):

@@ -6,6 +6,11 @@ hydra:
   sweep:
     dir: ./outputs/${dataset.name}/${exp_name}/${hydra.job.override_dirname}
   job_logging:
+    handlers:
+      console:
+        class: utils.tqdm_logging.TqdmLoggingHandler
+      file:
+        mode: w # comment if you dont want to overwrite
     root:
       handlers:
         - file
