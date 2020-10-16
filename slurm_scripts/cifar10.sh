@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=4       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
-#SBATCH --time=04:00:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=03:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
 #SBATCH --array=0-2
 
@@ -42,8 +42,10 @@ fi
 
 # Start Job here
 # Note: we're using the same GPU
-#python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_rigl seed=$SLURM_ARRAY_TASK_ID optimizer.weight_decay=1e-3 exp_name="L2_puzzle_solved" &
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_rigl seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK"
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=Dense +specific=cifar_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID optimizer.weight_decay=5e-4 &
+#python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_rigl seed=$SLURM_ARRAY_TASK_ID masking.sparse_init=random exp_name="RigL_random" &
 
-wait
+#python main.py dataset=CIFAR10 optimizer=SGD masking=Dense +specific=cifar_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID optimizer.weight_decay=5e-4 &
+
+#wait

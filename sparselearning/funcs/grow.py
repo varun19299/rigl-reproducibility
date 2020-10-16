@@ -81,7 +81,6 @@ def momentum_growth(masking, name, new_mask, total_regrowth, weight):
 def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
     """Grows weights in places where the abs(grad) is largest. (among present zero'ed weights)
     """
-    # logging.debug(f"{name}_grow_{total_regrowth}")
     grad = weight.grad
     if grad.dtype == torch.float16:
         grad = grad * (new_mask == 0).half()
