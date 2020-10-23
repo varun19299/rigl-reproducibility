@@ -4,7 +4,8 @@ hydra:
   run:
     dir: ./outputs/${dataset.name}/${exp_name}/${hydra.job.override_dirname}
   sweep:
-    dir: ./outputs/${dataset.name}/${exp_name}/${hydra.job.override_dirname}
+    dir: ./outputs/${dataset.name}/${exp_name}
+    subdir: ${hydra.job.override_dirname}
   job_logging:
     handlers:
       console:
@@ -20,7 +21,11 @@ hydra:
       override_dirname:
         exclude_keys:
           - exp_name
+          - dataset
+          - masking
+          - optimizer
           - hydra.verbose
+          - use_wandb
 #  sweeper:
 #   ax_config:
 #     # max_trials is application-specific. Tune it for your use case

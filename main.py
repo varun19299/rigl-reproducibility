@@ -37,7 +37,7 @@ def train(
     epoch: int,
     device: torch.device,
     mixed_precision_scalar: "GradScaler" = None,
-    log_interval: int = 10,
+    log_interval: int = 100,
     use_wandb: bool = False,
     masking_apply_when: str = "epoch_end",
     masking_interval: int = 1,
@@ -94,7 +94,16 @@ def train(
             msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f}"
             pbar.set_description(msg)
             if use_wandb:
-                wandb.log({"train_loss": loss}, step=global_step)
+                log_dict = {"train_loss": loss, "lr": lr_scheduler.get_lr()[0]}
+                if mask:
+                    log_dict = {
+                        **log_dict,
+                        "prune_rate": mask.prune_rate,
+                        "total_nonzero": mask.stats.total_nonzero,
+                    }
+                wandb.log(
+                    log_dict, step=global_step,
+                )
 
     msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f} Prune Rate {mask.prune_rate if mask else 0:.5f}"
     logging.info(msg)
@@ -180,9 +189,10 @@ def main(cfg: DictConfig):
             os.environ["WANDB_API_KEY"] = f.read()
 
         wandb.init(
+            entity="ml-reprod-2020",
             config=OmegaConf.to_container(cfg, resolve=True),
-            project="Sparse Network Training",
-            name=f"{cfg.exp_name}",
+            project="rethinking-sparse-learning",
+            name=f"{cfg.dataset.name}_{cfg.exp_name}_density_{cfg.masking.density}",
             reinit=True,
             save_code=True,
         )
@@ -208,7 +218,7 @@ def main(cfg: DictConfig):
     mixed_precision_scalar = GradScaler() if cfg.mixed_precision else None
 
     # Load from checkpoint
-    model, optimizer, step, start_epoch, best_val_loss, resume_mask = load_weights(
+    model, optimizer, step, start_epoch, best_val_loss, mask_steps = load_weights(
         model, optimizer, ckpt_dir=cfg.ckpt_dir, resume=cfg.resume
     )
 
@@ -226,7 +236,7 @@ def main(cfg: DictConfig):
         elif cfg.masking.decay_schedule == "linear":
             decay = LinearDecay(cfg.masking.prune_rate, max_iter)
 
-        sparse_init = "resume" if resume_mask else cfg.masking.sparse_init
+        sparse_init = "resume" if mask_steps else cfg.masking.sparse_init
         mask = Masking(
             optimizer,
             decay,
@@ -236,11 +246,20 @@ def main(cfg: DictConfig):
             growth_mode=cfg.masking.growth_mode,
             redistribution_mode=cfg.masking.redistribution_mode,
         )
-        mask.add_module(model)
+        mask.add_module(model, mask_steps)
 
     # Train model
+    epoch = None
     for epoch in range(start_epoch, cfg.optimizer.epochs):
         # step here is training iters not global steps
+        if mask:
+            _masking_args = {
+                "masking_apply_when": cfg.masking.apply_when,
+                "masking_interval": cfg.masking.interval,
+                "masking_end_when": cfg.masking.end_when,
+            }
+        else:
+            _masking_args = {}
         _, step = train(
             model,
             mask,
@@ -253,9 +272,7 @@ def main(cfg: DictConfig):
             mixed_precision_scalar,
             log_interval=cfg.log_interval,
             use_wandb=cfg.use_wandb,
-            masking_apply_when=cfg.masking.apply_when,
-            masking_interval=cfg.masking.interval,
-            masking_end_when=cfg.masking.end_when,
+            **_masking_args,
         )
 
         val_loss, _ = evaluate(
@@ -276,6 +293,7 @@ def main(cfg: DictConfig):
                 val_loss,
                 step,
                 epoch + 1,
+                mask_steps=mask.steps,
                 ckpt_dir=cfg.ckpt_dir,
                 is_min=is_min,
             )
@@ -288,6 +306,13 @@ def main(cfg: DictConfig):
         ):
             if epoch % cfg.masking.interval == 0:
                 mask.update_connections()
+
+    if not epoch:
+        # Run val anyway
+        epoch = cfg.optimizer.epochs - 1
+        val_loss, _ = evaluate(
+            model, val_loader, step, epoch + 1, device, use_wandb=cfg.use_wandb,
+        )
 
     evaluate(
         model,

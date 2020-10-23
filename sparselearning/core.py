@@ -118,7 +118,7 @@ class Masking(object):
         * print_nonzero_counts() [if verbose]
     """
 
-    def add_module(self, module):
+    def add_module(self, module, mask_steps: int = 0):
         """
         Store dict of parameters to mask
         """
@@ -139,6 +139,10 @@ class Masking(object):
 
         # Call init
         self.init()
+        self.steps = mask_steps
+
+        if mask_steps:
+            logging.info(f"Initialised from ckpt at mask steps: {mask_steps}.")
 
     def adjust_prune_rate(self):
         """
@@ -227,6 +231,7 @@ class Masking(object):
         # Number of params originally non-zero
         # Total params * inital density
         self.baseline_nonzero = 0
+        total_params = 0
 
         if self.sparse_init == "random":
             # initializes each layer with a random percentage of dense weights
@@ -250,8 +255,8 @@ class Masking(object):
                 self.masks[name] = (
                     (torch.rand(weight.shape) < self.density).float().data.to(device)
                 )
-                # self.baseline_nonzero += weight.numel() * self.density
                 self.baseline_nonzero += self.masks[name].sum().int().item()
+                total_params += weight.numel()
 
         elif self.sparse_init == "resume":
             # Initializes the mask according to the weights
@@ -263,11 +268,16 @@ class Masking(object):
                 if name not in self.masks:
                     continue
 
-                logging.info((weight != 0.0).sum().item())
+                breakpoint()
                 device = weight.device
                 self.masks[name] = (weight != 0.0).float().data.to(device)
-                # self.baseline_nonzero += weight.numel() * self.density
                 self.baseline_nonzero += self.masks[name].sum().int().item()
+                total_params += weight.numel()
+                logging.debug(
+                    f"{name} shape : {weight.shape} non-zero: {(weight != 0.0).sum().int().item()} density: {(weight != 0.0).sum().int().item()/ weight.numel()}"
+                )
+
+            logging.info(f"Overall sparsity {self.baseline_nonzero /total_params}")
 
         elif self.sparse_init == "erdos_renyi":
             # Same as Erdos Renyi with modification for conv
@@ -277,20 +287,10 @@ class Masking(object):
             # for fully connected layers, and h*w*in_c*out_c for conv
             # layers.
 
-            total_params = 0
             for e, (name, weight) in enumerate(self.module.named_parameters()):
-                # Skip first layer
-                if e == 0:
-                    self.remove_weight(name)
-                    logging.info(
-                        f"Removing (first layer) {name} of size {weight.numel()} parameters."
-                    )
-                    continue
-
                 if name not in self.masks:
                     continue
                 total_params += weight.numel()
-                # self.baseline_nonzero += weight.numel() * self.density
 
             _erk_power_scale = 1.0
 
@@ -351,15 +351,10 @@ class Masking(object):
                     is_epsilon_valid = False
                     for mask_name, mask_raw_prob in raw_probabilities.items():
                         if mask_raw_prob == max_prob:
-                            logging.info(
-                                f"Density of layer:{mask_name} set to 1.0"
-                            )
+                            logging.info(f"Density of layer:{mask_name} set to 1.0")
                             _dense_layers.add(mask_name)
                 else:
                     is_epsilon_valid = True
-
-            density_dict = {}
-            total_nonzero = 0.0
 
             # With the valid epsilon, we can set sparsities of the remaning layers.
             for name, weight in self.module.named_parameters():
@@ -571,7 +566,7 @@ class Masking(object):
         self.apply_mask()
 
         # Get updated prune rate
-        self.prune_rate_decay.step()
+        self.prune_rate_decay.step(self.steps)
 
         self.steps += 1
 

@@ -3,10 +3,13 @@ exp_name: ${masking.name}
 seed: 0
 model: wrn-22-2
 
+masking:
+  dense: True
+  density: 1
+
 dataset:
   batch_size: 128
-  max_threads: 4
-  validation_split: 0.0
+  validation_split: 0.1
 
 optimizer:
   epochs: 250

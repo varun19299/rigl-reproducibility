@@ -109,11 +109,16 @@ def get_dataloaders(
             train_dataset,
             batch_size,
             num_workers=train_threads,
-            pin_memory=True,
+            pin_memory=False,
             shuffle=True,
+            multiprocessing_context="fork",
         )
         valid_loader = DataLoader(
-            val_dataset, test_batch_size, num_workers=val_threads, pin_memory=True
+            val_dataset,
+            test_batch_size,
+            num_workers=val_threads,
+            pin_memory=False,
+            multiprocessing_context="fork",
         )
     else:
         train_dataset = full_dataset
@@ -121,12 +126,18 @@ def get_dataloaders(
             full_dataset,
             batch_size,
             num_workers=max_threads,
-            pin_memory=True,
+            pin_memory=False,
             shuffle=True,
+            multiprocessing_context="fork",
         )
 
     test_loader = DataLoader(
-        test_dataset, test_batch_size, shuffle=False, num_workers=1, pin_memory=True,
+        test_dataset,
+        test_batch_size,
+        shuffle=False,
+        num_workers=1,
+        pin_memory=False,
+        multiprocessing_context="fork",
     )
     logging.info(f"Train dataset length {len(train_dataset)}")
     logging.info(f"Val dataset length {len(val_dataset)}")
@@ -196,6 +207,7 @@ def save_weights(
     val_loss: float,
     step: int,
     epoch: int,
+    mask_steps: int,
     ckpt_dir: str,
     is_min: bool = True,
 ):
@@ -206,32 +218,37 @@ def save_weights(
         "step": step,
         "epoch": epoch,
         "state_dict": model.state_dict(),
+        "mask_steps": mask_steps,
         "optimizer": optimizer.state_dict(),
         "val_loss": val_loss,
     }
 
-    model_path = f"model_best_epoch_{epoch}.pth" if is_min else f"epoch_{epoch}.pth"
-    model_path = Path(ckpt_dir) / model_path
+    model_path = Path(ckpt_dir) / f"epoch_{epoch}.pth"
 
     torch.save(state_dict, model_path)
+
+    if is_min:
+        model_path = Path(ckpt_dir) / "best_model.pth"
+        torch.save(state_dict, model_path)
 
 
 def load_weights(
     model: "nn.Module", optimizer: "optim", ckpt_dir: str, resume: bool = True
-) -> "Union[nn.Module, optim, int, int, float, bool]":
+) -> "Union[nn.Module, optim, int, int, float, int]":
     ckpt_dir = Path(ckpt_dir)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
-    pth_files = list(ckpt_dir.glob("*.pth"))
+    pth_files = list(ckpt_dir.glob("epoch_*.pth"))
 
     # Defaults
     epoch = 0
     step = 0
     best_val_loss = 1e6
+    mask_steps = 0
 
     if not resume or not pth_files:
-        logging.info(f"No checkpoint found  at {ckpt_dir}.")
-        return model, optimizer, step, epoch, best_val_loss, False
+        logging.info(f"No checkpoint found at {ckpt_dir.resolve()}.")
+        return model, optimizer, step, epoch, best_val_loss, mask_steps
 
     # Extract latest epoch
     latest_epoch = max([int(re.findall("\d+", file.name)[-1]) for file in pth_files])
@@ -244,19 +261,22 @@ def load_weights(
     ckpt = torch.load(model_path, map_location=torch.device("cpu"))
     load_state_dict(model, ckpt["state_dict"])
 
-    epoch = ckpt.get("epoch", 0)
+    epoch = ckpt.get("epoch", 1) - 1
     step = ckpt.get("step", 0)
     val_loss = ckpt.get("val_loss", "not stored")
+    mask_steps = ckpt.get("mask_steps", 0)
     logging.info(f"Model has val loss of {val_loss}.")
 
     # Extract best loss
-    best_model_path = list(ckpt_dir.glob(f"*best_epoch*.pth"))[0]
+    best_model_path = ckpt_dir / "best_model.pth"
     if best_model_path:
         ckpt = torch.load(model_path, map_location=torch.device("cpu"))
         best_val_loss = ckpt.get("val_loss", "not stored")
-        logging.info(f"Best model has val loss of {best_val_loss}.")
+        logging.info(
+            f"Best model has val loss of {best_val_loss} at epoch {ckpt.get('epoch',1)-1}."
+        )
 
-    return model, optimizer, step, epoch, best_val_loss, True
+    return model, optimizer, step, epoch, best_val_loss, mask_steps
 
 
 class SmoothenValue(object):

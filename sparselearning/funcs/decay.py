@@ -33,7 +33,14 @@ class CosineDecay(Decay):
             self.sgd, T_max, eta_min, last_epoch
         )
 
-    def step(self):
+    def step(self, step: int = -1):
+        if step >= 0:
+            if self._step < self.T_max:
+                self.cosine_stepper.step(step)
+                self._step = step + 1
+            else:
+                self._step = self.T_max
+            return
         if self._step < self.T_max:
             self.cosine_stepper.step()
             self._step += 1
@@ -53,8 +60,18 @@ class LinearDecay(Decay):
 
         self.decrement = prune_rate / float(T_max)
         self.current_prune_rate = prune_rate
+        self.initial_prune_rate = prune_rate
 
-    def step(self):
+    def step(self, step: int = -1):
+        if step >= 0:
+            if self._step < self.T_max:
+                self.current_prune_rate = self.initial_prune_rate - self.decrement * (
+                    step + 1
+                )
+                self._step = step + 1
+            else:
+                self._step = self.T_max
+            return
         if self._step < self.T_max:
             self.current_prune_rate -= self.decrement
             self._step += 1
