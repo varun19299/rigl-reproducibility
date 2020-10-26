@@ -261,7 +261,7 @@ class LeNet_5_Caffe(nn.Module):
     by Milad Alizadeh.
     """
 
-    def __init__(self, save_features: bool=None, bench_model: bool=False):
+    def __init__(self, save_features: bool = None, bench_model: bool = False):
         super().__init__()
         self.conv1 = nn.Conv2d(1, 20, 5, padding=0, bias=True)
         self.conv2 = nn.Conv2d(20, 50, 5, bias=True)
@@ -441,6 +441,7 @@ class WideResNet(nn.Module):
         dropRate: float = 0.3,
         save_features: bool = False,
         bench_model: bool = False,
+        small_dense_density: float = 1.0,
     ):
         """
         depth, widen_factor as described by the paper.
@@ -450,7 +451,10 @@ class WideResNet(nn.Module):
         bench_model: bool = benchmark model speedup (due to sparsity).
         """
         super(WideResNet, self).__init__()
+
+        small_dense_multiplier = np.sqrt(small_dense_density)
         nChannels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]
+        nChannels = [int(c * small_dense_multiplier) for c in nChannels]
         assert (depth - 4) % 6 == 0
         n = (depth - 4) / 6
         block = BasicBlock
@@ -555,9 +559,9 @@ class BasicBlock(nn.Module):
         in_planes: int,
         out_planes: int,
         stride: int,
-        dropRate: float =0.0,
-        save_features: bool=False,
-        bench: bool=None,
+        dropRate: float = 0.0,
+        save_features: bool = False,
+        bench: bool = None,
     ):
         super(BasicBlock, self).__init__()
         self.bn1 = nn.BatchNorm2d(in_planes)
@@ -692,3 +696,9 @@ registry = {
     "wrn-16-8": (WideResNet, [16, 8, 10, 0.3]),
     "wrn-16-10": (WideResNet, [16, 10, 10, 0.3]),
 }
+
+if __name__ == "__main__":
+    from torchsummary import summary
+
+    model = WideResNet(*registry["wrn-22-2"][1], small_dense_density=0.5)
+    summary(model, (3, 32, 32))

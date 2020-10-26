@@ -52,7 +52,7 @@ class CosineDecay(Decay):
 class LinearDecay(Decay):
     """Anneals the pruning rate linearly with each step."""
 
-    def __init__(self, prune_rate, T_max):
+    def __init__(self, prune_rate: float, T_max: int):
         super().__init__()
 
         self._step = 0
@@ -78,3 +78,6 @@ class LinearDecay(Decay):
 
     def get_dr(self):
         return self.current_prune_rate
+
+
+class

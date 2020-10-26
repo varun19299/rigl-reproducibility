@@ -1,4 +1,6 @@
 outputs/*
+slurm_outputs/*
+
 wandb/*
 #wandb_api.key
 __pycache__/*

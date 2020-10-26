@@ -73,7 +73,7 @@ def momentum_growth(masking, name, new_mask, total_regrowth, weight):
     else:
         momentum = momentum * (new_mask == 0).float()
     y, idx = torch.sort(torch.abs(momentum).flatten(), descending=True)
-    new_mask.data.view(-1)[idx[:total_regrowth]] = 1.0
+    new_mask.data.view(-1)[idx[:int(total_regrowth)]] = 1.0
 
     return new_mask
 

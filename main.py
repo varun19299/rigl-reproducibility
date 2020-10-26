@@ -181,7 +181,10 @@ def main(cfg: DictConfig):
         cfg.model in model_registry.keys()
     ), f"Select from {','.join(model_registry.keys())}"
     model_class, model_args = model_registry[cfg.model]
-    model = model_class(*(model_args + [cfg.save_features, cfg.benchmark])).to(device)
+    _small_density = cfg.masking.density if cfg.masking.name == "Small_Dense" else 1.0
+    model = model_class(
+        *model_args, cfg.save_features, cfg.benchmark, _small_density
+    ).to(device)
 
     # wandb
     if cfg.use_wandb:
@@ -293,7 +296,7 @@ def main(cfg: DictConfig):
                 val_loss,
                 step,
                 epoch + 1,
-                mask_steps=mask.steps,
+                mask_steps=mask.steps if mask else 0,
                 ckpt_dir=cfg.ckpt_dir,
                 is_min=is_min,
             )

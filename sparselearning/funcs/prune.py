@@ -74,9 +74,7 @@ def global_magnitude_prune(masking):
     tokill = math.ceil(prune_rate * masking.baseline_nonzero)
     total_removed = 0
     prev_removed = 0
-    while total_removed < tokill * (1.0 - masking.tolerance) or (
-        total_removed > tokill * (1.0 + masking.tolerance)
-    ):
+    while abs(total_removed - tokill) > masking.tolerance:
         total_removed = 0
         for module in masking.modules:
             for name, weight in module.named_parameters():
