@@ -1,6 +1,8 @@
 outputs/*
 slurm_outputs/*
 
+sparselearning.egg-info/*
+
 wandb/*
 #wandb_api.key
 __pycache__/*
