@@ -67,34 +67,30 @@ def magnitude_prune(masking, mask, weight, name):
 
 
 def global_magnitude_prune(masking):
-    prune_rate = 0.0
-    for name in masking.name2prune_rate:
-        if name in masking.masks:
-            prune_rate = masking.name2prune_rate[name]
-    tokill = math.ceil(prune_rate * masking.baseline_nonzero)
+    tokill = math.ceil(masking.prune_rate * masking.baseline_nonzero)
     total_removed = 0
     prev_removed = 0
-    while abs(total_removed - tokill) > masking.tolerance:
-        total_removed = 0
-        for module in masking.modules:
-            for name, weight in module.named_parameters():
+
+    if tokill:
+        while abs(total_removed - tokill) > masking.tolerance:
+            total_removed = 0
+            for name, weight in masking.module.named_parameters():
                 if name not in masking.masks:
                     continue
                 remain = (torch.abs(weight.data) > masking.prune_threshold).sum().item()
                 total_removed += masking.stats.nonzeros_dict[name] - remain
 
-        if prev_removed == total_removed:
-            break
-        prev_removed = total_removed
-        if total_removed > tokill * (1.0 + masking.tolerance):
-            masking.prune_threshold *= 1.0 - masking.increment
-            masking.increment *= 0.99
-        elif total_removed < tokill * (1.0 - masking.tolerance):
-            masking.prune_threshold *= 1.0 + masking.increment
-            masking.increment *= 0.99
+            if prev_removed == total_removed:
+                break
+            prev_removed = total_removed
+            if total_removed > tokill * (1.0 + masking.tolerance):
+                masking.prune_threshold *= 1.0 - masking.increment
+                masking.increment *= 0.99
+            elif total_removed < tokill * (1.0 - masking.tolerance):
+                masking.prune_threshold *= 1.0 + masking.increment
+                masking.increment *= 0.99
 
-    for module in masking.modules:
-        for name, weight in module.named_parameters():
+        for name, weight in masking.module.named_parameters():
             if name not in masking.masks:
                 continue
             masking.masks[name][:] = torch.abs(weight.data) > masking.prune_threshold
@@ -115,6 +111,10 @@ def magnitude_and_negativity_prune(masking, mask, weight, name):
     # remove all weights which absolute value is smaller than threshold
     x, idx = torch.sort(torch.abs(weight.data.view(-1)))
     mask.data.view(-1)[idx[:k]] = 0.0
+
+    # Remove zeta fraction of smallest weights
+
+    # Remove zeta fraction of most negative weights
 
     # remove the most negative weights
     x, idx = torch.sort(weight.data.view(-1))
@@ -174,8 +174,8 @@ def magnitude_variance_pruning(masking, mask, weight, name):
 
 
 registry = {
-    "global_magnitude": global_magnitude_prune,
+    "global-magnitude": global_magnitude_prune,
     "magnitude": magnitude_prune,
-    "magnitude_negativity": magnitude_and_negativity_prune,
+    "magnitude-negativity": magnitude_and_negativity_prune,
     "SET": magnitude_and_negativity_prune,
 }

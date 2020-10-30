@@ -5,7 +5,7 @@ import os
 
 from sparselearning.core import Masking
 from sparselearning.models import registry as model_registry
-from sparselearning.funcs.decay import CosineDecay, LinearDecay
+from sparselearning.funcs.decay import registry as decay_registry
 
 import torch
 import torch.nn.functional as F
@@ -96,16 +96,18 @@ def train(
             if use_wandb:
                 log_dict = {"train_loss": loss, "lr": lr_scheduler.get_lr()[0]}
                 if mask:
+                    density = mask.stats.total_nonzero / mask.total_params
                     log_dict = {
                         **log_dict,
                         "prune_rate": mask.prune_rate,
-                        "total_nonzero": mask.stats.total_nonzero,
+                        "density": density,
                     }
                 wandb.log(
                     log_dict, step=global_step,
                 )
 
-    msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f} Prune Rate {mask.prune_rate if mask else 0:.5f}"
+    density = mask.stats.total_nonzero / mask.total_params if mask else 1.0
+    msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f} Prune Rate {mask.prune_rate if mask else 0:.5f} Density {density:.5f}"
     logging.info(msg)
 
     return _loss_collector.smooth, global_step
@@ -191,11 +193,16 @@ def main(cfg: DictConfig):
         with open(cfg.wandb_api_key) as f:
             os.environ["WANDB_API_KEY"] = f.read()
 
+        _density = (
+            cfg.masking.final_density
+            if cfg.masking.name == "Pruning"
+            else cfg.masking.density
+        )
         wandb.init(
             entity="ml-reprod-2020",
             config=OmegaConf.to_container(cfg, resolve=True),
             project="rethinking-sparse-learning",
-            name=f"{cfg.dataset.name}_{cfg.exp_name}_density_{cfg.masking.density}",
+            name=f"{cfg.dataset.name}_{cfg.exp_name}_density_{_density}",
             reinit=True,
             save_code=True,
         )
@@ -234,10 +241,17 @@ def main(cfg: DictConfig):
             else cfg.masking.end_when * len(train_loader)
         )
 
-        if cfg.masking.decay_schedule == "cosine":
-            decay = CosineDecay(cfg.masking.prune_rate, max_iter)
-        elif cfg.masking.decay_schedule == "linear":
-            decay = LinearDecay(cfg.masking.prune_rate, max_iter)
+        kwargs = {"prune_rate": cfg.masking.prune_rate, "T_max": max_iter}
+
+        if cfg.masking.decay_schedule == "magnitude-prune":
+            kwargs = {
+                "final_sparsity": 1 - cfg.masking.final_density,
+                "T_max": max_iter,
+                "T_start": cfg.masking.start_when,
+                "interval": cfg.masking.interval,
+            }
+
+        decay = decay_registry[cfg.masking.decay_schedule](**kwargs)
 
         sparse_init = "resume" if mask_steps else cfg.masking.sparse_init
         mask = Masking(
@@ -255,14 +269,14 @@ def main(cfg: DictConfig):
     epoch = None
     for epoch in range(start_epoch, cfg.optimizer.epochs):
         # step here is training iters not global steps
+        _masking_args = {}
         if mask:
             _masking_args = {
                 "masking_apply_when": cfg.masking.apply_when,
                 "masking_interval": cfg.masking.interval,
                 "masking_end_when": cfg.masking.end_when,
             }
-        else:
-            _masking_args = {}
+
         _, step = train(
             model,
             mask,

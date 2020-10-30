@@ -5,7 +5,7 @@ density: 0.05  # The density of the overall sparse network.
 sparse_init: random
 
 growth_mode: random  # Growth mode. Choose from: momentum, random, and momentum_neuron.
-prune_mode: SET  # Prune mode / pruning mode. Choose from: magnitude, SET.
+prune_mode: magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.
 redistribution_mode: none  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
 prune_rate: 0.5  # The pruning rate / prune rate.
 dense: False  # Enable dense mode. Default: False.

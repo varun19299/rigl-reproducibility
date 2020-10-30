@@ -80,4 +80,80 @@ class LinearDecay(Decay):
         return self.current_prune_rate
 
 
-class
+@dataclass
+class MagnitudePruneDecay(Decay):
+    """
+    Anneals according to Zhu et al., "To prune or not to prune"
+
+    We implement cumulative sparsity and take a finite difference to get sparsity(t).
+
+    Amount to prune = sparsity.
+    """
+
+    initial_sparsity: float = 0.0
+    final_sparsity: float = 0.3
+    T_max: int = 30000
+    T_start: int = 350
+    interval: int = 100
+
+    def __post_init__(self):
+        self.current_prune_rate = 0.0
+        self._step = 0
+
+    def cumulative_sparsity(self, step):
+        if step < self.T_start:
+            return self.initial_sparsity
+        elif step < self.T_max:
+            mul = (1 - (step - self.T_start) / (self.T_max - self.T_start)) ** 3
+            return (
+                self.final_sparsity
+                + (self.initial_sparsity - self.final_sparsity) * mul
+            )
+        elif step >= self.T_max:
+            return self.final_sparsity
+
+    def step(self, step: int = -1):
+        if step >= 0:
+            self.current_prune_rate = self.cumulative_sparsity(
+                step
+            ) - self.cumulative_sparsity(step - self.interval)
+        else:
+            self.current_prune_rate = self.cumulative_sparsity(
+                self._step
+            ) - self.cumulative_sparsity(self._step - self.interval)
+            self._step += 1
+
+    def get_dr(self):
+        return self.current_prune_rate
+
+
+def decay_test():
+    from matplotlib import pyplot as plt
+
+    decay = MagnitudePruneDecay(
+        initial_sparsity=0.0, final_sparsity=0.8, T_max=65000, T_start=700, interval=100
+    )
+
+    prune_rate = []
+    sparsity = []
+    i_ll = []
+    for i in range(0, 65000, 100):
+        i_ll.append(i)
+        decay.step(i)
+        prune_rate.append(decay.get_dr())
+        sparsity.append(decay.cumulative_sparsity(i))
+
+    plt.plot(i_ll, sparsity)
+    plt.show()
+    plt.plot(i_ll, prune_rate)
+    plt.show()
+
+
+registry = {
+    "cosine": CosineDecay,
+    "linear": LinearDecay,
+    "magnitude-prune": MagnitudePruneDecay,
+}
+
+if __name__ == "__main__":
+    decay_test()

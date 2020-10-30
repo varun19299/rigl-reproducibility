@@ -1,0 +1,16 @@
+# @package _group_
+name: Pruning
+density: 1.0  # The density of the overall sparse network.
+sparse_init: random
+final_density: 0.2
+
+growth_mode: none  # Growth mode. Choose from: momentum, random, and momentum_neuron.
+prune_mode: global-magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.
+redistribution_mode: none  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
+dense: False  # Enable dense mode. Default: False.
+
+decay_schedule: magnitude-prune  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
+apply_when: step_end  # or step_end
+start_when: 700 # training steps
+end_when: 65918 # Epochs / Training Step till which mask updates are applied (set to 75% total steps)
+interval: 100 # Which epochs or steps to apply at

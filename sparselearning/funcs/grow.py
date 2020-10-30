@@ -136,6 +136,11 @@ def momentum_neuron_growth(masking, name, new_mask, total_regrowth, weight):
 
     return new_mask
 
+def no_growth(masking, name, new_mask, total_regrowth, weight):
+    """
+    No growth
+    """
+    return new_mask
 
 def global_momentum_growth(masking, total_regrowth):
     togrow = total_regrowth
@@ -186,9 +191,10 @@ def global_momentum_growth(masking, total_regrowth):
 
 
 registry = {
-    "absolute_gradient": abs_grad_growth,
-    "global_momentum_growth": global_momentum_growth,
+    "absolute-gradient": abs_grad_growth,
+    "global-momentum-growth": global_momentum_growth,
     "momentum": momentum_growth,
-    "momentum_neuron": momentum_neuron_growth,
+    "momentum-neuron": momentum_neuron_growth,
+    "none": no_growth,
     "random": random_growth,
 }

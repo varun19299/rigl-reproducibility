@@ -1,9 +1,9 @@
 # @package _group_
 name: RigL
 density: 0.05  # The density of the overall sparse network.
-sparse_init: erdos_renyi
+sparse_init: erdos-renyi-kernel
 
-growth_mode: absolute_gradient  # Growth mode. Choose from: momentum, random, and momentum_neuron.
+growth_mode: absolute-gradient  # Growth mode. Choose from: momentum, random, and momentum_neuron.
 prune_mode: magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.
 redistribution_mode: none  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
 dense: False  # Enable dense mode. Default: False.
