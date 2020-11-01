@@ -71,19 +71,20 @@ def train(
 
         # Mask the gradient step
         stepper = mask if mask else optimizer
-        if mixed_precision_scalar:
-            mixed_precision_scalar.step(stepper)
-            mixed_precision_scalar.update()
+        if (
+            mask
+            and masking_apply_when == "step_end"
+            and (global_step < masking_end_when)
+            and (global_step % masking_interval) == 0
+        ):
+            mask.update_connections()
+            _mask_update_counter += 1
         else:
-            stepper.step()
-
-        # Apply mask
-        if mask and masking_apply_when == "step_end":
-            if (global_step < masking_end_when) and (
-                global_step % masking_interval
-            ) == 0:
-                mask.update_connections()
-                _mask_update_counter += 1
+            if mixed_precision_scalar:
+                mixed_precision_scalar.step(stepper)
+                mixed_precision_scalar.update()
+            else:
+                stepper.step()
 
         # Lr scheduler
         lr_scheduler.step()
@@ -201,7 +202,7 @@ def main(cfg: DictConfig):
         wandb.init(
             entity="ml-reprod-2020",
             config=OmegaConf.to_container(cfg, resolve=True),
-            project="rethinking-sparse-learning",
+            project="cifar10",
             name=f"{cfg.dataset.name}_{cfg.exp_name}_density_{_density}",
             reinit=True,
             save_code=True,
