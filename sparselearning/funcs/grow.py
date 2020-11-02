@@ -73,7 +73,7 @@ def momentum_growth(masking, name, new_mask, total_regrowth, weight):
     else:
         momentum = momentum * (new_mask == 0).float()
     y, idx = torch.sort(torch.abs(momentum).flatten(), descending=True)
-    new_mask.data.view(-1)[idx[:int(total_regrowth)]] = 1.0
+    new_mask.data.view(-1)[idx[: int(total_regrowth)]] = 1.0
 
     return new_mask
 
@@ -100,8 +100,11 @@ def random_growth(masking, name, new_mask, total_regrowth, weight):
     if n == 0:
         return new_mask
     expeced_growth_probability = total_regrowth / n
-    new_weights = torch.rand(new_mask.shape).cuda() < expeced_growth_probability
-    return new_mask.bool() | new_weights
+    new_weights = torch.zeros_like(new_mask).bool()
+    new_weights[new_mask == 0] = (
+        torch.rand_like(new_weights[new_mask == 0].float()) < expeced_growth_probability
+    )
+    return new_mask.bool() | new_weights.bool()
 
 
 def momentum_neuron_growth(masking, name, new_mask, total_regrowth, weight):
@@ -136,11 +139,13 @@ def momentum_neuron_growth(masking, name, new_mask, total_regrowth, weight):
 
     return new_mask
 
+
 def no_growth(masking, name, new_mask, total_regrowth, weight):
     """
     No growth
     """
     return new_mask
+
 
 def global_momentum_growth(masking, total_regrowth):
     togrow = total_regrowth
