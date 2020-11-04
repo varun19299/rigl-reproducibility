@@ -70,6 +70,7 @@ class Masking(object):
 
     density: float  # Sparsity = 1 - density
     sparse_init: str = "random"  # or erdos_renyi
+    dense_gradients: bool = False
 
     prune_mode: str = "magnitude"
     growth_mode: str = "momentum"
@@ -169,6 +170,7 @@ class Masking(object):
                         sparsity, self.name2prune_rate[name]
                     )
 
+    @torch.no_grad()
     def apply_mask(self):
         """
         Applies boolean mask to modules
@@ -176,6 +178,15 @@ class Masking(object):
         for name, weight in self.module.named_parameters():
             if name in self.masks:
                 weight.data = weight.data * self.masks[name]
+
+    @torch.no_grad()
+    def apply_mask_gradients(self):
+        """
+        Applies boolean mask to modules's gradients
+        """
+        for name, weight in self.module.named_parameters():
+            if name in self.masks:
+                weight.grad = weight.grad * self.masks[name]
 
     def calc_growth_redistribution(self):
         residual = 9999
@@ -230,6 +241,7 @@ class Masking(object):
 
         return name2regrowth
 
+    @torch.no_grad()
     def init(self):
         # Number of params originally non-zero
         # Total params * inital density
@@ -423,6 +435,29 @@ class Masking(object):
             if isinstance(module, nn_type):
                 self.remove_weight(name)
 
+    @torch.no_grad()
+    def reset_momentum(self):
+        for name, weight in self.module.named_parameters():
+            # if sparsity is 0%, skip
+            if name not in self.masks:
+                continue
+
+            param_state = self.optimizer.state[weight]
+            mask = self.masks[name]
+
+            # Adam
+            if "exp_avg" in param_state:
+                buf_1 = param_state["exp_avg"]
+                buf_2 = param_state["exp_avg_sq"]
+                buf_1 *= mask
+                buf_2 *= mask
+
+            # SGD
+            elif "momentum_buffer" in param_state:
+                # mask the momentum matrix
+                buf = param_state["momentum_buffer"]
+                buf *= mask
+
     def step(self):
         """
         Performs a masking step
@@ -430,11 +465,16 @@ class Masking(object):
         self.optimizer.step()
         self.apply_mask()
 
+        if not self.dense_gradients:
+            self.reset_momentum()
+            self.apply_mask_gradients()
+
         # Get updated prune rate
         self.prune_rate_decay.step(self.steps)
 
         self.steps += 1
 
+    @torch.no_grad()
     def truncate_weights(self):
         """
         Perform grow / prune / redistribution step
@@ -493,6 +533,10 @@ class Masking(object):
                 total_nonzero_new += new_nonzero
 
         self.apply_mask()
+
+        if not self.dense_gradients:
+            self.reset_momentum()
+            self.apply_mask_gradients()
 
         # Some growth techniques and redistribution are probablistic and we might not grow enough weights or too much weights
         # Here we run an exponential smoothing over (prune-growth) residuals to adjust future growth

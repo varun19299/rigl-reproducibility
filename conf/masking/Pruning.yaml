@@ -3,6 +3,7 @@ name: Pruning
 density: 1.0  # The density of the overall sparse network.
 sparse_init: random
 final_density: 0.2
+dense_gradients: True
 
 growth_mode: none  # Growth mode. Choose from: momentum, random, and momentum_neuron.
 prune_mode: global-magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.

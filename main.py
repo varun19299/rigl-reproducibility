@@ -259,6 +259,7 @@ def main(cfg: DictConfig):
             optimizer,
             decay,
             density=cfg.masking.density,
+            dense_gradients=cfg.masking.dense_gradients,
             sparse_init=sparse_init,
             prune_mode=cfg.masking.prune_mode,
             growth_mode=cfg.masking.growth_mode,

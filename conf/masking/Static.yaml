@@ -3,6 +3,7 @@ name: Static
 
 density: 0.05  # The density of the overall sparse network.
 sparse_init: random
+dense_gradients: False
 
 growth_mode: momentum  # Growth mode. Choose from: momentum, random, and momentum_neuron.
 prune_mode: magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.

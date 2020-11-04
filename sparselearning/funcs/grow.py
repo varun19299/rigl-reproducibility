@@ -104,7 +104,10 @@ def random_growth(masking, name, new_mask, total_regrowth, weight):
     new_weights[new_mask == 0] = (
         torch.rand_like(new_weights[new_mask == 0].float()) < expeced_growth_probability
     )
-    return new_mask.bool() | new_weights.bool()
+    new_mask = new_mask.bool() | new_weights.bool()
+    weight.data[new_mask == 0] = 0.0
+
+    return new_mask
 
 
 def momentum_neuron_growth(masking, name, new_mask, total_regrowth, weight):
