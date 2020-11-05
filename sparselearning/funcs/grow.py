@@ -81,6 +81,11 @@ def momentum_growth(masking, name, new_mask, total_regrowth, weight):
 def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
     """Grows weights in places where the abs(grad) is largest. (among present zero'ed weights)
     """
+    # If dense, skip
+    n = (new_mask == 0).sum().item()
+    if n == 0:
+        return new_mask
+
     grad = weight.grad
     if grad.dtype == torch.float16:
         grad = grad * (new_mask == 0).half()
@@ -96,6 +101,7 @@ def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
 
 
 def random_growth(masking, name, new_mask, total_regrowth, weight):
+    # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
         return new_mask
@@ -105,6 +111,9 @@ def random_growth(masking, name, new_mask, total_regrowth, weight):
         torch.rand_like(new_weights[new_mask == 0].float()) < expeced_growth_probability
     )
     new_mask = new_mask.bool() | new_weights.bool()
+
+    # init new weights to 0
+    weight.data[new_weights == 1] = 0.0
     weight.data[new_mask == 0] = 0.0
 
     return new_mask

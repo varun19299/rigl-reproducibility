@@ -43,12 +43,8 @@ fi
 # Start Job here
 # Note: we're using the same GPU
 
-#python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK_magnitude_prune' masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
-
-#python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK_sparse_grad' masking.sparse_init=erdos-renyi-kernel masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK_sparse_grad' masking.sparse_init=erdos-renyi-kernel masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
 
 python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_Random_sparse_grad' masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
-
-#python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_Random_magnitude_prune' masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
 
 #wait

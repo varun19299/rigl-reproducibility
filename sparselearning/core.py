@@ -39,6 +39,48 @@ class LayerStats(object):
     total_nonzero: int = 0
     total_removed: int = 0
 
+    def load_state_dict(self, *initial_data, **kwargs):
+        for dictionary in initial_data:
+            for key in dictionary:
+                setattr(self, key, dictionary[key])
+        for key in kwargs:
+            setattr(self, key, kwargs[key])
+
+    def state_dict(self):
+        _state_dict = {
+            "variance_dict": self.variance_dict,
+            "zeros_dict": self.zeros_dict,
+            "nonzeros_dict": self.nonzeros_dict,
+            "removed_dict": self.removed_dict,
+            "total_variance": self.total_variance,
+            "total_zero": self.total_zero,
+            "total_nonzero": self.total_nonzero,
+            "total_removed": self.total_removed,
+        }
+        return _state_dict
+
+    @property
+    def total_density(self):
+        return self.total_nonzero / (self.total_zero + self.total_nonzero)
+
+    def __repr__(self):
+        _str_dict = {
+            "total_variance": self.total_variance,
+            "total_zero": self.total_zero,
+            "total_nonzero": self.total_nonzero,
+            "total_removed": self.total_removed,
+            "total_density": self.total_density,
+        }
+
+        _str = "LayerStats("
+        for e, (name, value) in enumerate(_str_dict.items()):
+            if e == len(_str_dict) - 1:
+                _str += f"{name}={value})"
+            else:
+                _str += f"{name}={value}, "
+
+        return _str
+
 
 @dataclass
 class Masking(object):
@@ -88,7 +130,7 @@ class Masking(object):
     module: "nn.Module" = None  # Pytorch module
 
     # stats
-    steps: int = 0
+    step: int = 0
 
     def __post_init__(self):
         # Apply growth or prune func to entire module
@@ -123,7 +165,7 @@ class Masking(object):
         * print_nonzero_counts() [if verbose]
     """
 
-    def add_module(self, module, mask_steps: int = 0):
+    def add_module(self, module, mask_step: int = 0):
         """
         Store dict of parameters to mask
         """
@@ -144,19 +186,19 @@ class Masking(object):
 
         # Call init
         self.init()
-        self.steps = mask_steps
+        self.step = mask_step
 
-        if mask_steps:
-            logging.info(f"Initialised from ckpt at mask steps: {mask_steps}.")
+        if mask_step:
+            logging.info(f"Initialised from ckpt at mask step: {mask_step}.")
 
     def adjust_prune_rate(self):
         """
         Modify prune rate for layers with low sparsity
         """
-        for name in self.names:
+        for name, mask in self.masks.items():
             self.name2prune_rate[name] = self.prune_rate
 
-            sparsity = self.stats.zeros_dict[name] / self.masks[name].numel()
+            sparsity = self.stats.zeros_dict[name] / mask.numel()
             if sparsity < 0.2:
                 # determine if matrix is relatively dense but still growing
                 expected_variance = 1.0 / len(self.stats.variance_dict.keys())
@@ -196,10 +238,7 @@ class Masking(object):
         while residual > 0 and i < 1000:
             residual = 0
             for name in self.stats.variance_dict:
-                # prune_rate = self.name2prune_rate[name]
-                # num_remove = math.ceil(prune_rate * self.stats.nonzeros_dict[name])
                 num_remove = self.stats.removed_dict[name]
-                # num_nonzero = self.stats.nonzeros_dict[name]
                 num_zero = self.stats.zeros_dict[name]
                 max_regrowth = num_zero + num_remove
 
@@ -316,10 +355,11 @@ class Masking(object):
         assert (
             self.growth_mode in grow_registry.keys()
         ), f"Available growth modes: {','.join(grow_registry.keys())}"
-        if "global" in self.growth_mode:
-            self.global_growth = True
-
         return grow_registry[self.growth_mode]
+
+    @property
+    def global_growth(self):
+        return "global" in self.growth_mode
 
     def get_momentum_for_weight(self, weight):
         """
@@ -336,12 +376,18 @@ class Masking(object):
 
         return momentum
 
-    @property
-    def names(self) -> "List[str]":
-        """
-        Names of each masked layer
-        """
-        return list(self.masks.keys())
+    def load_state_dict(self, *initial_data, **kwargs):
+        for state_dict in initial_data:
+            for key, value in state_dict.items():
+                if key == "stats":
+                    self.stats.load_state_dict(value)
+                else:
+                    setattr(self, key, value)
+        for key, value in kwargs.items():
+            if key == "stats":
+                self.stats.load_state_dict(kwargs[key])
+            else:
+                setattr(self, key, kwargs[key])
 
     def print_nonzero_counts(self):
         for name, mask in self.masks.items():
@@ -371,9 +417,11 @@ class Masking(object):
         assert (
             self.prune_mode in prune_registry.keys()
         ), f"Available prune modes: {','.join(prune_registry.keys())}"
-        if "global" in self.prune_mode:
-            self.global_prune = True
         return prune_registry[self.prune_mode]
+
+    @property
+    def prune_mode(self):
+        return "global" in self.prune_mode
 
     @property
     def prune_rate(self) -> float:
@@ -435,6 +483,33 @@ class Masking(object):
             if isinstance(module, nn_type):
                 self.remove_weight(name)
 
+    def __repr__(self):
+        _str_dict = {
+            "density": self.density,
+            "dense_gradients": self.dense_gradients,
+            "growth_increment": self.growth_increment,
+            "growth_mode": self.growth_mode,
+            "growth_threshold": self.growth_threshold,
+            "increment": self.increment,
+            "layer_names": self.masks.keys(),
+            "prune_mode": self.prune_mode,
+            "prune_threshold": self.prune_threshold,
+            "redistribution_mode": self.redistribution_mode,
+            "sparse_init": self.sparse_init,
+            "stats": self.stats,
+            "step": self.step,
+            "tolerance": self.tolerance,
+        }
+
+        _str = "Masking("
+        for e, (name, value) in enumerate(_str_dict.items()):
+            if e == len(_str_dict) - 1:
+                _str += f"{name}={value})"
+            else:
+                _str += f"{name}={value}, "
+
+        return _str
+
     @torch.no_grad()
     def reset_momentum(self):
         for name, weight in self.module.named_parameters():
@@ -458,6 +533,17 @@ class Masking(object):
                 buf = param_state["momentum_buffer"]
                 buf *= mask
 
+    def state_dict(self):
+        # Won't store hyperparams here
+        _state_dict = {
+            "baseline_nonzero": self.baseline_nonzero,
+            "masks": self.masks,
+            "stats": self.stats.state_dict(),
+            "step": self.step,
+            "total_params": self.total_params,
+        }
+        return _state_dict
+
     def step(self):
         """
         Performs a masking step
@@ -466,9 +552,9 @@ class Masking(object):
         self.apply_mask()
 
         # Get updated prune rate
-        self.prune_rate_decay.step(self.steps)
+        self.prune_rate_decay.step(self.step)
 
-        self.steps += 1
+        self.step += 1
 
     @torch.no_grad()
     def truncate_weights(self):
