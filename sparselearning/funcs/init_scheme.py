@@ -27,9 +27,8 @@ def random_init(masking: "Masking"):
         if name not in masking.masks:
             continue
 
-        device = masking.masks[name].device
         masking.masks[name] = (
-            (torch.rand(weight.shape) < masking.density).float().data.to(device)
+            (torch.rand(weight.shape) < masking.density).float().data
         )
         masking.baseline_nonzero += masking.masks[name].sum().int().item()
         masking.total_params += weight.numel()
@@ -45,8 +44,7 @@ def resume_init(masking: "Masking"):
         if name not in masking.masks:
             continue
 
-        device = weight.device
-        masking.masks[name] = (weight != 0.0).float().data.to(device)
+        masking.masks[name] = (weight != 0.0).float().data
         masking.baseline_nonzero += masking.masks[name].sum().int().item()
         masking.total_params += weight.numel()
         logging.debug(
@@ -149,8 +147,7 @@ def erdos_renyi(masking: "Masking", is_kernel: bool = True):
             prob = epsilon * raw_probabilities[name]
         logging.debug(f"ERK {name}: {weight.shape} prob {prob:.4f}")
 
-        device = weight.device
-        masking.masks[name] = (torch.rand(weight.shape) < prob).float().data.to(device)
+        masking.masks[name] = (torch.rand(weight.shape) < prob).float().data
         masking.baseline_nonzero += (masking.masks[name] != 0).sum().int().item()
 
 

@@ -1,0 +1,80 @@
+from sparselearning import models
+from sparselearning.core import Masking
+from sparselearning.funcs.decay import CosineDecay
+
+import torch
+from torch.nn import functional as F
+
+
+def save(model, optimizer, mask, step):
+    state_dict = {
+        "step": step,
+        "model": model.state_dict(),
+        "mask": mask.state_dict(),
+        "optimizer": optimizer.state_dict(),
+    }
+
+    torch.save(state_dict, f"tests/test_save_{step}.pth")
+
+
+def load(model, optimizer, mask, step):
+    state_dict = torch.load(f"tests/test_save_{step}.pth", map_location="cpu")
+
+    step = state_dict["step"]
+    mask.load_state_dict(state_dict["mask"])
+    model.load_state_dict(state_dict["model"])
+    optimizer.load_state_dict(state_dict["optimizer"])
+
+    return model, optimizer, mask, step
+
+
+def test_save_load():
+    """
+    1. Initialise
+    2. Save
+    3. Load
+        Assert if equal
+    4. Perform optim step
+    """
+    # Initialise
+    model = models.WideResNet(depth=22, widen_factor=2)
+    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
+
+    decay = CosineDecay()
+    mask = Masking(optimizer, decay)
+    mask.add_module(model)
+
+    step = 0
+
+    save(model, optimizer, mask, step)
+    new_model, new_optimizer, new_mask, new_step = load(model, optimizer, mask, step)
+
+    assert new_step == step
+    assert new_model == model
+    assert new_mask == mask
+
+    for step in range(5):
+        dummy_input = torch.rand(1, 3, 32, 32)
+        output = model(dummy_input)
+        loss = F.mse_loss(output, torch.zeros_like(output))
+
+        loss.backward()
+        assert model == mask.module
+
+        if step == 5:
+            mask.update_connections()
+        else:
+            mask.step()
+
+    save(model, optimizer, mask, step)
+
+    # Re-initialise
+    model = models.WideResNet(depth=22, widen_factor=2)
+    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
+
+    decay = CosineDecay()
+    mask = Masking(optimizer, decay)
+    mask.add_module(model)
+
+if __name__ == "__main__":
+    test_save_load()

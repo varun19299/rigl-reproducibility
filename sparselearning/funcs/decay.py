@@ -20,7 +20,7 @@ class CosineDecay(Decay):
     """
 
     def __init__(
-        self, prune_rate: float, T_max: int, eta_min: float = 0.0, last_epoch: int = -1
+        self, prune_rate: float = 0.3, T_max: int = 1000, eta_min: float = 0.0, last_epoch: int = -1
     ):
         super().__init__()
         self._step = 0

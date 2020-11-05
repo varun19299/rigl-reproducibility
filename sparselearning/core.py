@@ -1,3 +1,4 @@
+from copy import copy
 from dataclasses import dataclass, field
 
 import logging
@@ -61,6 +62,8 @@ class LayerStats(object):
 
     @property
     def total_density(self):
+        if not (self.total_zero + self.total_nonzero):
+            return 0.0
         return self.total_nonzero / (self.total_zero + self.total_nonzero)
 
     def __repr__(self):
@@ -110,7 +113,7 @@ class Masking(object):
     optimizer: "optim"
     prune_rate_decay: "Decay"
 
-    density: float  # Sparsity = 1 - density
+    density: float = 0.1  # Sparsity = 1 - density
     sparse_init: str = "random"  # or erdos_renyi
     dense_gradients: bool = False
 
@@ -130,13 +133,11 @@ class Masking(object):
     module: "nn.Module" = None  # Pytorch module
 
     # stats
-    step: int = 0
+    mask_step: int = 0
 
     def __post_init__(self):
-        # Apply growth or prune func to entire module
-        # Instead of layer wise
-        self.global_growth = "global" in self.growth_mode
-        self.global_prune = "global" in self.prune_mode
+        self.baseline_nonzero = 0
+        self.total_params = 0
 
         # Growth adjustment
         self.adjusted_growth = 0
@@ -171,10 +172,12 @@ class Masking(object):
         """
         self.module = module
         for name, weight in self.module.named_parameters():
-            device = weight.device
             self.masks[name] = torch.zeros_like(
                 weight, dtype=torch.float32, requires_grad=False
-            ).to(device)
+            )
+
+        # Send to appropriate device, same as weights
+        self = self.to_module_device()
 
         # Remove bias, batchnorms
         logging.info("Removing biases...")
@@ -186,7 +189,7 @@ class Masking(object):
 
         # Call init
         self.init()
-        self.step = mask_step
+        self.mask_step = mask_step
 
         if mask_step:
             logging.info(f"Initialised from ckpt at mask step: {mask_step}.")
@@ -284,9 +287,6 @@ class Masking(object):
     def init(self):
         # Number of params originally non-zero
         # Total params * inital density
-        self.baseline_nonzero = 0
-        self.total_params = 0
-
         # Performs weight initialization
         init_registry[self.sparse_init](self)
 
@@ -361,6 +361,10 @@ class Masking(object):
     def global_growth(self):
         return "global" in self.growth_mode
 
+    @property
+    def global_prune(self):
+        return "global" in self.prune_mode
+
     def get_momentum_for_weight(self, weight):
         """
         Return momentum from optimizer (SGD or Adam)
@@ -388,6 +392,9 @@ class Masking(object):
                 self.stats.load_state_dict(kwargs[key])
             else:
                 setattr(self, key, kwargs[key])
+
+    # def load_mask(self, ckpt_path: "Path"):
+    #     state_dict = torch.load(ckpt_path, map_location="cpu")
 
     def print_nonzero_counts(self):
         for name, mask in self.masks.items():
@@ -418,10 +425,6 @@ class Masking(object):
             self.prune_mode in prune_registry.keys()
         ), f"Available prune modes: {','.join(prune_registry.keys())}"
         return prune_registry[self.prune_mode]
-
-    @property
-    def prune_mode(self):
-        return "global" in self.prune_mode
 
     @property
     def prune_rate(self) -> float:
@@ -492,12 +495,12 @@ class Masking(object):
             "growth_threshold": self.growth_threshold,
             "increment": self.increment,
             "layer_names": self.masks.keys(),
+            "mask_step": self.mask_step,
             "prune_mode": self.prune_mode,
             "prune_threshold": self.prune_threshold,
             "redistribution_mode": self.redistribution_mode,
             "sparse_init": self.sparse_init,
             "stats": self.stats,
-            "step": self.step,
             "tolerance": self.tolerance,
         }
 
@@ -533,13 +536,13 @@ class Masking(object):
                 buf = param_state["momentum_buffer"]
                 buf *= mask
 
-    def state_dict(self):
+    def state_dict(self) -> "Dict":
         # Won't store hyperparams here
         _state_dict = {
             "baseline_nonzero": self.baseline_nonzero,
-            "masks": self.masks,
+            "masks": self.to(torch.device("cpu")).masks,
             "stats": self.stats.state_dict(),
-            "step": self.step,
+            "mask_step": self.mask_step,
             "total_params": self.total_params,
         }
         return _state_dict
@@ -552,9 +555,28 @@ class Masking(object):
         self.apply_mask()
 
         # Get updated prune rate
-        self.prune_rate_decay.step(self.step)
+        self.prune_rate_decay.step(self.mask_step)
 
-        self.step += 1
+        self.mask_step += 1
+
+    def to(self, device) -> "Masking":
+        copied_self = copy(self)
+        for name in copied_self.masks:
+            copied_self.masks[name] = copied_self.masks[name].to(device)
+
+        return copied_self
+
+    def to_module_device(self) -> "Masking":
+        """
+        Send to module's device
+        """
+        copied_self = copy(self)
+        for name, weight in copied_self.module.named_parameters():
+            if name in copied_self.masks:
+                device = weight.device
+                copied_self.masks[name] = copied_self.masks[name].to(device)
+
+        return copied_self
 
     @torch.no_grad()
     def truncate_weights(self):

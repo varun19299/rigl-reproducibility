@@ -204,21 +204,20 @@ def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
 def save_weights(
     model: "nn.Module",
     optimizer: "optim",
+    mask: "Masking",
     val_loss: float,
     step: int,
     epoch: int,
-    mask_steps: int,
     ckpt_dir: str,
     is_min: bool = True,
 ):
     logging.info(f"Epoch {epoch + 1} saving weights")
 
-    # Gen
     state_dict = {
         "step": step,
         "epoch": epoch,
-        "state_dict": model.state_dict(),
-        "mask_steps": mask_steps,
+        "model": model.state_dict(),
+        "mask": mask.state_dict(),
         "optimizer": optimizer.state_dict(),
         "val_loss": val_loss,
     }
@@ -233,7 +232,11 @@ def save_weights(
 
 
 def load_weights(
-    model: "nn.Module", optimizer: "optim", ckpt_dir: str, resume: bool = True
+    model: "nn.Module",
+    optimizer: "optim",
+    mask: "Masking",
+    ckpt_dir: str,
+    resume: bool = True,
 ) -> "Union[nn.Module, optim, int, int, float, int]":
     ckpt_dir = Path(ckpt_dir)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -259,7 +262,7 @@ def load_weights(
     logging.info(f"Loading checkpoint from {model_path}.")
 
     ckpt = torch.load(model_path, map_location=torch.device("cpu"))
-    load_state_dict(model, ckpt["state_dict"])
+    load_state_dict(model, ckpt["model"])
 
     epoch = ckpt.get("epoch", 1) - 1
     step = ckpt.get("step", 0)
@@ -290,103 +293,3 @@ class SmoothenValue(object):
         self.n += 1
         self.mov_avg = self.beta * self.mov_avg + (1 - self.beta) * val
         self.smooth = self.mov_avg / (1 - self.beta ** self.n)
-
-
-def plot_class_feature_histograms(args, model, device, test_loader, optimizer):
-    if not os.path.exists("./results"):
-        os.mkdir("./results")
-    model.eval()
-    agg = {}
-    num_classes = 10
-    feat_id = 0
-    sparse = not args.dense
-    model_name = "alexnet"
-    # model_name = 'vgg'
-    # model_name = 'wrn'
-
-    densities = None
-    for batch_idx, (data, target) in enumerate(test_loader):
-        if batch_idx % 100 == 0:
-            print(batch_idx, "/", len(test_loader))
-        with torch.no_grad():
-            # if batch_idx == 10: break
-            data, target = data.to(device), target.to(device)
-            for cls in range(num_classes):
-                # print('=='*50)
-                # print('CLASS {0}'.format(cls))
-                model.t = target
-                sub_data = data[target == cls]
-
-                output = model(sub_data)
-
-                feats = model.feats
-                if densities is None:
-                    densities = []
-                    densities += model.densities
-
-                if len(agg) == 0:
-                    for feat_id, feat in enumerate(feats):
-                        agg[feat_id] = []
-                        # print(feat.shape)
-                        for i in range(feat.shape[1]):
-                            agg[feat_id].append(np.zeros((num_classes,)))
-
-                for feat_id, feat in enumerate(feats):
-                    map_contributions = torch.abs(feat).sum([0, 2, 3])
-                    for map_id in range(map_contributions.shape[0]):
-                        # print(feat_id, map_id, cls)
-                        # print(len(agg), len(agg[feat_id]), len(agg[feat_id][map_id]), len(feats))
-                        agg[feat_id][map_id][cls] += map_contributions[map_id].item()
-
-                del model.feats[:]
-                del model.densities[:]
-                model.feats = []
-                model.densities = []
-
-    if sparse:
-        np.save("./results/{0}_sparse_density_data".format(model_name), densities)
-
-    for feat_id, map_data in agg.items():
-        data = np.array(map_data)
-        # print(feat_id, data)
-        full_contribution = data.sum()
-        # print(full_contribution, data)
-        contribution_per_channel = (1.0 / full_contribution) * data.sum(1)
-        # print('pre', data.shape[0])
-        channels = data.shape[0]
-        # data = data[contribution_per_channel > 0.001]
-
-        channel_density = np.cumsum(np.sort(contribution_per_channel))
-        print(channel_density)
-        idx = np.argsort(contribution_per_channel)
-
-        threshold_idx = np.searchsorted(channel_density, 0.05)
-        print(data.shape, "pre")
-        data = data[idx[threshold_idx:]]
-        print(data.shape, "post")
-
-        # perc = np.percentile(contribution_per_channel[contribution_per_channel > 0.0], 10)
-        # print(contribution_per_channel, perc, feat_id)
-        # data = data[contribution_per_channel > perc]
-        # print(contribution_per_channel[contribution_per_channel < perc].sum())
-        # print('post', data.shape[0])
-        normed_data = np.max(data / np.sum(data, 1).reshape(-1, 1), 1)
-        # normed_data = (data/np.sum(data,1).reshape(-1, 1) > 0.2).sum(1)
-        # counts, bins = np.histogram(normed_data, bins=4, range=(0, 4))
-        np.save(
-            "./results/{2}_{1}_feat_data_layer_{0}".format(
-                feat_id, "sparse" if sparse else "dense", model_name
-            ),
-            normed_data,
-        )
-        # plt.ylim(0, channels/2.0)
-        ##plt.hist(normed_data, bins=range(0, 5))
-        # plt.hist(normed_data, bins=[(i+20)/float(200) for i in range(180)])
-        # plt.xlim(0.1, 0.5)
-        # if sparse:
-        #    plt.title("Sparse: Conv2D layer {0}".format(feat_id))
-        #    plt.savefig('./output/feat_histo/layer_{0}_sp.png'.format(feat_id))
-        # else:
-        #    plt.title("Dense: Conv2D layer {0}".format(feat_id))
-        #    plt.savefig('./output/feat_histo/layer_{0}_d.png'.format(feat_id))
-        # plt.clf()
