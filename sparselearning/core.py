@@ -163,7 +163,7 @@ class Masking(object):
                 actual_variance = self.stats.variance_dict[name]
                 expected_vs_actual = expected_variance / actual_variance
 
-                # if weights arent steady yet, i.e., can change significantly
+                # if weights aren't steady yet, i.e., can change significantly
                 if expected_vs_actual < 1.0:
                     # growing
                     self.name2prune_rate[name] = min(
@@ -438,7 +438,7 @@ class Masking(object):
     @torch.no_grad()
     def reset_momentum(self):
         for name, weight in self.module.named_parameters():
-            # if sparsity is 0%, skip
+            # Skip modules we aren't masking
             if name not in self.masks:
                 continue
 
@@ -465,10 +465,6 @@ class Masking(object):
         self.optimizer.step()
         self.apply_mask()
 
-        if not self.dense_gradients:
-            self.reset_momentum()
-            self.apply_mask_gradients()
-
         # Get updated prune rate
         self.prune_rate_decay.step(self.steps)
 
@@ -487,7 +483,7 @@ class Masking(object):
             self.stats.total_removed = self.prune_func(self)
         else:
             for name, weight in self.module.named_parameters():
-                # Skip modules we arent masking
+                # Skip modules we aren't masking
                 if name not in self.masks:
                     continue
 
@@ -512,7 +508,7 @@ class Masking(object):
                 name2regrowth = self.calc_growth_redistribution()
 
             for name, weight in self.module.named_parameters():
-                # Skip modules we arent masking
+                # Skip modules we aren't masking
                 if name not in self.masks:
                     continue
 
@@ -538,7 +534,8 @@ class Masking(object):
             self.reset_momentum()
             self.apply_mask_gradients()
 
-        # Some growth techniques and redistribution are probablistic and we might not grow enough weights or too much weights
+        # Some growth techniques and redistribution are probablistic
+        # we might not grow enough weights or too much weights
         # Here we run an exponential smoothing over (prune-growth) residuals to adjust future growth
         self.adjustments.append(
             self.baseline_nonzero - total_nonzero_new

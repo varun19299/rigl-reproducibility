@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=cifar-wrn-SNFS    # create a short name for your job
+#SBATCH --job-name=cifar-wrn-RigL    # create a short name for your job
 
 #SBATCH --partition=batch_default   # use batch_default, or wacc for quick (< 30 min) ones
 
@@ -43,10 +43,10 @@ fi
 # Start Job here
 # Note: we're using the same GPU
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK_corrected" masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK_truly_sparse" masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
 
-#python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
-#
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random_truly_sparse" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
+
 #python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_ERK" masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
 #
 #python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
