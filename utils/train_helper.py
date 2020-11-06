@@ -217,10 +217,12 @@ def save_weights(
         "step": step,
         "epoch": epoch,
         "model": model.state_dict(),
-        "mask": mask.state_dict(),
         "optimizer": optimizer.state_dict(),
         "val_loss": val_loss,
     }
+
+    if mask:
+        state_dict["mask"] = mask.state_dict()
 
     model_path = Path(ckpt_dir) / f"epoch_{epoch}.pth"
 
@@ -237,7 +239,7 @@ def load_weights(
     mask: "Masking",
     ckpt_dir: str,
     resume: bool = True,
-) -> "Union[nn.Module, optim, int, int, float, int]":
+) -> "Union[nn.Module, optim, Masking, int, int, float]":
     ckpt_dir = Path(ckpt_dir)
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
@@ -247,11 +249,10 @@ def load_weights(
     epoch = 0
     step = 0
     best_val_loss = 1e6
-    mask_steps = 0
 
     if not resume or not pth_files:
         logging.info(f"No checkpoint found at {ckpt_dir.resolve()}.")
-        return model, optimizer, step, epoch, best_val_loss, mask_steps
+        return model, optimizer, mask, step, epoch, best_val_loss
 
     # Extract latest epoch
     latest_epoch = max([int(re.findall("\d+", file.name)[-1]) for file in pth_files])
@@ -264,10 +265,13 @@ def load_weights(
     ckpt = torch.load(model_path, map_location=torch.device("cpu"))
     load_state_dict(model, ckpt["model"])
 
+    if mask and "mask" in ckpt:
+        mask.load_state_dict(ckpt["mask"])
+
     epoch = ckpt.get("epoch", 1) - 1
     step = ckpt.get("step", 0)
     val_loss = ckpt.get("val_loss", "not stored")
-    mask_steps = ckpt.get("mask_steps", 0)
+
     logging.info(f"Model has val loss of {val_loss}.")
 
     # Extract best loss
@@ -279,7 +283,7 @@ def load_weights(
             f"Best model has val loss of {best_val_loss} at epoch {ckpt.get('epoch',1)-1}."
         )
 
-    return model, optimizer, step, epoch, best_val_loss, mask_steps
+    return model, optimizer, mask, step, epoch, best_val_loss
 
 
 class SmoothenValue(object):

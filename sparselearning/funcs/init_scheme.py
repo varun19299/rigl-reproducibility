@@ -9,52 +9,7 @@ if TYPE_CHECKING:
     from utils.typing_alias import *
 
 
-def random_init(masking: "Masking"):
-    # initializes each layer with a random percentage of dense weights
-    # each layer will have weight.numel()*density weights.
-    # weight.numel()*density == weight.numel()*(1.0-sparsity)
-
-    for e, (name, weight) in enumerate(masking.module.named_parameters()):
-        # In random init, skip first layer
-        if e == 0:
-            masking.remove_weight(name)
-            logging.info(
-                f"Removing (first layer) {name} of size {weight.numel()} parameters."
-            )
-            continue
-
-        # Skip modules we arent masking
-        if name not in masking.masks:
-            continue
-
-        masking.masks[name] = (
-            (torch.rand(weight.shape) < masking.density).float().data
-        )
-        masking.baseline_nonzero += masking.masks[name].sum().int().item()
-        masking.total_params += weight.numel()
-
-
-def resume_init(masking: "Masking"):
-    # Initializes the mask according to the weights
-    # which are currently zero-valued. This is required
-    # if you want to resume a sparse model but did not
-    # save the mask.
-    for name, weight in masking.module.named_parameters():
-        # Skip modules we arent masking
-        if name not in masking.masks:
-            continue
-
-        masking.masks[name] = (weight != 0.0).float().data
-        masking.baseline_nonzero += masking.masks[name].sum().int().item()
-        masking.total_params += weight.numel()
-        logging.debug(
-            f"{name} shape : {weight.shape} non-zero: {(weight != 0.0).sum().int().item()} density: {(weight != 0.0).sum().int().item() / weight.numel()}"
-        )
-
-    logging.info(f"Overall sparsity {masking.baseline_nonzero / masking.total_params}")
-
-
-def erdos_renyi(masking: "Masking", is_kernel: bool = True):
+def erdos_renyi(masking: "Masking", is_kernel: bool = True, **kwargs):
     # Same as Erdos Renyi with modification for conv
     # initialization used in sparse evolutionary training
     # scales the number of non-zero weights linearly proportional
@@ -117,7 +72,7 @@ def erdos_renyi(masking: "Masking", is_kernel: bool = True):
                     # Note that raw_probabilities[mask] * n_param gives the individual
                     # elements of the divisor.
                 else:
-                    n_in, n_out = mask.shape[:2] # Cin and Cout for a conv kernel
+                    n_in, n_out = mask.shape[:2]  # Cin and Cout for a conv kernel
                     raw_probabilities[name] = (n_in + n_out) / (n_in * n_out)
                 divisor += raw_probabilities[name] * n_param
         # By multipliying individual probabilites with epsilon, we should get the
@@ -151,9 +106,67 @@ def erdos_renyi(masking: "Masking", is_kernel: bool = True):
         masking.baseline_nonzero += (masking.masks[name] != 0).sum().int().item()
 
 
+def lottery_ticket_init(masking: "Masking", lottery_mask_path: "Path"):
+    state_dict = torch.load(lottery_mask_path, map_location="cpu")
+    assert "mask" in state_dict, f"No mask found at {lottery_mask_path}"
+    setattr(masking, "masks", state_dict["mask"]["masks"])
+
+    for name, weight in masking.module.named_parameters():
+        # Skip modules we arent masking
+        if name not in masking.masks:
+            continue
+
+        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.total_params += weight.numel()
+
+
+def random_init(masking: "Masking", **kwargs):
+    # initializes each layer with a random percentage of dense weights
+    # each layer will have weight.numel()*density weights.
+    # weight.numel()*density == weight.numel()*(1.0-sparsity)
+
+    for e, (name, weight) in enumerate(masking.module.named_parameters()):
+        # In random init, skip first layer
+        if e == 0:
+            masking.remove_weight(name)
+            logging.info(
+                f"Removing (first layer) {name} of size {weight.numel()} parameters."
+            )
+            continue
+
+        # Skip modules we arent masking
+        if name not in masking.masks:
+            continue
+
+        masking.masks[name] = (torch.rand(weight.shape) < masking.density).float().data
+        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.total_params += weight.numel()
+
+
+def resume_init(masking: "Masking", **kwargs):
+    # Initializes the mask according to the weights
+    # which are currently zero-valued. This is required
+    # if you want to resume a sparse model but did not
+    # save the mask.
+    for name, weight in masking.module.named_parameters():
+        # Skip modules we arent masking
+        if name not in masking.masks:
+            continue
+
+        masking.masks[name] = (weight != 0.0).float().data
+        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.total_params += weight.numel()
+        logging.debug(
+            f"{name} shape : {weight.shape} non-zero: {(weight != 0.0).sum().int().item()} density: {(weight != 0.0).sum().int().item() / weight.numel()}"
+        )
+
+    logging.info(f"Overall sparsity {masking.baseline_nonzero / masking.total_params}")
+
+
 registry = {
     "erdos-renyi": partial(erdos_renyi, is_kernel=False),
     "erdos-renyi-kernel": partial(erdos_renyi, is_kernel=True),
+    "lottery-ticket": lottery_ticket_init,
     "random": random_init,
     "resume": resume_init,
 }

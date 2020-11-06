@@ -228,11 +228,6 @@ def main(cfg: DictConfig):
     # Mixed Precision
     mixed_precision_scalar = GradScaler() if cfg.mixed_precision else None
 
-    # Load from checkpoint
-    model, optimizer, step, start_epoch, best_val_loss, mask_steps = load_weights(
-        model, optimizer, ckpt_dir=cfg.ckpt_dir, resume=cfg.resume
-    )
-
     # Setup mask
     mask = None
     if not cfg.masking.dense:
@@ -254,18 +249,24 @@ def main(cfg: DictConfig):
 
         decay = decay_registry[cfg.masking.decay_schedule](**kwargs)
 
-        sparse_init = "resume" if mask_steps else cfg.masking.sparse_init
         mask = Masking(
             optimizer,
             decay,
             density=cfg.masking.density,
             dense_gradients=cfg.masking.dense_gradients,
-            sparse_init=sparse_init,
+            sparse_init=cfg.masking.sparse_init,
             prune_mode=cfg.masking.prune_mode,
             growth_mode=cfg.masking.growth_mode,
             redistribution_mode=cfg.masking.redistribution_mode,
         )
-        mask.add_module(model, mask_steps)
+        # Support for lottery mask
+        lottery_mask_path = cfg.masking.lottery_mask_path if cfg.masking.name=="Lottery" else None
+        mask.add_module(model, lottery_mask_path)
+
+    # Load from checkpoint
+    model, optimizer, mask, step, start_epoch, best_val_loss = load_weights(
+        model, optimizer, mask, ckpt_dir=cfg.ckpt_dir, resume=cfg.resume
+    )
 
     # Train model
     epoch = None
@@ -309,10 +310,10 @@ def main(cfg: DictConfig):
             save_weights(
                 model,
                 optimizer,
+                mask,
                 val_loss,
                 step,
                 epoch + 1,
-                mask_steps=mask.steps if mask else 0,
                 ckpt_dir=cfg.ckpt_dir,
                 is_min=is_min,
             )

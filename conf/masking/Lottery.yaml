@@ -1,0 +1,18 @@
+# @package _group_
+name: Lottery
+
+density: 0.05  # The density of the overall sparse network.
+sparse_init: lottery-ticket
+lottery_mask_path: ${hydra:runtime.cwd}/outputs/${dataset.name}/
+dense_gradients: True
+
+growth_mode: momentum  # Growth mode. Choose from: momentum, random, and momentum_neuron.
+prune_mode: magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.
+redistribution_mode: momentum  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
+prune_rate: 0.0  # The pruning rate / prune rate.
+dense: False  # Enable dense mode. Default: False.
+
+decay_schedule: cosine # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
+apply_when: epoch_end # or step_end
+end_when: -1 # Epochs / Training steps till which mask updates are applied
+interval: 1 # Which epochs or steps to apply at

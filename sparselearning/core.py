@@ -182,7 +182,7 @@ class Masking(object):
         * print_nonzero_counts() [if verbose]
     """
 
-    def add_module(self, module, mask_step: int = 0):
+    def add_module(self, module, lottery_mask_path: "Path" = None):
         """
         Store dict of parameters to mask
         """
@@ -204,11 +204,7 @@ class Masking(object):
         self.remove_type(nn.BatchNorm1d)
 
         # Call init
-        self.init()
-        self.mask_step = mask_step
-
-        if mask_step:
-            logging.info(f"Initialised from ckpt at mask step: {mask_step}.")
+        self.init(lottery_mask_path)
 
     def adjust_prune_rate(self):
         """
@@ -300,12 +296,9 @@ class Masking(object):
         return name2regrowth
 
     @torch.no_grad()
-    def init(self):
-        # Number of params originally non-zero
-        # Total params * inital density
+    def init(self, lottery_mask_path: "Path"):
         # Performs weight initialization
-        self.sparsify()
-
+        self.sparsify(lottery_mask_path=lottery_mask_path)
         self.apply_mask()
         self.print_nonzero_counts()
 

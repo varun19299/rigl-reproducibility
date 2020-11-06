@@ -17,6 +17,7 @@ __all__ = [
     "Masking",
     "nn.Module",
     "optim",
+    "Path",
     "SummaryWriter",
     "Tensor",
     "tqdm",
@@ -25,6 +26,7 @@ __all__ = [
 ]
 
 from numpy import ndarray as Array
+from pathlib import Path
 from sparselearning.core import Masking
 from sparselearning.funcs.decay import Decay
 from typing import Dict, List, Any, Tuple, Union
