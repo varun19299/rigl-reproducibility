@@ -6,6 +6,9 @@ import torch.optim as optim
 
 @dataclass
 class Decay(object):
+    def __init__(self):
+        self.mode = "current"
+
     def step(self):
         raise NotImplementedError
 
@@ -20,7 +23,11 @@ class CosineDecay(Decay):
     """
 
     def __init__(
-        self, prune_rate: float = 0.3, T_max: int = 1000, eta_min: float = 0.0, last_epoch: int = -1
+        self,
+        prune_rate: float = 0.3,
+        T_max: int = 1000,
+        eta_min: float = 0.0,
+        last_epoch: int = -1,
     ):
         super().__init__()
         self._step = 0
@@ -97,6 +104,7 @@ class MagnitudePruneDecay(Decay):
     interval: int = 100
 
     def __post_init__(self):
+        self.mode = "cumulative"
         self.current_prune_rate = 0.0
         self._step = 0
 
@@ -112,16 +120,17 @@ class MagnitudePruneDecay(Decay):
         elif step >= self.T_max:
             return self.final_sparsity
 
-    def step(self, step: int = -1):
-        if step >= 0:
-            self.current_prune_rate = self.cumulative_sparsity(
-                step
-            ) - self.cumulative_sparsity(step - self.interval)
-        else:
-            self.current_prune_rate = self.cumulative_sparsity(
-                self._step
-            ) - self.cumulative_sparsity(self._step - self.interval)
-            self._step += 1
+    def step(self, step: int = -1, current_sparsity=-1):
+        if step == -1:
+            step = self._step
+
+        if current_sparsity == -1:
+            current_sparsity = self.cumulative_sparsity(step - self.interval)
+
+        self.current_prune_rate = self.cumulative_sparsity(step) - current_sparsity
+
+        step += 1
+        self._step = step
 
     def get_dr(self):
         return self.current_prune_rate

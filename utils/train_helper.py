@@ -267,6 +267,7 @@ def load_weights(
 
     if mask and "mask" in ckpt:
         mask.load_state_dict(ckpt["mask"])
+        mask.to_module_device_()
 
     epoch = ckpt.get("epoch", 1) - 1
     step = ckpt.get("step", 0)

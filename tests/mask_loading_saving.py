@@ -61,12 +61,19 @@ def test_save_load():
         loss.backward()
         assert model == mask.module
 
+        print(f"Loss {loss}")
+
         if step == 5:
             mask.update_connections()
         else:
             mask.step()
 
     save(model, optimizer, mask, step)
+    new_model, new_optimizer, new_mask, new_step = load(model, optimizer, mask, step)
+
+    assert new_step == step
+    assert new_model == model
+    assert new_mask.stats.total_density == mask.stats.total_density
 
     # Re-initialise
     model = models.WideResNet(depth=22, widen_factor=2)

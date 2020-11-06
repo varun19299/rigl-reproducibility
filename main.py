@@ -97,7 +97,7 @@ def train(
             if use_wandb:
                 log_dict = {"train_loss": loss, "lr": lr_scheduler.get_lr()[0]}
                 if mask:
-                    density = mask.stats.total_nonzero / mask.total_params
+                    density = mask.stats.total_density
                     log_dict = {
                         **log_dict,
                         "prune_rate": mask.prune_rate,
@@ -107,7 +107,7 @@ def train(
                     log_dict, step=global_step,
                 )
 
-    density = mask.stats.total_nonzero / mask.total_params if mask else 1.0
+    density = mask.stats.total_density if mask else 1.0
     msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f} Prune Rate {mask.prune_rate if mask else 0:.5f} Density {density:.5f}"
     logging.info(msg)
 
@@ -260,7 +260,9 @@ def main(cfg: DictConfig):
             redistribution_mode=cfg.masking.redistribution_mode,
         )
         # Support for lottery mask
-        lottery_mask_path = cfg.masking.lottery_mask_path if cfg.masking.name=="Lottery" else None
+        lottery_mask_path = (
+            cfg.masking.lottery_mask_path if cfg.masking.name == "Lottery" else None
+        )
         mask.add_module(model, lottery_mask_path)
 
     # Load from checkpoint
@@ -342,6 +344,10 @@ def main(cfg: DictConfig):
         device,
         is_test_set=True,
         use_wandb=cfg.use_wandb,
+    )
+
+    save_weights(
+        model, optimizer, mask, val_loss, step, epoch + 1, ckpt_dir=cfg.ckpt_dir,
     )
 
     return val_loss
