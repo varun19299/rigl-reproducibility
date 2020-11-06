@@ -114,7 +114,8 @@ class Masking(object):
     prune_rate_decay: "Decay"
 
     density: float = 0.1  # Sparsity = 1 - density
-    sparse_init: str = "random"  # or erdos_renyi
+    sparse_init: str = "random"  # see sparselearning/funcs/init_scheme.py
+
     dense_gradients: bool = False
 
     prune_mode: str = "magnitude"
@@ -145,6 +146,21 @@ class Masking(object):
 
         self.name2prune_rate = {}
         self.stats = LayerStats()
+
+        # Assertions
+        assert (
+            self.sparse_init in init_registry
+        ), f"Sparse init {self.sparse_init} not found. Available {init_registry.keys()}"
+        assert (
+            self.growth_mode in grow_registry.keys()
+        ), f"Available growth modes: {','.join(grow_registry.keys())}"
+
+        assert (
+            self.prune_mode in prune_registry.keys()
+        ), f"Available prune modes: {','.join(prune_registry.keys())}"
+        assert (
+            self.redistribution_mode in redistribute_registry.keys()
+        ), f"Available redistribute modes: {','.join(redistribute_registry.keys())}"
 
     """
     Code flow:
@@ -288,7 +304,7 @@ class Masking(object):
         # Number of params originally non-zero
         # Total params * inital density
         # Performs weight initialization
-        init_registry[self.sparse_init](self)
+        self.sparsify()
 
         self.apply_mask()
         self.print_nonzero_counts()
@@ -352,9 +368,7 @@ class Masking(object):
 
     @property
     def growth_func(self):
-        assert (
-            self.growth_mode in grow_registry.keys()
-        ), f"Available growth modes: {','.join(grow_registry.keys())}"
+
         return grow_registry[self.growth_mode]
 
     @property
@@ -421,9 +435,6 @@ class Masking(object):
         We use @property, so that it is always
         synced with prune_mode
         """
-        assert (
-            self.prune_mode in prune_registry.keys()
-        ), f"Available prune modes: {','.join(prune_registry.keys())}"
         return prune_registry[self.prune_mode]
 
     @property
@@ -441,9 +452,6 @@ class Masking(object):
         We use @property, so that it is always
         synced with redistribution_mode
         """
-        assert (
-            self.redistribution_mode in redistribute_registry.keys()
-        ), f"Available redistribute modes: {','.join(redistribute_registry.keys())}"
         return redistribute_registry[self.redistribution_mode]
 
     def remove_weight(self, name):
@@ -535,6 +543,9 @@ class Masking(object):
                 # mask the momentum matrix
                 buf = param_state["momentum_buffer"]
                 buf *= mask
+
+    def sparsify(self):
+        init_registry[self.sparse_init](self)
 
     def state_dict(self) -> "Dict":
         # Won't store hyperparams here
