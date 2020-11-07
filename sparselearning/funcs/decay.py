@@ -127,7 +127,8 @@ class MagnitudePruneDecay(Decay):
         if current_sparsity == -1:
             current_sparsity = self.cumulative_sparsity(step - self.interval)
 
-        self.current_prune_rate = self.cumulative_sparsity(step) - current_sparsity
+        # Threshold by 0
+        self.current_prune_rate = max(self.cumulative_sparsity(step) - current_sparsity,0)
 
         step += 1
         self._step = step

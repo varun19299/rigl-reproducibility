@@ -2,6 +2,7 @@ import math
 import torch
 import logging
 
+
 def magnitude_prune(masking, mask, weight, name):
     """Prunes the weights with smallest magnitude.
 
@@ -68,11 +69,18 @@ def magnitude_prune(masking, mask, weight, name):
 
 def global_magnitude_prune(masking):
     tokill = math.ceil(masking.prune_rate * masking.baseline_nonzero)
+    if tokill <= 0:
+        return 0
     total_removed = 0
     prev_removed = 0
 
+    # TODO: terrible logic, need to simplify
     if tokill:
-        while abs(total_removed - tokill) > masking.tolerance:
+        increment = masking.increment
+        tries_before_breaking = 10
+        tries = 0
+
+        while abs(total_removed - tokill) > tokill * masking.tolerance:
             total_removed = 0
             for name, weight in masking.module.named_parameters():
                 if name not in masking.masks:
@@ -81,14 +89,19 @@ def global_magnitude_prune(masking):
                 total_removed += masking.stats.nonzeros_dict[name] - remain
 
             if prev_removed == total_removed:
-                break
+                tries += 1
+                if tries == tries_before_breaking:
+                    break
+            else:
+                tries = 0
+
             prev_removed = total_removed
             if total_removed > tokill * (1.0 + masking.tolerance):
-                masking.prune_threshold *= 1.0 - masking.increment
-                masking.increment *= 0.99
+                masking.prune_threshold *= 1.0 - increment
+                increment *= 0.99
             elif total_removed < tokill * (1.0 - masking.tolerance):
-                masking.prune_threshold *= 1.0 + masking.increment
-                masking.increment *= 0.99
+                masking.prune_threshold *= 1.0 + increment
+                increment *= 0.99
 
         for name, weight in masking.module.named_parameters():
             if name not in masking.masks:

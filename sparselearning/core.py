@@ -127,7 +127,7 @@ class Masking(object):
     growth_threshold: float = 0.001
     growth_increment: float = 0.2
     increment: float = 0.2
-    tolerance: float = 0.02
+    tolerance: float = 1e-6
 
     # mask & module
     masks: "Dict[str, Tensor]" = field(default_factory=dict)
