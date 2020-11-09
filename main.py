@@ -210,17 +210,18 @@ def main(cfg: DictConfig):
         wandb.watch(model)
 
     # Training multiplier
-    training_multiplier = cfg.optimizer.training_multiplier
-    if training_multiplier != 1:
-        cfg.optimizer.decay_frequency *= training_multiplier
-        cfg.optimizer.epochs *= training_multiplier
+    cfg.optimizer.decay_frequency *= cfg.optimizer.training_multiplier
+    cfg.optimizer.decay_frequency = int(cfg.optimizer.decay_frequency)
 
-        cfg.masking.end_when *= training_multiplier
-        cfg.masking.end_when = int(cfg.masking.end_when)
+    cfg.optimizer.epochs *= cfg.optimizer.training_multiplier
+    cfg.optimizer.epochs = int(cfg.optimizer.epochs)
 
-        if cfg.masking.apply_when == "step_end":
-            cfg.masking.interval *= training_multiplier
-            cfg.masking.interval = int(cfg.masking.interval)
+    cfg.masking.end_when *= cfg.optimizer.training_multiplier
+    cfg.masking.end_when = int(cfg.masking.end_when)
+
+    if cfg.masking.apply_when == "step_end":
+        cfg.masking.interval *= cfg.optimizer.training_multiplier
+        cfg.masking.interval = int(cfg.masking.interval)
 
     # Setup optimizers, lr schedulers
     optimizer, lr_scheduler = get_optimizer(model, **cfg.optimizer)
@@ -260,9 +261,7 @@ def main(cfg: DictConfig):
             redistribution_mode=cfg.masking.redistribution_mode,
         )
         # Support for lottery mask
-        lottery_mask_path = (
-            cfg.masking.lottery_mask_path if cfg.masking.name == "Lottery" else None
-        )
+        lottery_mask_path = cfg.masking.get("lottery_mask_path", None)
         mask.add_module(model, lottery_mask_path)
 
     # Load from checkpoint

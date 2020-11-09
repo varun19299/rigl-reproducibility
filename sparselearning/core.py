@@ -315,6 +315,9 @@ class Masking(object):
         total_size = 0
         for name, weight in self.masks.items():
             total_size += weight.numel()
+
+        self.stats.total_nonzero = self.baseline_nonzero
+        self.stats.total_zero = self.total_params - self.baseline_nonzero
         logging.info(f"Total parameters after removed layers: {total_size}.")
         logging.info(
             f"Total parameters under sparsity level of {self.density}: {self.baseline_nonzero}"

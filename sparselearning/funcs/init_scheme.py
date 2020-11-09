@@ -119,6 +119,10 @@ def lottery_ticket_init(masking: "Masking", lottery_mask_path: "Path"):
         masking.baseline_nonzero += masking.masks[name].sum().int().item()
         masking.total_params += weight.numel()
 
+    logging.info(
+        f"Loaded mask from {lottery_mask_path} with density: {masking.baseline_nonzero/masking.total_params}"
+    )
+
 
 def random_init(masking: "Masking", **kwargs):
     # initializes each layer with a random percentage of dense weights

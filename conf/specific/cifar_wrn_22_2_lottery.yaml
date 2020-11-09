@@ -1,0 +1,17 @@
+# @package _global_
+exp_name: ${masking.name}
+seed: 0
+model: wrn-22-2
+
+dataset:
+  batch_size: 128
+  validation_split: 0.1
+
+optimizer:
+  epochs: 250
+  training_multiplier: 1 #0.28 # 70 / 250
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 5e-4
+  decay_frequency: 30000
+  decay_factor: 0.2
