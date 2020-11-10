@@ -404,9 +404,6 @@ class Masking(object):
             else:
                 setattr(self, key, kwargs[key])
 
-    # def load_mask(self, ckpt_path: "Path"):
-    #     state_dict = torch.load(ckpt_path, map_location="cpu")
-
     def print_nonzero_counts(self):
         for name, mask in self.masks.items():
             num_nonzeros = (mask != 0).sum().item()

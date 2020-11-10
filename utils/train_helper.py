@@ -191,6 +191,7 @@ def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
     for name, param in model.named_parameters():
         if not param.requires_grad:
             continue
+        # Bias, BN have shape 1
         if len(param.shape) == 1 or name in skip_list:
             no_decay.append(param)
         else:

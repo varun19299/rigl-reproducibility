@@ -45,6 +45,6 @@ fi
 
 #python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar_wrn_22_2_pruning exp_name='Pruning' seed=$SLURM_ARRAY_TASK_ID  masking.final_density=0.05,0.1,0.2,0.5 use_wandb=True -m
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=Lottery +specific=cifar_wrn_22_2_lottery exp_name='Lottery' seed=$SLURM_ARRAY_TASK_ID  masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=Lottery +specific=cifar_wrn_22_2_lottery exp_name='Lottery_corrected' seed=$SLURM_ARRAY_TASK_ID  masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
 
 #wait
