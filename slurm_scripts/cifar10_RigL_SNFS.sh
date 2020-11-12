@@ -43,14 +43,12 @@ fi
 # Start Job here
 # Note: we're using the same GPU
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK_truly_sparse_twice" masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK_sanity" masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random_truly_sparse_twice" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random_sanity" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
 
 #python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_ERK" masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
-#
+
 #python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
-#
-#python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SET_ERK" masking.density=0.05,0.1,0.2,0.5 use_wandb=True -m
 
 #wait

@@ -527,18 +527,15 @@ class Masking(object):
             param_state = self.optimizer.state[weight]
             mask = self.masks[name]
 
+            # mask the momentum matrix
             # Adam
             if "exp_avg" in param_state:
-                buf_1 = param_state["exp_avg"]
-                buf_2 = param_state["exp_avg_sq"]
-                buf_1 *= mask
-                buf_2 *= mask
+                param_state["exp_avg"] *= mask
+                param_state["exp_avg_sq"] *= mask
 
             # SGD
             elif "momentum_buffer" in param_state:
-                # mask the momentum matrix
-                buf = param_state["momentum_buffer"]
-                buf *= mask
+                param_state["momentum_buffer"] *= mask
 
     def sparsify(self, **kwargs):
         init_registry[self.sparse_init](self, **kwargs)
@@ -560,6 +557,9 @@ class Masking(object):
         """
         self.optimizer.step()
         self.apply_mask()
+
+        if not self.dense_gradients:
+            self.reset_momentum()
 
         # Get updated prune rate
         if self.prune_rate_decay.mode == "cumulative":
