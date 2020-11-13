@@ -40,7 +40,7 @@ hydra:
 #       max_epochs_without_improvement: 10
   launcher:
     _target_: hydra_plugins.hydra_joblib_launcher.joblib_launcher.JoblibLauncher
-    n_jobs: 5
+    n_jobs: 6
     backend: null
     prefer: processes
     require: null

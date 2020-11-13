@@ -13,6 +13,7 @@ __pycache__/*
 
 # Datasets
 datasets/*
+data/*
 .pytest_cache/*
 
 Icon*

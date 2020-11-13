@@ -4,7 +4,7 @@
 
 ## Install 
 
-* `pytorch`: 1.6.0+
+* `pytorch`: 1.7.0+
 * `pip install -r requirements.txt`
 
 ## W&B API key
