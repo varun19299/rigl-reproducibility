@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=cifar-wrn-hyperparam-density-0.1    # create a short name for your job
+#SBATCH --job-name=cifar-wrn-hyperparam-density-0.2    # create a short name for your job
 
 #SBATCH --partition=batch_default   # use batch_default, or wacc for quick (< 30 min) ones
 
@@ -43,7 +43,7 @@ fi
 # Start Job here
 # Note: we're using the same GPU
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK_hyperparam" masking.density=0.2 masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 use_wandb=True -m
+#python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK_hyperparam" masking.density=0.2 masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 use_wandb=True -m
 
 python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='RigL_Random_hyperparam' masking.density=0.2 masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 masking.sparse_init=random use_wandb=True -m
 

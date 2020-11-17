@@ -1,7 +1,4 @@
 # @package _global_
-defaults:
-  - hydra/sweeper: optuna
-
 exp_name: ${masking.name}
 seed: 0
 model: wrn-22-2

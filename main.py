@@ -301,7 +301,9 @@ def main(cfg: DictConfig):
         )
 
         # Save weights
-        if (epoch + 1) % cfg.ckpt_interval == 0:
+        if (epoch + 1 == cfg.optimizer.epochs) or (
+            (epoch + 1) % cfg.ckpt_interval == 0
+        ):
             if val_loss < best_val_loss:
                 is_min = True
                 best_val_loss = val_loss
@@ -343,10 +345,6 @@ def main(cfg: DictConfig):
         device,
         is_test_set=True,
         use_wandb=cfg.use_wandb,
-    )
-
-    save_weights(
-        model, optimizer, mask, val_loss, step, epoch + 1, ckpt_dir=cfg.ckpt_dir,
     )
 
     return val_loss
