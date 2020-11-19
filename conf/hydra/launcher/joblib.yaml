@@ -1,0 +1,13 @@
+# @package _group_
+_target_: hydra_plugins.hydra_joblib_launcher.joblib_launcher.JoblibLauncher
+n_jobs: 6
+backend: null
+prefer: processes
+require: null
+verbose: 0
+timeout: null
+pre_dispatch: 2*n_jobs
+batch_size: auto
+temp_folder: null
+max_nbytes: null
+mmap_mode: r

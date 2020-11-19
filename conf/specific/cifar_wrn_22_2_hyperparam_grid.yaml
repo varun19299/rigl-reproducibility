@@ -2,17 +2,16 @@
 exp_name: ${masking.name}
 seed: 0
 model: wrn-22-2
-project: cifar10
+project: cifar10 hyperparams
 
 masking:
-  name: Static
   sparse_init: erdos-renyi-kernel
   density: 0.2  # The density of the overall sparse network.
   prune_rate: 0.3  # The pruning rate / prune rate.
   decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
   apply_when: step_end  # or step_end
   interval: 100 # Which epochs or steps to apply at
-  end_when: -1
+  end_when: 65918
 
 dataset:
   batch_size: 128

@@ -6,13 +6,11 @@ defaults:
   - hydra/job_logging: colorlog
   - hydra/hydra_logging: colorlog
   - hydra/launcher: joblib
-# Uncomment the next line
-# for Ax Hyperparam sweep
-#  - hydra/sweeper: ax
 
 exp_name: ${masking.name}
 seed: 0
 model: lenet5
+project: cifar10
 
 # Train args
 device: cuda # cpu or cuda

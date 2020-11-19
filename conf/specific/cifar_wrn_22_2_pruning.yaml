@@ -2,6 +2,7 @@
 exp_name: ${masking.name}
 seed: 0
 model: wrn-22-2
+project: cifar10
 
 masking:
   name: Pruning

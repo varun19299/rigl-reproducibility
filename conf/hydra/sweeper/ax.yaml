@@ -1,0 +1,12 @@
+# @package _group_
+ax_config:
+  # max_trials is application-specific. Tune it for your use case
+  max_trials: 8
+  experiment:
+    # Default to minimize, set to false to maximize
+    minimize: false
+  early_stop:
+    # Number of epochs without a significant improvement from
+    # the currently known best parameters
+    # An Epoch is defined as a batch of trials executed in parallel
+    max_epochs_without_improvement: 10

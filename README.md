@@ -7,6 +7,12 @@
 * `pytorch`: 1.7.0+
 * `pip install -r requirements.txt`
 
+## Installing Optuna
+
+Clone hydra from https://github.com/toshihikoyanase/hydra/tree/add-optuna-sweeper.
+
+Install `optuna` under `plugins`. Note that this might be merged into master hydra soon.
+
 ## W&B API key
 
 Copy your WandB API key to `wandb_api.key`.

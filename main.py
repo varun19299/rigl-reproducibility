@@ -202,7 +202,7 @@ def main(cfg: DictConfig):
         wandb.init(
             entity="ml-reprod-2020",
             config=OmegaConf.to_container(cfg, resolve=True),
-            project="cifar10 hyperparams",
+            project=cfg.project,
             name=f"{cfg.dataset.name}_{cfg.exp_name}_density_{_density}_alpha_{cfg.masking.prune_rate}_deltaT_{cfg.masking.interval}",
             reinit=True,
             save_code=True,

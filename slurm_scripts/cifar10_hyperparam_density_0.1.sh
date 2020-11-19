@@ -26,9 +26,9 @@ echo "== Time limit: ${SBATCH_TIMELIMIT}"
 nvidia-smi
 
 # Conda stuff
-module load cuda/10.2 anaconda/wml
+module load cuda/11.0 anaconda/wml
 source ~/.zshrc
-conda activate torch38
+conda activate torch1.7_py38
 
 # NVIDIA SMI monitoring
 if [ $SLURM_ARRAY_TASK_ID -eq 0 ]; then
@@ -42,9 +42,9 @@ fi
 # Start Job here
 # Note: we're using the same GPU
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=0 exp_name="RigL_ERK_hyperparam" masking.density=0.1 masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 use_wandb=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_hyperparam_grid seed=0 exp_name="RigL_ERK_hyperparam" masking.density=0.1 masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 use_wandb=True -m
 
-#python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='RigL_Random_hyperparam' masking.density=0.1 masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 masking.sparse_init=random use_wandb=True -m
+#python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_hyperparam_grid seed=$SLURM_ARRAY_TASK_ID exp_name='RigL_Random_hyperparam' masking.density=0.1 masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 masking.sparse_init=random use_wandb=True -m
 
 
 #wait
