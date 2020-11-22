@@ -1,9 +1,9 @@
 # @package _group_
 optuna_config:
   direction: minimize
-  study_name: sphere
-  storage: null
-  n_trials: 20
-  n_jobs: 6
-  sampler: TPESampler
+  study_name: cifar10-hyperparams-alpha-delta-T
+  storage: sqlite:///${hydra.sweeper.optuna_config.study_name}_${masking.sparse_init}.db
+  n_trials: 21
+  n_jobs: 3
+  sampler: tpe
   seed: 123
