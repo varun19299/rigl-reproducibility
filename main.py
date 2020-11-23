@@ -296,7 +296,7 @@ def main(cfg: DictConfig):
             **_masking_args,
         )
 
-        val_loss, _ = evaluate(
+        val_loss, val_accuracy = evaluate(
             model, val_loader, step, epoch + 1, device, use_wandb=cfg.use_wandb,
         )
 
@@ -333,7 +333,7 @@ def main(cfg: DictConfig):
     if not epoch:
         # Run val anyway
         epoch = cfg.optimizer.epochs - 1
-        val_loss, _ = evaluate(
+        val_loss, val_accuracy = evaluate(
             model, val_loader, step, epoch + 1, device, use_wandb=cfg.use_wandb,
         )
 
@@ -347,7 +347,7 @@ def main(cfg: DictConfig):
         use_wandb=cfg.use_wandb,
     )
 
-    return val_loss
+    return val_accuracy
 
 
 if __name__ == "__main__":

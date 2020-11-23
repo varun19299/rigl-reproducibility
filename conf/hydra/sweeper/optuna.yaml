@@ -1,9 +1,9 @@
 # @package _group_
 optuna_config:
-  direction: minimize
-  study_name: cifar10-hyperparams-alpha-delta-T
-  storage: sqlite:///${hydra.sweeper.optuna_config.study_name}_${masking.sparse_init}.db
-  n_trials: 21
+  direction: maximize
+  study_name: cifar10-alpha-deltaT-${masking.sparse_init}-density-${masking.density}
+  storage: sqlite:///outputs/databases/cifar10_alpha_deltaT.db
+  n_trials: 15
   n_jobs: 3
   sampler: tpe
   seed: 123

@@ -4,7 +4,7 @@ ax_config:
   max_trials: 20
   experiment:
     # Default to minimize, set to false to maximize
-    minimize: true
+    minimize: false
   early_stop:
     # Number of epochs without a significant improvement from
     # the currently known best parameters

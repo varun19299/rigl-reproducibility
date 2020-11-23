@@ -2,9 +2,9 @@
 # Hydra configs
 hydra:
   run:
-    dir: ./outputs/${dataset.name}/${exp_name}/${hydra.job.override_dirname}
+    dir: ./outputs/${dataset.name}/${exp_name}/${masking.density}/${hydra.job.override_dirname}
   sweep:
-    dir: ./outputs/${dataset.name}/${exp_name}
+    dir: ./outputs/${dataset.name}/${exp_name}/${masking.density}
     subdir: ${hydra.job.override_dirname}
   job_logging:
     handlers:
@@ -23,6 +23,7 @@ hydra:
           - exp_name
           - dataset
           - masking
+          - masking.density
           - optimizer
           - hydra.verbose
           - use_wandb
