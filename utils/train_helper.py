@@ -212,7 +212,7 @@ def save_weights(
     ckpt_dir: str,
     is_min: bool = True,
 ):
-    logging.info(f"Epoch {epoch + 1} saving weights")
+    logging.info(f"Epoch {epoch} saving weights")
 
     state_dict = {
         "step": step,
@@ -270,7 +270,7 @@ def load_weights(
         mask.load_state_dict(ckpt["mask"])
         mask.to_module_device_()
 
-    epoch = ckpt.get("epoch", 1) - 1
+    epoch = ckpt.get("epoch", 0)
     step = ckpt.get("step", 0)
     val_loss = ckpt.get("val_loss", "not stored")
 
