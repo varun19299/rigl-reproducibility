@@ -2,7 +2,10 @@
 exp_name: ${masking.name}
 seed: 0
 model: wrn-22-2
-project: cifar10
+
+wandb:
+  project: cifar10
+  name: ${dataset.name}_${exp_name}_density_${masking.density}
 
 masking:
   sparse_init: erdos-renyi-kernel

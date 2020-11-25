@@ -190,20 +190,15 @@ def main(cfg: DictConfig):
     ).to(device)
 
     # wandb
-    if cfg.use_wandb:
-        with open(cfg.wandb_api_key) as f:
+    if cfg.wandb.use:
+        with open(cfg.wandb.api_key) as f:
             os.environ["WANDB_API_KEY"] = f.read()
 
-        _density = (
-            cfg.masking.final_density
-            if cfg.masking.name == "Pruning"
-            else cfg.masking.density
-        )
         wandb.init(
             entity="ml-reprod-2020",
             config=OmegaConf.to_container(cfg, resolve=True),
-            project=cfg.project,
-            name=f"{cfg.dataset.name}_{cfg.exp_name}_density_{_density}_alpha_{cfg.masking.prune_rate}_deltaT_{cfg.masking.interval}",
+            project=cfg.wandb.project,
+            name=cfg.wandb.name,
             reinit=True,
             save_code=True,
         )
@@ -292,12 +287,12 @@ def main(cfg: DictConfig):
             device,
             mixed_precision_scalar,
             log_interval=cfg.log_interval,
-            use_wandb=cfg.use_wandb,
+            use_wandb=cfg.wandb.use,
             **_masking_args,
         )
 
         val_loss, val_accuracy = evaluate(
-            model, val_loader, step, epoch + 1, device, use_wandb=cfg.use_wandb,
+            model, val_loader, step, epoch + 1, device, use_wandb=cfg.wandb.use,
         )
 
         # Save weights
@@ -334,7 +329,7 @@ def main(cfg: DictConfig):
         # Run val anyway
         epoch = cfg.optimizer.epochs - 1
         val_loss, val_accuracy = evaluate(
-            model, val_loader, step, epoch + 1, device, use_wandb=cfg.use_wandb,
+            model, val_loader, step, epoch + 1, device, use_wandb=cfg.wandb.use,
         )
 
     evaluate(
@@ -344,7 +339,7 @@ def main(cfg: DictConfig):
         epoch + 1,
         device,
         is_test_set=True,
-        use_wandb=cfg.use_wandb,
+        use_wandb=cfg.wandb.use,
     )
 
     return val_accuracy

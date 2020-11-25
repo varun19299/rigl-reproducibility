@@ -2,7 +2,10 @@
 exp_name: ${masking.name}
 seed: 0
 model: wrn-22-2
-project: cifar10 hyperparams
+
+wandb:
+  project: cifar10 hyperparams
+  name: ${dataset.name}_${exp_name}_density_${masking.density}_alpha_${masking.prune_rate}_deltaT_${masking.interval}
 
 masking:
   sparse_init: erdos-renyi-kernel

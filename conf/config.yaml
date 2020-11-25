@@ -10,7 +10,6 @@ defaults:
 exp_name: ${masking.name}
 seed: 0
 model: lenet5
-project: cifar10
 
 # Train args
 device: cuda # cpu or cuda
@@ -25,6 +24,12 @@ resume: True
 save_features: False
 
 # W&B
+wandb:
+  use: False
+  api_key: ${hydra:runtime.cwd}/wandb_api.key
+  project: cifar10
+  name: ${exp_name}
+
 use_wandb: False
 wandb_api_key: ${hydra:runtime.cwd}/wandb_api.key
 
