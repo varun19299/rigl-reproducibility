@@ -27,6 +27,7 @@ save_features: False
 wandb:
   use: False
   api_key: ${hydra:runtime.cwd}/wandb_api.key
+  entity: ml-reprod-2020
   project: cifar10
   name: ${exp_name}
 

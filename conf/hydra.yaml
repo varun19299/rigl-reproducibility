@@ -26,4 +26,4 @@ hydra:
           - masking.density
           - optimizer
           - hydra.verbose
-          - use_wandb
+          - wandb.use

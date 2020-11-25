@@ -195,7 +195,7 @@ def main(cfg: DictConfig):
             os.environ["WANDB_API_KEY"] = f.read()
 
         wandb.init(
-            entity="ml-reprod-2020",
+            entity=cfg.wandb.entity,
             config=OmegaConf.to_container(cfg, resolve=True),
             project=cfg.wandb.project,
             name=cfg.wandb.name,
