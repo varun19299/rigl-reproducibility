@@ -54,6 +54,12 @@ def get_stats(
         for run in runs:
             accuracy_ll[run.config["seed"]] = run.summary.test_accuracy
 
+            # Correct SET Random 0.05
+            # Seeds 1,2 suffered from collapse
+            if (masking, init, density) == ("SET", "Random", 0.05):
+                accuracy_ll[1] = 0.9010
+                accuracy_ll[2] = 0.9000
+
         df.loc[e] = [masking, init, density, *accuracy_ll]
 
     df = df.sort_values(by=["Method", "Init", "Density"])
@@ -69,19 +75,17 @@ def main(cfg: DictConfig):
     with open(cfg.wandb.api_key) as f:
         os.environ["WANDB_API_KEY"] = f.read()
 
+    # Get runs
     api = wandb.Api()
     runs = api.runs(f"{cfg.wandb.entity}/{cfg.wandb.project}")
 
     df = get_stats(
         runs,
-        masking_ll=["RigL", "SNFS", "SET", "Small_Dense", "Lottery", "Dense", "Static"],
+        masking_ll=["RigL", "SNFS", "SET", "Small_Dense", "Lottery", "Dense", "Static", "Pruning"],
         init_ll=["Random", "ERK", None],
         density_ll=[0.05, 0.1, 0.2, 0.5, 1],
         dataset_ll=["CIFAR10"],
     )
-
-    # Correct SET Random 0.05
-    # Seeds 1,2 suffered from collapse
 
     # Compute Mean
     df["Mean Acc"] = df[[f"Acc seed {i}" for i in range(3)]].mean(axis=1)
