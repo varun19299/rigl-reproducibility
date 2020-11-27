@@ -1,7 +1,7 @@
 import logging
 from models import registry
 from sparselearning.core import Masking
-from sparselearning.funcs.decay import CosineDecay
+from sparselearning.funcs.decay import CosineDecay, MagnitudePruneDecay
 import torch
 from torch import nn, optim
 from typing import TYPE_CHECKING
@@ -98,7 +98,7 @@ def get_pre_activations_dict(net: "nn.Module", input_tensor: "Tensor"):
     return activation_dict
 
 
-def wrn_22_2_FLOPs(sparse_init: str = "random", density: float = 0.2) -> int:
+def wrn_22_2_FLOPs(sparse_init: str = "random", density: float = 0.2,) -> int:
     model_class, args = registry["wrn-22-2"]
     model = model_class(*args)
     decay = CosineDecay()
@@ -110,14 +110,55 @@ def wrn_22_2_FLOPs(sparse_init: str = "random", density: float = 0.2) -> int:
     return get_FLOPs(mask, torch.rand(1, 3, 32, 32))
 
 
+def RigL_FLOPs(sparse_FLOPs: int, dense_FLOPs: int, mask_interval: int = 100):
+    return (2 * sparse_FLOPs + dense_FLOPs + 3 * sparse_FLOPs * mask_interval) / (
+        mask_interval + 1
+    )
+
+
+def SNFS_FLOPs(sparse_FLOPs: int, dense_FLOPs: int, mask_interval: int = 100):
+    return 2 * sparse_FLOPs + dense_FLOPs
+
+
+def SET_FLOPs(sparse_FLOPs: int, dense_FLOPs: int, mask_interval: int = 100):
+    return 3 * sparse_FLOPs
+
+
+def Pruning_FLOPs(
+    dense_FLOPs: int, decay: MagnitudePruneDecay, total_steps: int = 87891
+):
+    avg_sparsity = 0.0
+    for i in range(0, total_steps):
+        avg_sparsity += decay.cumulative_sparsity(i)
+
+    avg_sparsity /= total_steps
+
+    return 3 * dense_FLOPs * (1 - avg_sparsity)
+
+
+# TODO: Pruning calculation
+# TODO: RigL, SNFS, SET calculation
+
 if __name__ == "__main__":
     dense_FLOPs = wrn_22_2_FLOPs(density=1.0)
+    dense_train_FLOPs = 3 * dense_FLOPs  # gradient of param and activation
     print(f"WRN-22-2 Dense FLOPS: {dense_FLOPs:,} \n")
 
-    for density in [0.05, 0.1, 0.2, 0.5]:
+    # Pruning & Masking
+    total_steps = 87891
+    T_max = 65918
+    interval = 100
+    # Pruning
+    T_start = 700
+
+    for density in [0.1, 0.2]:
         Random_FLOPs = wrn_22_2_FLOPs("random", density)
         ER_FLOPs = wrn_22_2_FLOPs("erdos-renyi", density)
         ERK_FLOPs = wrn_22_2_FLOPs("erdos-renyi-kernel", density)
+
+        pruning_decay = MagnitudePruneDecay(
+            final_sparsity=1 - density, T_max=T_max, T_start=T_start, interval=interval
+        )
 
         print(
             f"Random Density: {density} Inference FLOPs:{Random_FLOPs:,} Proportion:{Random_FLOPs/dense_FLOPs:.4f}"
@@ -130,3 +171,31 @@ if __name__ == "__main__":
         )
 
         print("\n")
+
+        for sparse_FLOPs, init_name in zip(
+            [Random_FLOPs, ERK_FLOPs], ["Random", "ERK"]
+        ):
+            set_train_FLOPs = SET_FLOPs(sparse_FLOPs, dense_FLOPs, interval)
+            snfs_train_FLOPs = SNFS_FLOPs(sparse_FLOPs, dense_FLOPs, interval)
+            rigl_train_FLOPs = RigL_FLOPs(sparse_FLOPs, dense_FLOPs, interval)
+
+            print(
+                f"SET {init_name.capitalize()} Density: {density} Train FLOPs:{set_train_FLOPs:,} Proportion:{set_train_FLOPs / dense_train_FLOPs:.4f}"
+            )
+            print(
+                f"SNFS {init_name.capitalize()} Density: {density} Train FLOPs:{snfs_train_FLOPs:,} Proportion:{snfs_train_FLOPs / dense_train_FLOPs:.4f}"
+            )
+            print(
+                f"RigL {init_name.capitalize()} Density: {density} Train FLOPs:{rigl_train_FLOPs:,} Proportion:{rigl_train_FLOPs / dense_train_FLOPs:.4f}"
+            )
+
+            print("\n")
+
+        pruning_train_FLOPs = Pruning_FLOPs(
+            dense_FLOPs, pruning_decay, total_steps=total_steps
+        )
+        print(
+            f"Pruning Density: {density} Train FLOPs:{pruning_train_FLOPs:,} Proportion:{pruning_train_FLOPs / dense_train_FLOPs:.4f}"
+        )
+
+        print("-----------\n")
