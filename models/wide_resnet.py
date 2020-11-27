@@ -31,6 +31,7 @@ class WideResNet(nn.Module):
         bench_model: bool = benchmark model speedup (due to sparsity).
         """
         super(WideResNet, self).__init__()
+        self.bench = None if not bench_model else SparseSpeedupBench()
 
         small_dense_multiplier = np.sqrt(small_dense_density)
         nChannels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]

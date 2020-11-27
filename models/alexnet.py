@@ -1,4 +1,4 @@
-from models import SparseSpeedupBench
+from models.benchmark import SparseSpeedupBench
 import torch.nn as nn
 import torch.nn.functional as F
 
