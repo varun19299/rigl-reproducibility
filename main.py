@@ -212,10 +212,6 @@ def main(cfg: DictConfig):
     cfg.masking.end_when *= cfg.optimizer.training_multiplier
     cfg.masking.end_when = int(cfg.masking.end_when)
 
-    if cfg.masking.apply_when == "step_end":
-        cfg.masking.interval *= cfg.optimizer.training_multiplier
-        cfg.masking.interval = int(cfg.masking.interval)
-
     # Setup optimizers, lr schedulers
     optimizer, lr_scheduler = get_optimizer(model, **cfg.optimizer)
 

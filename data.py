@@ -23,12 +23,14 @@ class DatasetSplitter(Dataset):
             raise ValueError(f"Dataset split {self.split} is not positive")
 
     def __len__(self):
-        step = 1 if not self.split.step else self.split.step
-        return (self.split.stop - self.split.start) // step
+        # absolute indices
+        _indices = self.split.indices(len((self.parent_dataset)))
+        # compute length
+        return len(range(*_indices))
 
     def __getitem__(self, index):
         assert index < len(self), "index out of bounds in split_datset"
-        return self.parent_dataset[index + self.split.start]
+        return self.parent_dataset[index + int(self.split.start or 0)]
 
 
 def _get_CIFAR10_dataset(root: "Path") -> "Union[Dataset,Dataset]":
