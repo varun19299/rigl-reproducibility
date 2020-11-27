@@ -74,7 +74,6 @@ def global_magnitude_prune(masking):
     total_removed = 0
     prev_removed = 0
 
-    # TODO: terrible logic, need to simplify
     if tokill:
         increment = masking.increment
         tries_before_breaking = 10

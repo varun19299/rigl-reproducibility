@@ -1,0 +1,39 @@
+"""
+Try testing salient dataset features:
+    1. Is it downloaded?
+    2. Does the loader work
+    3. Does the loader have data in your desired format?
+"""
+import data
+from data import get_dataloaders, DatasetSplitter, registry
+import pytest
+import torch
+from torch.utils.data import TensorDataset
+
+
+def test_splitter():
+    train_x = torch.rand(10, 3, 32, 32)
+    train_y = torch.rand(10, 10)
+    dataset = TensorDataset(train_x, train_y)
+    with pytest.raises(Exception) as e_info:
+        # Should raise Value error on slice
+        DatasetSplitter(dataset, slice(3, 1))
+        print(e_info)
+
+
+@pytest.mark.parametrize("dataset", ["CIFAR10", "MNIST", "Mini-Imagenet"])
+def test_registry(dataset):
+    full_dataset, test_dataset = registry[dataset](root=f"datasets/{dataset}")
+
+
+def loader_loop(loader):
+    for x, y in loader:
+        assert len(x.shape) == 4  # NCHWW
+        assert len(y.shape) == 1  # class ID
+
+
+@pytest.mark.parametrize("dataset", ["CIFAR10", "MNIST", "Mini-Imagenet"])
+def test_get_loaders(dataset):
+    loaders = get_dataloaders(dataset, root=f"datasets/{dataset}")
+    for loader in loaders:
+        loader_loop(loader)

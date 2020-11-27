@@ -3,16 +3,15 @@ import torch
 from torch import nn
 from typing import TYPE_CHECKING
 import utils.micronet_challenge.counting as counting
-from utils.micronet_challenge.counting import count_ops
 
 if TYPE_CHECKING:
     from utils.typing_alias import *
 
 
-def get_FLOPS(masking: "Masking", input_tensor: "Tensor", param_size: int = 32):
-    total_FLOPS = 0
+def get_FLOPs(masking: "Masking", input_tensor: "Tensor", param_size: int = 32):
+    total_FLOPs = 0
 
-    activation_dict = get_activations_dict(masking.module, input_tensor)
+    activation_dict = get_pre_activations_dict(masking.module, input_tensor)
 
     for name, module in masking.module.named_modules():
         layer_op = None
@@ -57,19 +56,28 @@ def get_FLOPS(masking: "Masking", input_tensor: "Tensor", param_size: int = 32):
             continue
 
         weight = module.weight
-        sparsity = (weight.data == 0).sum().int() / weight.numel()
-        print(name, activation_dict[name].shape, sparsity)
+        sparsity = (weight.data == 0).sum().item() / weight.numel()
         param_count, n_mult, n_add = counting.count_ops(layer_op, sparsity, param_size)
 
-        total_FLOPS += n_mult + n_add
+        logging.debug(
+            f"{name}: shape {weight.shape} params: {param_count} sparsity: {sparsity} FLOPs: {n_mult+ n_add}"
+        )
+        total_FLOPs += n_mult + n_add
 
-    return total_FLOPS.int().item()
+    total_FLOPs = int(total_FLOPs)
+    logging.debug(f"Total FLOPs: {total_FLOPs}")
+    return total_FLOPs
 
 
-def get_activations_dict(net: "nn.Module", input_tensor: "Tensor"):
+def get_pre_activations_dict(net: "nn.Module", input_tensor: "Tensor"):
     """
     Find (pre)activation dict for every possible module in net
     """
+    # TODO: this function invokes the warning
+    # torch/nn/modules/container.py:434: UserWarning: Setting attributes on ParameterList is not supported.
+    # warnings.warn("Setting attributes on ParameterList is not supported.")
+    # Why?
+
     activation_dict = {}
 
     def _get_activation(name):
@@ -92,20 +100,16 @@ if __name__ == "__main__":
     from sparselearning.core import Masking
     from sparselearning.funcs.decay import CosineDecay
     from torch import optim
-    from torchsummary import summary
 
     model = WideResNet(*registry["wrn-22-2"][1])
-
-    activation_dict = get_activations_dict(model, torch.rand(1, 3, 32, 32))
-
-    print(activation_dict["block1.layer.0.relu1"].shape)
+    activation_dict = get_pre_activations_dict(model, torch.rand(1, 3, 32, 32))
 
     decay = CosineDecay()
     optimizer = optim.SGD(model.parameters(), lr=0.1)
 
-    mask = Masking(optimizer, decay, sparse_init="erdos-renyi-kernel", density=0.1)
+    mask = Masking(optimizer, decay, sparse_init="erdos-renyi-kernel", density=1)
     # mask = Masking(optimizer, decay, sparse_init="random", density=0.1)
     mask.add_module(model)
-    total_FLOPS = get_FLOPS(mask, torch.rand(1, 3, 32, 32))
+    total_FLOPS = get_FLOPs(mask, torch.rand(1, 3, 32, 32))
 
     print(f"{total_FLOPS:,}")

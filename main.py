@@ -1,12 +1,11 @@
+from data import get_dataloaders
 import hydra
 import logging
 from omegaconf import DictConfig, OmegaConf
 import os
-
 from sparselearning.core import Masking
 from sparselearning.models import registry as model_registry
 from sparselearning.funcs.decay import registry as decay_registry
-
 import torch
 import torch.nn.functional as F
 from torch.cuda.amp import autocast, GradScaler
@@ -17,7 +16,6 @@ if TYPE_CHECKING:
     from utils.typing_alias import *
 
 from utils.train_helper import (
-    get_dataloaders,
     get_optimizer,
     load_weights,
     save_weights,

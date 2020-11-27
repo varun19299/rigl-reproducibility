@@ -1,15 +1,9 @@
 import logging
-import os
-from math import floor
-import numpy as np
-from pathlib import Path
 import re
 import torch
 from torch import nn
-import torch.nn.functional as F
 from torch import optim
-from torch.utils.data import Dataset, DataLoader
-from torchvision import datasets, transforms
+
 
 from typing import TYPE_CHECKING
 
@@ -17,138 +11,6 @@ if TYPE_CHECKING:
     from utils.typing_alias import *
 
 from utils.model_serialization import load_state_dict
-
-
-class DatasetSplitter(Dataset):
-    """This splitter makes sure that we always use the same training/validation split"""
-
-    def __init__(
-        self, parent_dataset: Dataset, split_start: int = -1, split_end: int = -1
-    ):
-        split_start = split_start if split_start != -1 else 0
-        split_end = split_end if split_end != -1 else len(parent_dataset)
-        assert (
-            split_start <= len(parent_dataset) - 1
-            and split_end <= len(parent_dataset)
-            and split_start < split_end
-        ), "invalid dataset split, check bounds of split"
-
-        self.parent_dataset = parent_dataset
-        self.split_start = split_start
-        self.split_end = split_end
-
-    def __len__(self):
-        return self.split_end - self.split_start
-
-    def __getitem__(self, index):
-        assert index < len(self), "index out of bounds in split_datset"
-        return self.parent_dataset[index + self.split_start]
-
-
-def get_dataloaders(
-    name: str,
-    root: str,
-    batch_size: int,
-    test_batch_size: int,
-    validation_split: float = 0.0,
-    max_threads: int = 3,
-):
-    """Creates augmented train, validation, and test data loaders."""
-
-    assert name in ["CIFAR10", "MNIST"]
-
-    if name == "CIFAR10":
-        normalize = transforms.Normalize(
-            (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
-        )
-
-        train_transform = transforms.Compose(
-            [
-                transforms.Pad(4, padding_mode="reflect"),
-                transforms.RandomCrop(32),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                normalize,
-            ]
-        )
-
-        test_transform = transforms.Compose([transforms.ToTensor(), normalize])
-
-        full_dataset = datasets.CIFAR10(
-            root, train=True, transform=train_transform, download=True
-        )
-        test_dataset = datasets.CIFAR10(
-            root, train=False, transform=test_transform, download=False
-        )
-    elif name == "MNIST":
-        normalize = transforms.Normalize((0.1307,), (0.3081,))
-        transform = transforms.Compose([transforms.ToTensor(), normalize])
-
-        full_dataset = datasets.MNIST(
-            root, train=True, download=True, transform=transform
-        )
-        test_dataset = datasets.MNIST(root, train=False, transform=transform)
-
-    # we need at least two threads
-    max_threads = 2 if max_threads < 2 else max_threads
-    if max_threads >= 6:
-        val_threads = 2
-        train_threads = max_threads - val_threads
-    else:
-        val_threads = 1
-        train_threads = max_threads - 1
-
-    # Split into train and val
-    valid_loader = None
-    val_dataset = []
-    if validation_split:
-        split = int(floor((1.0 - validation_split) * len(full_dataset)))
-        train_dataset = DatasetSplitter(full_dataset, split_end=split)
-        val_dataset = DatasetSplitter(full_dataset, split_start=split)
-        train_loader = DataLoader(
-            train_dataset,
-            batch_size,
-            num_workers=train_threads,
-            pin_memory=False,
-            shuffle=True,
-            multiprocessing_context="fork",
-        )
-        valid_loader = DataLoader(
-            val_dataset,
-            test_batch_size,
-            num_workers=val_threads,
-            pin_memory=False,
-            multiprocessing_context="fork",
-        )
-    else:
-        train_dataset = full_dataset
-        train_loader = DataLoader(
-            full_dataset,
-            batch_size,
-            num_workers=max_threads,
-            pin_memory=False,
-            shuffle=True,
-            multiprocessing_context="fork",
-        )
-
-    test_loader = DataLoader(
-        test_dataset,
-        test_batch_size,
-        shuffle=False,
-        num_workers=1,
-        pin_memory=False,
-        multiprocessing_context="fork",
-    )
-    logging.info(f"Train dataset length {len(train_dataset)}")
-    logging.info(f"Val dataset length {len(val_dataset)}")
-    logging.info(f"Test dataset length {len(test_dataset)}")
-
-    if not valid_loader:
-        logging.info("Running periodic eval on test data.")
-        valid_loader = test_loader
-
-    return train_loader, valid_loader, test_loader
-
 
 def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, lr_scheduler]":
     name = kwargs["name"]
