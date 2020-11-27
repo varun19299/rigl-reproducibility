@@ -1,4 +1,4 @@
-from sparselearning import models
+from models.wide_resnet import WideResNet
 from sparselearning.core import Masking
 from sparselearning.funcs.decay import CosineDecay
 
@@ -37,7 +37,7 @@ def test_save_load():
     4. Perform optim step
     """
     # Initialise
-    model = models.WideResNet(depth=22, widen_factor=2)
+    model = WideResNet(depth=22, widen_factor=2)
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
 
     decay = CosineDecay()
@@ -76,7 +76,7 @@ def test_save_load():
     assert new_mask.stats.total_density == mask.stats.total_density
 
     # Re-initialise
-    model = models.WideResNet(depth=22, widen_factor=2)
+    model = WideResNet(depth=22, widen_factor=2)
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
 
     decay = CosineDecay()

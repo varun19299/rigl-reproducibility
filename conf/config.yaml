@@ -21,7 +21,6 @@ log_interval: 100
 ckpt_dir: ckpts
 ckpt_interval: ${optimizer.epochs} # Dont save any intermediate weights, just final
 resume: True
-save_features: False
 
 # W&B
 wandb:

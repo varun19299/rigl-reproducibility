@@ -4,7 +4,7 @@ import logging
 from omegaconf import DictConfig, OmegaConf
 import os
 from sparselearning.core import Masking
-from sparselearning.models import registry as model_registry
+from models import registry as model_registry
 from sparselearning.funcs.decay import registry as decay_registry
 import torch
 import torch.nn.functional as F
@@ -184,7 +184,7 @@ def main(cfg: DictConfig):
     model_class, model_args = model_registry[cfg.model]
     _small_density = cfg.masking.density if cfg.masking.name == "Small_Dense" else 1.0
     model = model_class(
-        *model_args, cfg.save_features, cfg.benchmark, _small_density
+        *model_args, cfg.benchmark, _small_density
     ).to(device)
 
     # wandb

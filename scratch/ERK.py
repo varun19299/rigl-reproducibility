@@ -193,9 +193,9 @@ def googleAI_ERK(module, density, erk_power_scale: float = 1.0):
 
 
 if __name__ == "__main__":
-    import sparselearning.models as models
+    from models.wide_resnet import WideResNet
 
-    model = models.WideResNet(depth=22, widen_factor=2)
+    model = WideResNet(depth=22, widen_factor=2)
 
     logging.basicConfig()
     logging.getLogger().setLevel(logging.INFO)

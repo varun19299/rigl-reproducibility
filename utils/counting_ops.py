@@ -1,6 +1,9 @@
 import logging
+from models import registry
+from sparselearning.core import Masking
+from sparselearning.funcs.decay import CosineDecay
 import torch
-from torch import nn
+from torch import nn, optim
 from typing import TYPE_CHECKING
 import utils.micronet_challenge.counting as counting
 
@@ -95,21 +98,35 @@ def get_pre_activations_dict(net: "nn.Module", input_tensor: "Tensor"):
     return activation_dict
 
 
-if __name__ == "__main__":
-    from sparselearning.models import WideResNet, registry
-    from sparselearning.core import Masking
-    from sparselearning.funcs.decay import CosineDecay
-    from torch import optim
-
-    model = WideResNet(*registry["wrn-22-2"][1])
-    activation_dict = get_pre_activations_dict(model, torch.rand(1, 3, 32, 32))
-
+def wrn_22_2_FLOPs(sparse_init: str = "random", density: float = 0.2) -> int:
+    model_class, args = registry["wrn-22-2"]
+    model = model_class(*args)
     decay = CosineDecay()
     optimizer = optim.SGD(model.parameters(), lr=0.1)
 
-    mask = Masking(optimizer, decay, sparse_init="erdos-renyi-kernel", density=1)
-    # mask = Masking(optimizer, decay, sparse_init="random", density=0.1)
+    mask = Masking(optimizer, decay, sparse_init=sparse_init, density=density)
     mask.add_module(model)
-    total_FLOPS = get_FLOPs(mask, torch.rand(1, 3, 32, 32))
 
-    print(f"{total_FLOPS:,}")
+    return get_FLOPs(mask, torch.rand(1, 3, 32, 32))
+
+
+if __name__ == "__main__":
+    dense_FLOPs = wrn_22_2_FLOPs(density=1.0)
+    print(f"WRN-22-2 Dense FLOPS: {dense_FLOPs:,} \n")
+
+    for density in [0.05, 0.1, 0.2, 0.5]:
+        Random_FLOPs = wrn_22_2_FLOPs("random", density)
+        ER_FLOPs = wrn_22_2_FLOPs("erdos-renyi", density)
+        ERK_FLOPs = wrn_22_2_FLOPs("erdos-renyi-kernel", density)
+
+        print(
+            f"Random Density: {density} Inference FLOPs:{Random_FLOPs:,} Proportion:{Random_FLOPs/dense_FLOPs:.4f}"
+        )
+        print(
+            f"ER Density: {density} Inference FLOPs:{ER_FLOPs:,} Proportion:{ER_FLOPs/dense_FLOPs:.4f}"
+        )
+        print(
+            f"ERK Density: {density} Inference FLOPs:{ERK_FLOPs:,} Proportion:{ERK_FLOPs/dense_FLOPs:.4f}"
+        )
+
+        print("\n")
