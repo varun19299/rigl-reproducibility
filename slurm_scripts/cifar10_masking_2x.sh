@@ -44,6 +44,6 @@ fi
 # Note: we're using the same GPU
 
 # RigL
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID \
-exp_name="RigL_Random_2x" masking.sparse_init=random optimizer.training_multiplier=2 \
+python main.py dataset=CIFAR10 optimizer=SGD masking=${1} +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID \
+exp_name="${1}_Random_2x" masking.sparse_init=random optimizer.training_multiplier=2 \
 masking.density=0.05,0.1,0.2,0.5 wandb.project="cifar10 longer" wandb.use=True -m
