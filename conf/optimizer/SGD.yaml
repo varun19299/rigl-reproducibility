@@ -4,8 +4,8 @@ epochs: 100
 
 lr: 0.1 # Learning rate
 momentum: 0.9 # SGD momentum
-
 weight_decay: 5e-4 # Regularization
+label_smoothing: 0.0
 
 # LR Scheduler
 decay_frequency: 25000

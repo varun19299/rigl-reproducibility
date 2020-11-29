@@ -1,10 +1,10 @@
 # @package _global_
 exp_name: ${masking.name}
 seed: 0
-model: wrn-22-2
+model: resnet50
 
 wandb:
-  project: cifar10
+  project: mini-imagenet
   name: ${dataset.name}_${exp_name}_density_${masking.density}
 
 masking:
@@ -24,6 +24,7 @@ optimizer:
   epochs: 250
   lr: 0.1
   momentum: 0.9
-  weight_decay: 5e-4
+  weight_decay: 1e-4
+  label_smoothing: 0.1
   decay_frequency: 30000
   decay_factor: 0.2

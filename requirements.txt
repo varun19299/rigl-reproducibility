@@ -6,5 +6,6 @@ hydra_colorlog
 matplotlib
 numpy
 torch
+torchvision
 tqdm
 wandb

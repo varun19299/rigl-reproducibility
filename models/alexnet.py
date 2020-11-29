@@ -1,6 +1,5 @@
 from models.benchmark import SparseSpeedupBench
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 class AlexNet(nn.Module):
@@ -66,4 +65,4 @@ class AlexNet(nn.Module):
 
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
-        return F.log_softmax(x, dim=1)
+        return x

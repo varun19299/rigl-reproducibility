@@ -1,6 +1,7 @@
 from data import get_dataloaders
 import hydra
 import logging
+from loss import LabelSmoothingCrossEntropy
 from omegaconf import DictConfig, OmegaConf
 import os
 from sparselearning.core import Masking
@@ -35,6 +36,7 @@ def train(
     epoch: int,
     device: torch.device,
     mixed_precision_scalar: "GradScaler" = None,
+    label_smoothing: float = 0.0,
     log_interval: int = 100,
     use_wandb: bool = False,
     masking_apply_when: str = "epoch_end",
@@ -46,6 +48,7 @@ def train(
     _mask_update_counter = 0
     _loss_collector = SmoothenValue()
     pbar = tqdm(total=len(train_loader), dynamic_ncols=True)
+    smooth_CE = LabelSmoothingCrossEntropy(label_smoothing)
 
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device), target.to(device)
@@ -54,7 +57,7 @@ def train(
         if mixed_precision_scalar:
             with autocast():
                 output = model(data)
-                loss = F.nll_loss(output, target)
+                loss = smooth_CE(output, target)
 
             mixed_precision_scalar.scale(loss).backward()
 
@@ -278,6 +281,7 @@ def main(cfg: DictConfig):
             epoch + 1,
             device,
             mixed_precision_scalar,
+            label_smoothing=cfg.optimizer.label_smoothing,
             log_interval=cfg.log_interval,
             use_wandb=cfg.wandb.use,
             **_masking_args,
