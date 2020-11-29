@@ -2,6 +2,7 @@ import numpy as np
 from models.benchmark import SparseSpeedupBench
 import torch
 from torch import Tensor
+import torch.nn.functional as F
 import torch.nn as nn
 from typing import Type, Any, Callable, Union, List, Optional
 
@@ -283,7 +284,7 @@ class ResNet(nn.Module):
         x = torch.flatten(x, 1)
         x = self.fc(x)
 
-        return x
+        return F.log_softmax(x, dim=1)
 
     def forward(self, x: Tensor) -> Tensor:
         return self._forward_impl(x)

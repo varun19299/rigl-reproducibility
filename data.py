@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import logging
 from math import floor
 import numpy as np
@@ -17,10 +17,13 @@ class DatasetSplitter(Dataset):
 
     parent_dataset: Dataset
     split: "slice" = slice(None, None)
+    index_map: "Array" = np.array([0])
 
     def __post_init__(self):
         if len(self) <= 0:
             raise ValueError(f"Dataset split {self.split} is not positive")
+        if not self.index_map.any():
+            self.index_map = np.array(range(len(self.parent_dataset)), dtype=int)
 
     def __len__(self):
         # absolute indices
@@ -30,7 +33,8 @@ class DatasetSplitter(Dataset):
 
     def __getitem__(self, index):
         assert index < len(self), "index out of bounds in split_datset"
-        return self.parent_dataset[index + int(self.split.start or 0)]
+        index = self.index_map[index + int(self.split.start or 0)]
+        return self.parent_dataset[index]
 
 
 def _get_CIFAR10_dataset(root: "Path") -> "Union[Dataset,Dataset]":
@@ -77,8 +81,8 @@ def _get_Mini_Imagenet_dataset(root: "Path") -> "Union[Dataset,Dataset]":
 
     test_transform = transforms.Compose([transforms.ToTensor(), normalize])
 
-    full_dataset = datasets.ImageFolder(root / "full", transform=train_transform,)
-    test_dataset = datasets.CIFAR10(root / "test", transform=test_transform,)
+    full_dataset = datasets.ImageFolder(root / "train_val", transform=train_transform,)
+    test_dataset = datasets.ImageFolder(root / "test", transform=test_transform,)
 
     return full_dataset, test_dataset
 
@@ -100,6 +104,7 @@ def get_dataloaders(
     test_batch_size: int = 1,
     validation_split: float = 0.0,
     max_threads: int = 3,
+    fixed_shuffle: bool = False,
 ):
     """Creates augmented train, validation, and test data loaders."""
 
@@ -114,9 +119,21 @@ def get_dataloaders(
     # Split into train and val
     train_dataset = full_dataset
     if validation_split:
+        index_map = np.array(list(range(len(train_dataset))), dtype=int)
+
+        if fixed_shuffle:
+            index_map_path = Path(root) / "index_map.npy"
+            if index_map_path.exists():
+                logging.info(f"Loading index map from {index_map_path}")
+                index_map = np.load(index_map_path, allow_pickle=True)
+            else:
+                np.random.shuffle(index_map)
+                logging.info(f"Saving index map to {index_map_path}")
+                np.save(index_map_path, index_map)
+
         split = int(floor((1.0 - validation_split) * len(full_dataset)))
-        train_dataset = DatasetSplitter(full_dataset, slice(None, split))
-        val_dataset = DatasetSplitter(full_dataset, slice(split, None))
+        train_dataset = DatasetSplitter(full_dataset, slice(None, split), index_map)
+        val_dataset = DatasetSplitter(full_dataset, slice(split, None), index_map)
 
     train_loader = DataLoader(
         train_dataset,
@@ -131,6 +148,7 @@ def get_dataloaders(
         valid_loader = DataLoader(
             val_dataset,
             test_batch_size,
+            shuffle=True,
             num_workers=val_threads,
             pin_memory=False,
             multiprocessing_context="fork",
@@ -139,7 +157,7 @@ def get_dataloaders(
     test_loader = DataLoader(
         test_dataset,
         test_batch_size,
-        shuffle=False,
+        shuffle=True,
         num_workers=1,
         pin_memory=False,
         multiprocessing_context="fork",

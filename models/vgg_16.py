@@ -146,4 +146,4 @@ class VGG16(nn.Module):
 
         x = x.view(x.size(0), -1)
         x = self.classifier(x)
-        return x
+        return F.log_softmax(x, dim=1)

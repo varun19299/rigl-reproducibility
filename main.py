@@ -8,7 +8,7 @@ from sparselearning.core import Masking
 from models import registry as model_registry
 from sparselearning.funcs.decay import registry as decay_registry
 import torch
-import torch.nn.functional as F
+from torch.nn import functional as F
 from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 from typing import TYPE_CHECKING
@@ -63,7 +63,7 @@ def train(
 
         else:
             output = model(data)
-            loss = F.nll_loss(output, target)
+            loss = smooth_CE(output, target)
             loss.backward()
             # L2 Regularization
 
@@ -130,14 +130,14 @@ def evaluate(
     correct = 0
     n = 0
     pbar = tqdm(total=len(loader), dynamic_ncols=True)
+    smooth_CE = LabelSmoothingCrossEntropy(0.0) # No smoothing for val
 
     with torch.no_grad():
         for data, target in loader:
             data, target = data.to(device), target.to(device)
 
-            model.t = target
             output = model(data)
-            loss += F.nll_loss(output, target).item()  # sum up batch loss
+            loss += smooth_CE(output, target).item()  # sum up batch loss
 
             pred = output.argmax(
                 dim=1, keepdim=True
@@ -210,8 +210,9 @@ def main(cfg: DictConfig):
     cfg.optimizer.epochs *= cfg.optimizer.training_multiplier
     cfg.optimizer.epochs = int(cfg.optimizer.epochs)
 
-    cfg.masking.end_when *= cfg.optimizer.training_multiplier
-    cfg.masking.end_when = int(cfg.masking.end_when)
+    if cfg.masking.get("end_when", None):
+        cfg.masking.end_when *= cfg.optimizer.training_multiplier
+        cfg.masking.end_when = int(cfg.masking.end_when)
 
     # Setup optimizers, lr schedulers
     optimizer, lr_scheduler = get_optimizer(model, **cfg.optimizer)

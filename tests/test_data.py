@@ -7,6 +7,7 @@ Try testing salient dataset features:
 import data
 from data import get_dataloaders, DatasetSplitter, registry
 import pytest
+from pathlib import Path
 import torch
 from torch.utils.data import TensorDataset
 
@@ -23,17 +24,26 @@ def test_splitter():
 
 @pytest.mark.parametrize("dataset", ["CIFAR10", "MNIST", "Mini-Imagenet"])
 def test_registry(dataset):
-    full_dataset, test_dataset = registry[dataset](root=f"datasets/{dataset}")
+    full_dataset, test_dataset = registry[dataset](root=Path(f"datasets/{dataset}"))
 
 
 def loader_loop(loader):
     for x, y in loader:
         assert len(x.shape) == 4  # NCHWW
         assert len(y.shape) == 1  # class ID
+        print(y)
+        break
 
 
 @pytest.mark.parametrize("dataset", ["CIFAR10", "MNIST", "Mini-Imagenet"])
 def test_get_loaders(dataset):
-    loaders = get_dataloaders(dataset, root=f"datasets/{dataset}")
+    loaders = get_dataloaders(
+        dataset,
+        root=f"datasets/{dataset}",
+        batch_size=128,
+        test_batch_size=128,
+        validation_split=0.1,
+        fixed_shuffle=True,
+    )
     for loader in loaders:
         loader_loop(loader)

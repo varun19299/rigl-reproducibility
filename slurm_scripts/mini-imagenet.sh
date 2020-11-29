@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=cifar-wrn-RigL    # create a short name for your job
+#SBATCH --job-name=mini-imagenet-resnet50    # create a short name for your job
 
 #SBATCH --partition=batch_default   # use batch_default, or wacc for quick (< 30 min) ones
 
@@ -74,7 +74,7 @@ if [ ${1} == "SET" ]; then
 fi
 
 if [ ${1} == "Dense" ]; then
-  python main.py hydra/launcher=basic dataset=Mini-Imagenet optimizer=SGD \
+  python main.py dataset=Mini-Imagenet optimizer=SGD \
   masking=Dense +specific=mini-imagenet_resnet50_dense \
   seed=$SLURM_ARRAY_TASK_ID wandb.use=True
 fi

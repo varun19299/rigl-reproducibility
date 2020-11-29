@@ -5,3 +5,4 @@ batch_size: 128
 test_batch_size: ${dataset.batch_size}
 max_threads: 12
 validation_split: 0.1
+fixed_shuffle: true

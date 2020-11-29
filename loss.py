@@ -1,3 +1,8 @@
+"""
+Label Smoothing
+
+Source: https://github.com/pytorch/pytorch/issues/7455#issuecomment-720100742
+"""
 import torch.nn.functional as F
 from torch import nn
 
@@ -21,9 +26,8 @@ class LabelSmoothingCrossEntropy(nn.Module):
         self.epsilon = epsilon
         self.reduction = reduction
 
-    def forward(self, preds, target):
-        num_classes = preds.size()[-1]
-        log_preds = F.log_softmax(preds, dim=-1)
+    def forward(self, log_preds, target):
+        num_classes = log_preds.size()[-1]
         loss = reduce_loss(-log_preds.sum(dim=-1), self.reduction)
         nll = F.nll_loss(log_preds, target, reduction=self.reduction)
         return linear_combination(loss / num_classes, nll, self.epsilon)
