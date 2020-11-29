@@ -1,0 +1,30 @@
+# @package _global_
+exp_name: ${masking.name}
+seed: 0
+model: resnet50
+
+wandb:
+  project: mini-imagenet
+  name: ${dataset.name}_${exp_name}_density_${masking.density}
+
+masking:
+  sparse_init: erdos-renyi-kernel
+  density: 0.2  # The density of the overall sparse network.
+  prune_rate: 0.3  # The pruning rate / prune rate.
+  decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
+  apply_when: step_end  # or step_end
+  interval: 100 # Which epochs or steps to apply at
+  end_when: 65918
+
+dataset:
+  batch_size: 128
+  validation_split: 0.1
+
+optimizer:
+  epochs: 250
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 1e-4
+  label_smoothing: 0.1
+  decay_frequency: 30000
+  decay_factor: 0.2
