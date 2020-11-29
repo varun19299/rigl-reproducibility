@@ -380,6 +380,7 @@ class Masking(object):
         """
         Return momentum from optimizer (SGD or Adam)
         """
+        momentum = []
         # Adam
         if "exp_avg" in self.optimizer.state[weight]:
             adam_m1 = self.optimizer.state[weight]["exp_avg"]

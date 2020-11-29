@@ -73,7 +73,7 @@ def train(
             mask
             and masking_apply_when == "step_end"
             and (global_step < masking_end_when)
-            and (global_step % masking_interval) == 0
+            and ((global_step + 1) % masking_interval) == 0
         ):
             mask.update_connections()
             _mask_update_counter += 1
@@ -183,9 +183,7 @@ def main(cfg: DictConfig):
     ), f"Select from {','.join(model_registry.keys())}"
     model_class, model_args = model_registry[cfg.model]
     _small_density = cfg.masking.density if cfg.masking.name == "Small_Dense" else 1.0
-    model = model_class(
-        *model_args, cfg.benchmark, _small_density
-    ).to(device)
+    model = model_class(*model_args, cfg.benchmark, _small_density).to(device)
 
     # wandb
     if cfg.wandb.use:

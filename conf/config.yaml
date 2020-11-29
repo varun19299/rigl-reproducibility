@@ -1,6 +1,6 @@
 defaults:
   - masking: SNFS
-  - dataset: MNIST
+  - dataset: CIFAR10
   - optimizer: SGD
   - hydra
   - hydra/job_logging: colorlog
@@ -9,7 +9,7 @@ defaults:
 
 exp_name: ${masking.name}
 seed: 0
-model: lenet5
+model: wrn-22-2
 
 # Train args
 device: cuda # cpu or cuda
@@ -19,7 +19,7 @@ benchmark: False
 # Logging, Saving, Resuming
 log_interval: 100
 ckpt_dir: ckpts
-ckpt_interval: ${optimizer.epochs} # Dont save any intermediate weights, just final
+ckpt_interval: 250 #${optimizer.epochs} # Dont save any intermediate weights, just final
 resume: True
 
 # W&B
