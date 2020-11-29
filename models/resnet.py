@@ -1,3 +1,5 @@
+import numpy as np
+from models.benchmark import SparseSpeedupBench
 import torch
 from torch import Tensor
 import torch.nn as nn
@@ -97,6 +99,7 @@ class Bottleneck(nn.Module):
         super(Bottleneck, self).__init__()
         if norm_layer is None:
             norm_layer = nn.BatchNorm2d
+
         width = int(planes * (base_width / 64.0)) * groups
         # Both self.conv2 and self.downsample layers downsample the input when stride != 1
         self.conv1 = conv1x1(inplanes, width)
@@ -138,6 +141,7 @@ class ResNet(nn.Module):
         block: Type[Union[BasicBlock, Bottleneck]],
         layers: List[int],
         num_classes: int = 1000,
+        bench_model: bool = False,
         small_dense_density: float = 1.0,
         zero_init_residual: bool = False,
         groups: int = 1,
@@ -149,8 +153,11 @@ class ResNet(nn.Module):
             norm_layer = nn.BatchNorm2d
         self._norm_layer = norm_layer
 
-        self.inplanes = 64
+        small_dense_density = np.sqrt(small_dense_density)
+        self.inplanes = 64  # int(64 * small_dense_density)
         self.dilation = 1
+        self.bench = SparseSpeedupBench() if bench_model else None
+
         if replace_stride_with_dilation is None:
             # each element in the tuple indicates if we should replace
             # the 2x2 stride with a dilated convolution instead
@@ -161,25 +168,39 @@ class ResNet(nn.Module):
                 "or a 3-element tuple, got {}".format(replace_stride_with_dilation)
             )
         self.groups = groups
-        self.base_width = 64 * small_dense_density
+        self.base_width = 64
         self.conv1 = nn.Conv2d(
             3, self.inplanes, kernel_size=7, stride=2, padding=3, bias=False
         )
         self.bn1 = norm_layer(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
+        self.layer1 = self._make_layer(block, int(64 * small_dense_density), layers[0])
         self.layer2 = self._make_layer(
-            block, 128, layers[1], stride=2, dilate=replace_stride_with_dilation[0]
+            block,
+            int(128 * small_dense_density),
+            layers[1],
+            stride=2,
+            dilate=replace_stride_with_dilation[0],
         )
         self.layer3 = self._make_layer(
-            block, 256, layers[2], stride=2, dilate=replace_stride_with_dilation[1]
+            block,
+            int(256 * small_dense_density),
+            layers[2],
+            stride=2,
+            dilate=replace_stride_with_dilation[1],
         )
         self.layer4 = self._make_layer(
-            block, 512, layers[3], stride=2, dilate=replace_stride_with_dilation[2]
+            block,
+            int(512 * small_dense_density),
+            layers[3],
+            stride=2,
+            dilate=replace_stride_with_dilation[2],
         )
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
+        self.fc = nn.Linear(
+            int(512 * small_dense_density) * block.expansion, num_classes
+        )
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -266,3 +287,13 @@ class ResNet(nn.Module):
 
     def forward(self, x: Tensor) -> Tensor:
         return self._forward_impl(x)
+
+
+if __name__ == "__main__":
+    from torchsummary import summary
+
+    resnet50 = ResNet(Bottleneck, [3, 4, 6, 3], 10)
+    summary(resnet50, (3, 84, 84))
+
+    resnet50_small_dense = ResNet(Bottleneck, [3, 4, 6, 3], 10, small_dense_density=0.1)
+    summary(resnet50_small_dense, (3, 84, 84))

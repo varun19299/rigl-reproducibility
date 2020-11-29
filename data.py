@@ -59,7 +59,28 @@ def _get_CIFAR10_dataset(root: "Path") -> "Union[Dataset,Dataset]":
 
 
 def _get_Mini_Imagenet_dataset(root: "Path") -> "Union[Dataset,Dataset]":
-    pass
+    normalize = transforms.Normalize(
+        mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+    )
+
+    # Original Inception paper reported good performance
+    # with dramatic scales from 0.08 to 1.0 for cropping
+    # https://discuss.pytorch.org/t/is-transforms-randomresizedcrop-used-for-data-augmentation/16716
+    train_transform = transforms.Compose(
+        [
+            transforms.RandomResizedCrop(84),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            normalize,
+        ]
+    )
+
+    test_transform = transforms.Compose([transforms.ToTensor(), normalize])
+
+    full_dataset = datasets.ImageFolder(root / "full", transform=train_transform,)
+    test_dataset = datasets.CIFAR10(root / "test", transform=test_transform,)
+
+    return full_dataset, test_dataset
 
 
 def _get_MNIST_dataset(root: "Path") -> "Union[Dataset,Dataset]":
@@ -83,7 +104,7 @@ def get_dataloaders(
     """Creates augmented train, validation, and test data loaders."""
 
     assert name in registry.keys()
-    full_dataset, test_dataset = registry[name](root)
+    full_dataset, test_dataset = registry[name](Path(root))
 
     # we need at least two threads in total
     max_threads = max(2, max_threads)
