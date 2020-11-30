@@ -23,4 +23,5 @@ optimizer:
   weight_decay: 5e-4
   label_smoothing: 0.1
   decay_frequency: 30000
+  warmup_steps: 2112
   decay_factor: 0.2

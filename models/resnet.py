@@ -144,7 +144,7 @@ class ResNet(nn.Module):
         num_classes: int = 1000,
         bench_model: bool = False,
         small_dense_density: float = 1.0,
-        zero_init_residual: bool = False,
+        zero_init_residual: bool = True,
         groups: int = 1,
         replace_stride_with_dilation: Optional[List[bool]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
@@ -293,8 +293,8 @@ class ResNet(nn.Module):
 if __name__ == "__main__":
     from torchsummary import summary
 
-    resnet50 = ResNet(Bottleneck, [3, 4, 6, 3], 10)
-    summary(resnet50, (3, 84, 84))
+    resnet50 = ResNet(Bottleneck, [3, 4, 6, 3], 100)
+    summary(resnet50, (3, 32, 32))
 
-    resnet50_small_dense = ResNet(Bottleneck, [3, 4, 6, 3], 10, small_dense_density=0.1)
-    summary(resnet50_small_dense, (3, 84, 84))
+    # resnet50_small_dense = ResNet(Bottleneck, [3, 4, 6, 3], 100, small_dense_density=0.1)
+    # summary(resnet50_small_dense, (3, 84, 84))

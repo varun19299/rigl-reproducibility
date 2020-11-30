@@ -221,7 +221,7 @@ def main(cfg: DictConfig):
         cfg.masking.end_when = int(cfg.masking.end_when)
 
     # Setup optimizers, lr schedulers
-    optimizer, lr_scheduler = get_optimizer(model, **cfg.optimizer)
+    optimizer, (lr_scheduler, warmup_scheduler) = get_optimizer(model, **cfg.optimizer)
 
     # Mixed Precision
     mixed_precision_scalar = GradScaler() if cfg.mixed_precision else None
@@ -268,6 +268,9 @@ def main(cfg: DictConfig):
 
     # Train model
     epoch = None
+    warmup_steps = cfg.optimizer.get("warmup_steps", 0)
+    warmup_epochs = warmup_steps / len(train_loader)
+
     for epoch in range(start_epoch, cfg.optimizer.epochs):
         # step here is training iters not global steps
         _masking_args = {}
@@ -278,12 +281,13 @@ def main(cfg: DictConfig):
                 "masking_end_when": cfg.masking.end_when,
             }
 
+        scheduler = lr_scheduler if (epoch > warmup_epochs) else warmup_scheduler
         _, step = train(
             model,
             mask,
             train_loader,
             optimizer,
-            lr_scheduler,
+            scheduler,
             step,
             epoch + 1,
             device,
@@ -294,30 +298,32 @@ def main(cfg: DictConfig):
             **_masking_args,
         )
 
-        val_loss, val_accuracy = evaluate(
-            model, val_loader, step, epoch + 1, device, use_wandb=cfg.wandb.use,
-        )
-
-        # Save weights
-        if (epoch + 1 == cfg.optimizer.epochs) or (
-            (epoch + 1) % cfg.ckpt_interval == 0
-        ):
-            if val_loss < best_val_loss:
-                is_min = True
-                best_val_loss = val_loss
-            else:
-                is_min = False
-
-            save_weights(
-                model,
-                optimizer,
-                mask,
-                val_loss,
-                step,
-                epoch + 1,
-                ckpt_dir=cfg.ckpt_dir,
-                is_min=is_min,
+        # Run validation
+        if epoch % cfg.val_interval == 0:
+            val_loss, val_accuracy = evaluate(
+                model, val_loader, step, epoch + 1, device, use_wandb=cfg.wandb.use,
             )
+
+            # Save weights
+            if (epoch + 1 == cfg.optimizer.epochs) or (
+                (epoch + 1) % cfg.ckpt_interval == 0
+            ):
+                if val_loss < best_val_loss:
+                    is_min = True
+                    best_val_loss = val_loss
+                else:
+                    is_min = False
+
+                save_weights(
+                    model,
+                    optimizer,
+                    mask,
+                    val_loss,
+                    step,
+                    epoch + 1,
+                    ckpt_dir=cfg.ckpt_dir,
+                    is_min=is_min,
+                )
 
         # Apply mask
         if (

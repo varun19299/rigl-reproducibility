@@ -20,6 +20,7 @@ benchmark: False
 log_interval: 100
 ckpt_dir: ckpts
 ckpt_interval: 250 #${optimizer.epochs} # Dont save any intermediate weights, just final
+val_interval: 1
 resume: True
 
 # W&B

@@ -10,9 +10,10 @@ if TYPE_CHECKING:
     from utils.typing_alias import *
 
 from utils.model_serialization import load_state_dict
+from utils.warmup_scheduler import WarmUpLR
 
 
-def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, lr_scheduler]":
+def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, Tuple[lr_scheduler]]":
     name = kwargs["name"]
     lr = kwargs["lr"]
     weight_decay = kwargs["weight_decay"]
@@ -44,7 +45,10 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, lr_scheduler]":
         optimizer, decay_frequency, gamma=decay_factor
     )
 
-    return optimizer, lr_scheduler
+    warmup_steps = kwargs.get("warmup_steps", 0)
+    warmup_scheduler = WarmUpLR(optimizer, warmup_steps) if warmup_steps else None
+
+    return optimizer, (lr_scheduler, warmup_scheduler)
 
 
 def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
@@ -148,6 +152,3 @@ def load_weights(
         )
 
     return model, optimizer, mask, step, epoch, best_val_loss
-
-
-
