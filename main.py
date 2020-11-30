@@ -2,6 +2,7 @@ from data import get_dataloaders
 import hydra
 import logging
 from loss import LabelSmoothingCrossEntropy
+import numpy as np
 from omegaconf import DictConfig, OmegaConf
 import os
 from sparselearning.core import Masking
@@ -16,11 +17,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from utils.typing_alias import *
 
+from utils.accuracy_helper import get_topk_accuracy
+from utils.smoothen_value import SmoothenValue
 from utils.train_helper import (
     get_optimizer,
     load_weights,
     save_weights,
-    SmoothenValue,
 )
 
 import wandb
@@ -130,7 +132,10 @@ def evaluate(
     correct = 0
     n = 0
     pbar = tqdm(total=len(loader), dynamic_ncols=True)
-    smooth_CE = LabelSmoothingCrossEntropy(0.0) # No smoothing for val
+    smooth_CE = LabelSmoothingCrossEntropy(0.0)  # No smoothing for val
+
+    top_1_accuracy_ll = []
+    top_5_accuracy_ll = []
 
     with torch.no_grad():
         for data, target in loader:
@@ -139,29 +144,30 @@ def evaluate(
             output = model(data)
             loss += smooth_CE(output, target).item()  # sum up batch loss
 
-            pred = output.argmax(
-                dim=1, keepdim=True
-            )  # get the index of the max log-probability
-            correct += pred.eq(target.view_as(pred)).sum().item()
-
-            n += target.shape[0]
+            top_1_accuracy, top_5_accuracy = get_topk_accuracy(
+                output, target, topk=(1, 5)
+            )
+            top_1_accuracy_ll.append(top_1_accuracy)
+            top_5_accuracy_ll.append(top_5_accuracy)
 
             pbar.update(1)
 
-    accuracy = correct / n
-    loss /= len(loader)
+        loss /= len(loader)
+        top_1_accuracy = torch.tensor(top_1_accuracy_ll).mean()
+        top_5_accuracy = torch.tensor(top_5_accuracy_ll).mean()
 
     val_or_test = "val" if not is_test_set else "test"
-    msg = f"{val_or_test.capitalize()} Epoch {epoch} Iters {global_step} {val_or_test} loss {loss:.6f} accuracy {accuracy:.4f}"
+    msg = f"{val_or_test.capitalize()} Epoch {epoch} Iters {global_step} {val_or_test} loss {loss:.6f} top-1 accuracy {top_1_accuracy:.4f} top-5 accuracy {top_5_accuracy:.4f}"
     pbar.set_description(msg)
     logging.info(msg)
 
     # Log loss, accuracy
     if use_wandb:
         wandb.log({f"{val_or_test}_loss": loss}, step=global_step)
-        wandb.log({f"{val_or_test}_accuracy": accuracy}, step=global_step)
+        wandb.log({f"{val_or_test}_accuracy": top_1_accuracy}, step=global_step)
+        wandb.log({f"{val_or_test}_top_5_accuracy": top_5_accuracy}, step=global_step)
 
-    return loss, accuracy
+    return loss, top_1_accuracy
 
 
 @hydra.main(config_name="config", config_path="conf")
