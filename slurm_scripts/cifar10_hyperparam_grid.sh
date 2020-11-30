@@ -45,9 +45,9 @@ fi
 # Start Job here
 # Note: we're using the same GPU
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_hyperparam_grid seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK_hyperparam" masking.density=${1} masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 use_wandb=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_hyperparam_grid seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK_hyperparam" masking.density=${1} masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 use_wandb=True -m
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_hyperparam_grid seed=$SLURM_ARRAY_TASK_ID exp_name='RigL_Random_hyperparam' masking.density=${1} masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 masking.sparse_init=random use_wandb=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_hyperparam_grid seed=$SLURM_ARRAY_TASK_ID exp_name='RigL_Random_hyperparam' masking.density=${1} masking.prune_rate=0.1,0.3,0.5 masking.interval=50,100,200,500 masking.sparse_init=random use_wandb=True -m
 
 
 #wait

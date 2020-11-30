@@ -44,12 +44,12 @@ fi
 # Note: we're using the same GPU
 
 # Masking
-#python main.py dataset=CIFAR10 optimizer=SGD masking=${1} +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID \
+#python main.py dataset=CIFAR10 optimizer=SGD masking=${1} +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID \
 #exp_name="${1}_2x_ERK" optimizer.training_multiplier=2 \
 #masking.density=0.05,0.1,0.2,0.5 wandb.project="cifar10 longer" wandb.use=True -m
 
 #Static
-python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID \
+python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar10_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID \
 exp_name="Static_2x_Random" masking.sparse_init=random optimizer.training_multiplier=2 \
 masking.density=0.05,0.1,0.2,0.5 wandb.project="cifar10 longer" wandb.use=True -m
 

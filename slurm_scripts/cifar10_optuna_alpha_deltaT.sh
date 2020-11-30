@@ -45,11 +45,11 @@ fi
 # Note: we're using the same GPU
 
 if [ $SLURM_ARRAY_TASK_ID -eq 0 ]; then
-    python main.py hydra/sweeper=optuna dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_optuna exp_name='RigL_ERK_optuna' \
+    python main.py hydra/sweeper=optuna dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_optuna exp_name='RigL_ERK_optuna' \
     masking.density=${1} 'masking.prune_rate=interval(0.1,0.6)' 'masking.interval=range(50,1000,50)' wandb.use=True -m
 fi
 
 if [ $SLURM_ARRAY_TASK_ID -eq 1 ]; then
-  python main.py hydra/sweeper=optuna dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_optuna exp_name='RigL_Random_optuna' \
+  python main.py hydra/sweeper=optuna dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_optuna exp_name='RigL_Random_optuna' \
   masking.density=${1} 'masking.prune_rate=interval(0.1,0.6)' 'masking.interval=range(50,1000,50)' masking.sparse_init=random wandb.use=True -m
 fi

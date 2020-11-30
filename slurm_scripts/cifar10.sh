@@ -44,34 +44,34 @@ fi
 # Note: we're using the same GPU
 
 # RigL
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
 # SNFS
-python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
 # SET
-python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK' masking.sparse_init=erdos-renyi-kernel masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK' masking.sparse_init=erdos-renyi-kernel masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_Random' masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=SET +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_Random' masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
 # Dense
-python main.py dataset=CIFAR10 optimizer=SGD masking=Dense +specific=cifar_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID wandb.use=True
+python main.py dataset=CIFAR10 optimizer=SGD masking=Dense +specific=cifar10_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID wandb.use=True
 
 # Static
-python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID exp_name="Static_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar10_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID exp_name="Static_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
-python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID exp_name="Static_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar10_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID exp_name="Static_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
 # Small Dense
-python main.py dataset=CIFAR10 optimizer=SGD masking=Small_Dense +specific=cifar_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=Small_Dense +specific=cifar10_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
 # Pruning & Lottery
-python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar_wrn_22_2_pruning exp_name='Pruning' seed=$SLURM_ARRAY_TASK_ID  masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD +specific=cifar10_wrn_22_2_pruning exp_name='Pruning' seed=$SLURM_ARRAY_TASK_ID  masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
-python main.py dataset=CIFAR10 optimizer=SGD masking=Lottery +specific=cifar_wrn_22_2_lottery exp_name='Lottery' seed=$SLURM_ARRAY_TASK_ID  masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+python main.py dataset=CIFAR10 optimizer=SGD masking=Lottery +specific=cifar10_wrn_22_2_lottery exp_name='Lottery' seed=$SLURM_ARRAY_TASK_ID  masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
 
 #wait

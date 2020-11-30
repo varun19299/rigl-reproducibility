@@ -1,0 +1,8 @@
+# @package _group_
+name: CIFAR100
+root: ${hydra:runtime.cwd}/datasets/CIFAR100/
+batch_size: 128
+test_batch_size: ${dataset.batch_size}
+max_threads: 4
+validation_split: 0.1
+fixed_shuffle: false

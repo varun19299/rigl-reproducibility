@@ -5,7 +5,7 @@ model: resnet50
 ckpt_interval: 50
 
 wandb:
-  project: mini-imagenet
+  project: cifar 100
   name: ${dataset.name}_${exp_name}_density_${masking.density}
 
 masking:

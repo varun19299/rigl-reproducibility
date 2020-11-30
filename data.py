@@ -61,6 +61,30 @@ def _get_CIFAR10_dataset(root: "Path") -> "Union[Dataset,Dataset]":
 
     return full_dataset, test_dataset
 
+def _get_CIFAR100_dataset(root: "Path") -> "Union[Dataset,Dataset]":
+    normalize = transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+
+    train_transform = transforms.Compose(
+        [
+            transforms.Pad(4, padding_mode="reflect"),
+            transforms.RandomCrop(32),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            normalize,
+        ]
+    )
+
+    test_transform = transforms.Compose([transforms.ToTensor(), normalize])
+
+    full_dataset = datasets.CIFAR100(
+        root, train=True, transform=train_transform, download=True
+    )
+    test_dataset = datasets.CIFAR100(
+        root, train=False, transform=test_transform, download=False
+    )
+
+    return full_dataset, test_dataset
+
 
 def _get_Mini_Imagenet_dataset(root: "Path") -> "Union[Dataset,Dataset]":
     normalize = transforms.Normalize(
@@ -175,6 +199,7 @@ def get_dataloaders(
 
 registry = {
     "CIFAR10": _get_CIFAR10_dataset,
+    "CIFAR100": _get_CIFAR100_dataset,
     "Mini-Imagenet": _get_Mini_Imagenet_dataset,
     "MNIST": _get_MNIST_dataset,
 }

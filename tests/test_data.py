@@ -10,6 +10,7 @@ import pytest
 from pathlib import Path
 import torch
 from torch.utils.data import TensorDataset
+from tqdm import tqdm
 
 
 def test_splitter():
@@ -22,20 +23,18 @@ def test_splitter():
         print(e_info)
 
 
-@pytest.mark.parametrize("dataset", ["CIFAR10", "MNIST", "Mini-Imagenet"])
+@pytest.mark.parametrize("dataset", ["CIFAR10", "CIFAR100", "MNIST", "Mini-Imagenet"])
 def test_registry(dataset):
     full_dataset, test_dataset = registry[dataset](root=Path(f"datasets/{dataset}"))
 
 
 def loader_loop(loader):
-    for x, y in loader:
+    for x, y in tqdm(loader):
         assert len(x.shape) == 4  # NCHWW
         assert len(y.shape) == 1  # class ID
-        print(y)
-        break
 
 
-@pytest.mark.parametrize("dataset", ["CIFAR10", "MNIST", "Mini-Imagenet"])
+@pytest.mark.parametrize("dataset", ["CIFAR10", "CIFAR100", "MNIST", "Mini-Imagenet"])
 def test_get_loaders(dataset):
     loaders = get_dataloaders(
         dataset,
