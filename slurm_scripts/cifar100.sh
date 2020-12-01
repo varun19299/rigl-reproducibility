@@ -76,7 +76,7 @@ fi
 if [ ${1} == "Dense" ]; then
   python main.py dataset=CIFAR100 optimizer=SGD \
   masking=Dense +specific=cifar100_resnet50_dense \
-  exp_name="Dense_zero_residual_label_smooth" seed=$SLURM_ARRAY_TASK_ID wandb.use=True
+  exp_name="Dense_model_corrected" seed=$SLURM_ARRAY_TASK_ID wandb.use=True
 fi
 
 if [ ${1} == "Static" ]; then

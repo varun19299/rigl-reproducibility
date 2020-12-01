@@ -1,12 +1,22 @@
 from models.alexnet import AlexNet
 from models.vgg_16 import VGG16
 from models.wide_resnet import WideResNet
-from models.resnet import ResNet, BasicBlock, Bottleneck
+from models.resnet import ResNet, BasicBlock, BottleNeck
+from models.resnet_torchvision import (
+    ResNet as ResNet_torchvision,
+    BasicBlock as BasicBlock_torchvision,
+    BottleNeck as BottleNeck_torchvision,
+)
+
 
 registry = {
     "alexnet-b": (AlexNet, ["b", 10]),
     "alexnet-s": (AlexNet, ["s", 10]),
-    "resnet50": (ResNet, [Bottleneck, [3, 4, 6, 3], 100]),
+    "resnet50": (ResNet, [BottleNeck, [3, 4, 6, 3], 100]),
+    "resnet50-torchvision": (
+        ResNet_torchvision,
+        [BottleNeck_torchvision, [3, 4, 6, 3], 100],
+    ),
     "vgg-c": (VGG16, ["C", 10]),
     "vgg-d": (VGG16, ["D", 10]),
     "vgg-like": (VGG16, ["like", 10]),
