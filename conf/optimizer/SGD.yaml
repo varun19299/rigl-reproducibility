@@ -10,6 +10,7 @@ label_smoothing: 0.0
 # LR Scheduler
 decay_frequency: 25000
 decay_factor: 0.1
+warmup_steps: 0
 
 use_nesterov: True
 

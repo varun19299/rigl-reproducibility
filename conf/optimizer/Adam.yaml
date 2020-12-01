@@ -9,5 +9,6 @@ label_smoothing: 0.0
 # LR Scheduler (step)
 decay_frequency: 25000
 decay_factor: 0.1
+warmup_steps: 0
 
 training_multiplier: 1 # Useful for RigL 5x etc.

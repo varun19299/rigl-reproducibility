@@ -281,7 +281,7 @@ def main(cfg: DictConfig):
                 "masking_end_when": cfg.masking.end_when,
             }
 
-        scheduler = lr_scheduler if (epoch > warmup_epochs) else warmup_scheduler
+        scheduler = lr_scheduler if (epoch >= warmup_epochs) else warmup_scheduler
         _, step = train(
             model,
             mask,
