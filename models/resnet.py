@@ -128,6 +128,7 @@ class ResNet(nn.Module):
         num_classes: int = 100,
         bench_model: bool = False,
         small_dense_density: float = 1.0,
+        zero_init_residual: bool = True,
     ):
         super().__init__()
 
@@ -162,6 +163,21 @@ class ResNet(nn.Module):
         self.fc = nn.Linear(
             int(512 * small_dense_density) * block.expansion, num_classes
         )
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
+            elif isinstance(m, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.constant_(m.weight, 1)
+                nn.init.constant_(m.bias, 0)
+
+        # Zero-initialize the last BN in each residual branch,
+        # so that the residual branch starts with zeros, and each residual block behaves like an identity.
+        # This improves the model by 0.2~0.3% according to https://arxiv.org/abs/1706.02677
+        if zero_init_residual:
+            for m in self.modules():
+                if isinstance(m, BottleNeck) or isinstance(m, BasicBlock):
+                    nn.init.constant_(m.residual_function[-1].weight, 0)  # type: ignore[arg-type]
 
     def _make_layer(self, block, out_channels, num_blocks, stride):
         """make resnet layers(by layer i didnt mean this 'layer' was the
