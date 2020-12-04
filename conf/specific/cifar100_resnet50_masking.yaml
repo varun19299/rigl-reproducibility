@@ -1,0 +1,27 @@
+# @package _global_
+exp_name: ${masking.name}
+seed: 0
+model: resnet50
+ckpt_interval: 50
+
+wandb:
+  project: cifar 100
+  name: ${dataset.name}_${exp_name}_density_${masking.density}
+
+masking:
+  dense: True
+  density: 1
+
+dataset:
+  batch_size: 128
+  validation_split: 0.1
+
+optimizer:
+  epochs: 250
+  lr: 0.1
+  momentum: 0.9
+  weight_decay: 1e-4
+  label_smoothing: 0.1
+  decay_frequency: 20000
+  warmup_steps: 1760
+  decay_factor: 0.2
