@@ -2,15 +2,19 @@
 exp_name: ${masking.name}
 seed: 0
 model: resnet50
-ckpt_interval: 50
 
 wandb:
-  project: cifar 100
+  project: cifar100
   name: ${dataset.name}_${exp_name}_density_${masking.density}
 
 masking:
-  dense: True
-  density: 1
+  sparse_init: erdos-renyi-kernel
+  density: 0.2  # The density of the overall sparse network.
+  prune_rate: 0.3  # The pruning rate / prune rate.
+  decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
+  apply_when: step_end  # or step_end
+  interval: 100 # Which epochs or steps to apply at
+  end_when: 65918
 
 dataset:
   batch_size: 128

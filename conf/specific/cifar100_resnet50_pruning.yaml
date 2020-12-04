@@ -5,16 +5,23 @@ model: resnet50
 
 wandb:
   project: cifar100
-  name: ${dataset.name}_${exp_name}_density_${masking.density}
+  name: ${dataset.name}_${exp_name}_density_${masking.final_density}
 
 masking:
-  sparse_init: erdos-renyi-kernel
-  density: 0.2  # The density of the overall sparse network.
-  prune_rate: 0.3  # The pruning rate / prune rate.
-  decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
+  name: Pruning
+  sparse_init: random
+  density: 1.0  # The density of the overall sparse network.
+  final_density: 0.2
+  decay_schedule: magnitude-prune  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
   apply_when: step_end  # or step_end
+  start_when: 700 # training steps
   interval: 100 # Which epochs or steps to apply at
   end_when: 65918
+
+  growth_mode: none  # Growth mode. Choose from: momentum, random, and momentum_neuron.
+  prune_mode: global-magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.
+  redistribution_mode: none  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
+  dense: False  # Enable dense mode. Default: False.
 
 dataset:
   batch_size: 128

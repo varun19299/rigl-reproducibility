@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=12       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
-#SBATCH --time=16:00:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=1-16:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
 #SBATCH --array=0-2
 
@@ -44,49 +44,65 @@ fi
 # Note: we're using the same GPU
 
 if [ ${1} == "RigL" ]; then
-  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-  masking=RigL +specific=cifar100_resnet50_masking \
-  seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
-  
-  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-  masking=RigL +specific=cifar100_resnet50_masking \
-  seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  if [ ${2} == "ERK" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=RigL +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
+
+  if [ ${2} == "Random" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=RigL +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
 fi
 
 if [ ${1} == "SNFS" ]; then
-  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-  masking=SNFS +specific=cifar100_resnet50_masking \
-  seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  if [ ${2} == "ERK" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=SNFS +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
 
-  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-  masking=SNFS +specific=cifar100_resnet50_masking \
-  seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  if [ ${2} == "Random" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=SNFS +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
 fi
 
 if [ ${1} == "SET" ]; then
-  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-  masking=SET +specific=cifar100_resnet50_masking \
-  seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK' masking.sparse_init=erdos-renyi-kernel masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
-  
-  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-  masking=SET +specific=cifar100_resnet50_masking \
-  seed=$SLURM_ARRAY_TASK_ID exp_name='SET_Random' masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  if [ ${2} == "ERK" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=SET +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK' masking.sparse_init=erdos-renyi-kernel masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
+
+  if [ ${2} == "Random" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=SET +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name='SET_Random' masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
 fi
 
 if [ ${1} == "Dense" ]; then
-  python main.py dataset=CIFAR100 optimizer=SGD \
+  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
   masking=Dense +specific=cifar100_resnet50_dense \
-  exp_name="Dense_3_no_smooth" seed=$SLURM_ARRAY_TASK_ID wandb.use=True
+  exp_name="Dense" seed=$SLURM_ARRAY_TASK_ID wandb.use=True
 fi
 
 if [ ${1} == "Static" ]; then
-  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-  +specific=cifar100_resnet50_static \
-  seed=$SLURM_ARRAY_TASK_ID exp_name="Static_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  if [ ${2} == "ERK" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    +specific=cifar100_resnet50_static \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="Static_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
 
-  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-  +specific=cifar100_resnet50_static \
-  seed=$SLURM_ARRAY_TASK_ID exp_name="Static_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  if [ ${2} == "Random" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    +specific=cifar100_resnet50_static \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="Static_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
 fi
 
 if [ ${1} == "Small-Dense" ]; then
