@@ -630,7 +630,8 @@ class Masking(object):
                 if self.redistribution_mode not in ["nonzero", "none"]:
                     num_growth = name2regrowth[name]
                 else:
-                    num_growth = self.stats.removed_dict[name] + self.adjustments[-1]
+                    feedback = self.adjustments[-1] if self.adjustments else 0
+                    num_growth = self.stats.removed_dict[name] + feedback
 
                 new_mask = self.growth_func(self, name, new_mask, num_growth, weight)
                 new_nonzero = new_mask.sum().item()

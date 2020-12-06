@@ -74,13 +74,13 @@ fi
 if [ ${1} == "SET" ]; then
   if [ ${2} == "ERK" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=SET \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK' \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_corrected_ERK' \
     masking.sparse_init=erdos-renyi-kernel masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=SET \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_Random' \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_corrected_Random' \
     masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 fi
