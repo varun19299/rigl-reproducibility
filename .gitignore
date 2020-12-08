@@ -20,3 +20,6 @@ Icon*
 *Icon*
 *.pth
 *.key
+ 
+.ipynb_checkpoints
+figs
