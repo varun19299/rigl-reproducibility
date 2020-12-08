@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=12       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
-#SBATCH --time=1-16:00:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=20:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
 #SBATCH --array=0-2
 
@@ -112,9 +112,13 @@ if [ ${1} == "Small-Dense" ]; then
 fi
 
 if [ ${1} == "Pruning" ]; then
+#  python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+#  +specific=cifar100_resnet50_pruning exp_name='Pruning' \
+#  seed=$SLURM_ARRAY_TASK_ID  masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
+
   python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
   +specific=cifar100_resnet50_pruning exp_name='Pruning' \
-  seed=$SLURM_ARRAY_TASK_ID  masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  seed=$SLURM_ARRAY_TASK_ID  masking.final_density=0.5 wandb.use=True
 fi
 
 if [ ${1} == "Lottery" ]; then

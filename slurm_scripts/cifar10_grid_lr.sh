@@ -56,14 +56,26 @@ if [ $SLURM_ARRAY_TASK_ID -eq 0 ]; then
 #    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_ERK_grid_lr' \
 #    masking.density=${1} masking.prune_rate=0.4 masking.interval=500 optimizer.lr=0.1,0.05,0.01,0.005 \
 #    wandb.use=True -m
+#
+#    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_ERK_grid_lr' \
+#    masking.density=${1} masking.prune_rate=0.5 masking.interval=750 optimizer.lr=0.1,0.05,0.01,0.005 \
+#    wandb.use=True -m
 
     python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_ERK_grid_lr' \
-    masking.density=${1} masking.prune_rate=0.4 masking.interval=500 optimizer.lr=0.005 \
-    wandb.use=True -m
+    masking.density=${1} masking.prune_rate=0.3 masking.interval=100 optimizer.lr=0.2 \
+    wandb.use=True
 
     python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_ERK_grid_lr' \
-    masking.density=${1} masking.prune_rate=0.5 masking.interval=750 optimizer.lr=0.1,0.05,0.01,0.005 \
-    wandb.use=True -m
+    masking.density=${1} masking.prune_rate=0.4 masking.interval=200 optimizer.lr=0.2 \
+    wandb.use=True
+
+    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_ERK_grid_lr' \
+    masking.density=${1} masking.prune_rate=0.4 masking.interval=500 optimizer.lr=0.2 \
+    wandb.use=True
+
+    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_ERK_grid_lr' \
+    masking.density=${1} masking.prune_rate=0.5 masking.interval=750 optimizer.lr=0.2 \
+    wandb.use=True
 fi
 
 if [ $SLURM_ARRAY_TASK_ID -eq 1 ]; then
@@ -80,10 +92,22 @@ if [ $SLURM_ARRAY_TASK_ID -eq 1 ]; then
 #    wandb.use=True -m
 
 #    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_Random_grid_lr' \
-#    masking.density=${1} masking.prune_rate=0.5 masking.interval=750 optimizer.lr=0.1,0.05,0.01,0.005 \
+#    masking.density=${1} masking.prune_rate=0.5 masking.interval=750 optimizer.lr=0.1,0.05,0.01,0.005  \
 #    wandb.use=True -m
 
     python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_Random_grid_lr' \
-    masking.density=${1} masking.prune_rate=0.5 masking.interval=750 optimizer.lr=0.005 \
+    masking.density=${1} masking.prune_rate=0.3 masking.interval=100 optimizer.lr=0.2 \
+    masking.sparse_init=random wandb.use=True
+
+    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_Random_grid_lr' \
+    masking.density=${1} masking.prune_rate=0.4 masking.interval=200 optimizer.lr=0.2 \
+    wandb.use=True
+
+    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_Random_grid_lr' \
+    masking.density=${1} masking.prune_rate=0.4 masking.interval=500 optimizer.lr=0.2 \
+    wandb.use=True
+
+    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar10_wrn_22_2_grid_lr exp_name='RigL_Random_grid_lr' \
+    masking.density=${1} masking.prune_rate=0.5 masking.interval=750 optimizer.lr=0.2 \
     wandb.use=True
 fi

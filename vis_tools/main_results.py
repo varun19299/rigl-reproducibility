@@ -19,6 +19,7 @@ def get_stats(
     density_ll: "List[float]" = [0.1],
     dataset_ll: "List[str]" = ["CIFAR10"],
     reorder: bool = True,
+    correct_SET: bool = False,
 ) -> pd.DataFrame:
     """
     List all possible choices for
@@ -51,13 +52,17 @@ def get_stats(
 
         accuracy_ll = [None, None, None]
         for run in runs:
+            if not ("test_accuracy" in run.summary):
+                continue
+
             accuracy_ll[run.config["seed"]] = run.summary.test_accuracy
 
-            # Correct SET Random 0.05
-            # Seeds 1,2 suffered from collapse
-            if (masking, suffix, init, density) == ("SET", None, "Random", 0.05):
-                accuracy_ll[1] = 0.9010
-                accuracy_ll[2] = 0.9000
+            if correct_SET:
+                # Correct SET Random 0.05
+                # Seeds 1,2 suffered from collapse
+                if (masking, suffix, init, density) == ("SET", None, "Random", 0.05):
+                    accuracy_ll[1] = 0.9010
+                    accuracy_ll[2] = 0.9000
 
         if suffix:
             masking = f"{masking}_{suffix}"
@@ -87,15 +92,15 @@ def main(cfg: DictConfig):
             "SNFS",
             "SET",
             "Small_Dense",
-            "Lottery",
             "Dense",
             "Static",
             "Pruning",
         ],
         init_ll=["Random", "ERK", None],
-        suffix_ll=[None, "2x"],
+        suffix_ll=[None],
         density_ll=[0.05, 0.1, 0.2, 0.5, 1],
-        dataset_ll=["CIFAR10"],
+        dataset_ll=[cfg.dataset.name],
+        correct_SET=cfg.dataset.name == "CIFAR10",
     )
 
     # Compute Mean
@@ -108,8 +113,9 @@ def main(cfg: DictConfig):
     pd.options.display.max_rows = 100
     print(df)
 
-    df.to_csv(f"{hydra.utils.get_original_cwd()}/outputs/csv/cifar10_main_results.csv")
-
+    df.to_csv(
+        f"{hydra.utils.get_original_cwd()}/outputs/csv/{cfg.dataset.name.lower()}_main_results.csv"
+    )
 
 if __name__ == "__main__":
     main()
