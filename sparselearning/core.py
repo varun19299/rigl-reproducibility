@@ -365,7 +365,6 @@ class Masking(object):
 
     @property
     def growth_func(self):
-
         return grow_registry[self.growth_mode]
 
     @property
@@ -631,7 +630,7 @@ class Masking(object):
                     num_growth = name2regrowth[name]
                 else:
                     feedback = self.adjustments[-1] if self.adjustments else 0
-                    num_growth = self.stats.removed_dict[name] + feedback
+                    num_growth = self.stats.removed_dict[name] #+ feedback
 
                 new_mask = self.growth_func(self, name, new_mask, num_growth, weight)
                 new_nonzero = new_mask.sum().item()

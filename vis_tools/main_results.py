@@ -55,14 +55,14 @@ def get_stats(
             if not ("test_accuracy" in run.summary):
                 continue
 
-            accuracy_ll[run.config["seed"]] = run.summary.test_accuracy
+            accuracy_ll[run.config["seed"]] = run.summary.test_accuracy * 100
 
             if correct_SET:
                 # Correct SET Random 0.05
                 # Seeds 1,2 suffered from collapse
                 if (masking, suffix, init, density) == ("SET", None, "Random", 0.05):
-                    accuracy_ll[1] = 0.9010
-                    accuracy_ll[2] = 0.9000
+                    accuracy_ll[1] = 0.9010 * 100
+                    accuracy_ll[2] = 0.9000 * 100
 
         if suffix:
             masking = f"{masking}_{suffix}"
@@ -97,7 +97,7 @@ def main(cfg: DictConfig):
             "Pruning",
         ],
         init_ll=["Random", "ERK", None],
-        suffix_ll=[None],
+        suffix_ll=[None, "corrected", "no_val", "no_val_c"],
         density_ll=[0.05, 0.1, 0.2, 0.5, 1],
         dataset_ll=[cfg.dataset.name],
         correct_SET=cfg.dataset.name == "CIFAR10",
@@ -111,7 +111,9 @@ def main(cfg: DictConfig):
 
     # Set longer length
     pd.options.display.max_rows = 100
-    print(df)
+
+    with pd.option_context('display.float_format', '{:.3f}'.format):
+        print(df)
 
     df.to_csv(
         f"{hydra.utils.get_original_cwd()}/outputs/csv/{cfg.dataset.name.lower()}_main_results.csv"
