@@ -150,7 +150,7 @@ def main(cfg: DictConfig):
 
     # Plot it
     alpha_deltaT_plot(
-        df, init_ll=["Random"], density_ll=[0.1, 0.2, 0.5],
+        df, init_ll=["ERK"], density_ll=[0.1, 0.2, 0.5],
     )
 
 

@@ -5,7 +5,7 @@ model: wrn-22-2
 
 wandb:
   project: cifar10 optuna
-  name: ${dataset.name}_${exp_name}_density_${masking.density}_alpha_${masking.prune_rate}_deltaT_${masking.interval}
+  name: ${dataset.name}_${exp_name}_optuna_density_${masking.density}_alpha_${masking.prune_rate}_deltaT_${masking.interval}
 
 masking:
   sparse_init: erdos-renyi-kernel

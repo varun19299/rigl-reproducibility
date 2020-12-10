@@ -49,8 +49,12 @@ def momentum_redistribution(masking, name, weight, mask):
         Total number of parameters removed in pruning:
             masking.stats.total_removed = 0
     """
-    grad = masking.get_momentum_for_weight(weight)
-    mean_magnitude = torch.abs(grad[mask.bool()]).mean().item()
+    momentum = masking.get_momentum_for_weight(weight)
+
+    # Mask the momentum
+    momentum = momentum * masking.masks[name]
+
+    mean_magnitude = torch.abs(momentum[mask.bool()]).mean().item()
     return mean_magnitude
 
 

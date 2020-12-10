@@ -8,7 +8,7 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=12       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
-#SBATCH --time=16:00:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=6:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
 #SBATCH --array=0-2
 
@@ -45,13 +45,9 @@ fi
 
 if [ ${1} == "RigL" ]; then
   if [ ${2} == "ERK" ]; then
-#    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL \
-#    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" \
-#    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
-
     python main.py dataset=CIFAR10 optimizer=SGD masking=RigL \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_no_val_no_feedback_ERK" \
-    dataset.validation_split=0.0 masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" \
+    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
@@ -64,13 +60,13 @@ fi
 if [ ${1} == "SNFS" ]; then
   if [ ${2} == "ERK" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_ERK" \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_corrected_ERK" \
     masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_Random" \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_corrected_Random" \
     masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 fi
@@ -90,22 +86,15 @@ if [ ${1} == "SET" ]; then
 fi
 
 if [ ${1} == "Dense" ]; then
-#  python main.py dataset=CIFAR10 optimizer=SGD masking=Dense \
-#  +specific=cifar10_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID wandb.use=True
-
-  python main.py dataset=CIFAR10 optimizer=SGD masking=Dense exp_name="Dense_no_val"\
-  dataset.validation_split=0.0 +specific=cifar10_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID wandb.use=True
+  python main.py dataset=CIFAR10 optimizer=SGD masking=Dense \
+  +specific=cifar10_wrn_22_2_dense seed=$SLURM_ARRAY_TASK_ID wandb.use=True
 fi
 
 if [ ${1} == "Static" ]; then
   if [ ${2} == "ERK" ]; then
-#    python main.py dataset=CIFAR10 optimizer=SGD \
-#    +specific=cifar10_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID exp_name="Static_ERK" \
-#    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
-
     python main.py dataset=CIFAR10 optimizer=SGD \
-    +specific=cifar10_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID exp_name="Static_no_val_ERK" \
-    dataset.validation_split=0.0 masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+    +specific=cifar10_wrn_22_2_static seed=$SLURM_ARRAY_TASK_ID exp_name="Static_ERK" \
+    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
@@ -122,13 +111,9 @@ if [ ${1} == "Small-Dense" ]; then
 fi
 
 if [ ${1} == "Pruning" ]; then
-#  python main.py dataset=CIFAR10 optimizer=SGD \
-#  +specific=cifar10_wrn_22_2_pruning exp_name='Pruning' seed=$SLURM_ARRAY_TASK_ID  \
-#  masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
-
   python main.py dataset=CIFAR10 optimizer=SGD \
-  +specific=cifar10_wrn_22_2_pruning exp_name='Pruning_no_val' seed=$SLURM_ARRAY_TASK_ID  \
-  dataset.validation_split=0.0 masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  +specific=cifar10_wrn_22_2_pruning exp_name='Pruning' seed=$SLURM_ARRAY_TASK_ID  \
+  masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
 fi
 
 if [ ${1} == "Lottery" ]; then
