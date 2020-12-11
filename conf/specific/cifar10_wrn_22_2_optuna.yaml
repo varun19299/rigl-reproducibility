@@ -4,7 +4,7 @@ seed: 0
 model: wrn-22-2
 
 wandb:
-  project: cifar10 optuna
+  project: cifar10 optuna all seeds
   name: ${dataset.name}_${exp_name}_optuna_density_${masking.density}_alpha_${masking.prune_rate}_deltaT_${masking.interval}
 
 masking:

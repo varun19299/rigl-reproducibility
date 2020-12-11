@@ -170,8 +170,7 @@ def evaluate(
     return loss, top_1_accuracy
 
 
-@hydra.main(config_name="config", config_path="conf")
-def main(cfg: DictConfig):
+def single_seed_run(cfg: DictConfig) -> float:
     print(OmegaConf.to_yaml(cfg))
 
     # Manual seeds
@@ -352,6 +351,21 @@ def main(cfg: DictConfig):
     )
 
     return val_accuracy
+
+
+@hydra.main(config_name="config", config_path="conf")
+def main(cfg: DictConfig) -> float:
+    if cfg.multi_seed:
+        val_accuracy_ll = []
+        for seed in cfg.multi_seed:
+            cfg.seed = seed
+            val_accuracy = single_seed_run(cfg)
+            val_accuracy_ll.append(val_accuracy)
+
+        return sum(val_accuracy_ll) / len(val_accuracy_ll)
+    else:
+        val_accuracy = single_seed_run(cfg)
+        return val_accuracy
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ defaults:
 
 exp_name: ${masking.name}
 seed: 0
+multi_seed: []
 model: wrn-22-2
 
 # Train args
