@@ -20,7 +20,7 @@ benchmark: False
 # Logging, Saving, Resuming
 log_interval: 100
 ckpt_dir: ckpts
-ckpt_interval: 50 #${optimizer.epochs} # Dont save any intermediate weights, just final
+ckpt_interval: ${optimizer.epochs} # Dont save any intermediate weights, just final
 val_interval: 1
 resume: True
 
@@ -32,7 +32,6 @@ wandb:
   project: cifar10
   name: ${exp_name}
 
-use_wandb: False
 wandb_api_key: ${hydra:runtime.cwd}/wandb_api.key
 
 

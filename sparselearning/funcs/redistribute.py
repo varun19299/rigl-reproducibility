@@ -51,9 +51,6 @@ def momentum_redistribution(masking, name, weight, mask):
     """
     momentum = masking.get_momentum_for_weight(weight)
 
-    # Mask the momentum
-    momentum = momentum * masking.masks[name]
-
     mean_magnitude = torch.abs(momentum[mask.bool()]).mean().item()
     return mean_magnitude
 

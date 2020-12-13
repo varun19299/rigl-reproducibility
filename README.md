@@ -7,6 +7,9 @@
 * `pytorch`: 1.7.0+
 * `pip install -r requirements.txt`
 
+Install as a library:
+* `pip install -e .`
+
 ## Installing Optuna
 
 Clone hydra from https://github.com/toshihikoyanase/hydra/tree/add-optuna-sweeper.

@@ -3,6 +3,6 @@ name: CIFAR10
 root: ${hydra:runtime.cwd}/datasets/CIFAR10/
 batch_size: 128
 test_batch_size: ${dataset.batch_size}
-max_threads: 4
+max_threads: 10
 validation_split: 0.1
 fixed_shuffle: false

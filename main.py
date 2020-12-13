@@ -1,3 +1,4 @@
+from copy import deepcopy
 from data import get_dataloaders
 import hydra
 import logging
@@ -350,6 +351,10 @@ def single_seed_run(cfg: DictConfig) -> float:
         use_wandb=cfg.wandb.use,
     )
 
+    if cfg.wandb.use:
+        # Close wandb context
+        wandb.join()
+
     return val_accuracy
 
 
@@ -358,8 +363,10 @@ def main(cfg: DictConfig) -> float:
     if cfg.multi_seed:
         val_accuracy_ll = []
         for seed in cfg.multi_seed:
-            cfg.seed = seed
-            val_accuracy = single_seed_run(cfg)
+            run_cfg = deepcopy(cfg)
+            run_cfg.seed = seed
+            run_cfg.ckpt_dir = f"{cfg.ckpt_dir}_seed={seed}"
+            val_accuracy = single_seed_run(run_cfg)
             val_accuracy_ll.append(val_accuracy)
 
         return sum(val_accuracy_ll) / len(val_accuracy_ll)
