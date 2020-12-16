@@ -12,6 +12,24 @@ if TYPE_CHECKING:
     from utils.typing_alias import *
 
 
+# Matplotlib font sizes
+SMALL_SIZE = 12
+MEDIUM_SIZE = 14
+BIGGER_SIZE = 16
+
+plt.rc("font", size=SMALL_SIZE)  # controls default text sizes
+plt.rc("axes", titlesize=SMALL_SIZE)  # fontsize of the axes title
+plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
+plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
+
+# Matplotlib line thickness
+LINE_WIDTH = 3
+ALPHA = 0.9
+
+
 def get_stats(
     runs,
     masking_ll: "List[str]" = ["RigL"],
@@ -131,7 +149,7 @@ def lr_tuning_plot(
             ]
             lr_ll = [lr for lr in lr_ll if test_acc_exists[lr]]
 
-            plt.semilogx(lr_ll, test_acc_ll)
+            plt.semilogx(lr_ll, test_acc_ll, linewidth=LINE_WIDTH, alpha=ALPHA)
             legend.append(rf"$\alpha=${alpha},$\Delta T=${deltaT}")
 
         plt.legend(legend)
@@ -139,13 +157,9 @@ def lr_tuning_plot(
 
         # grab a reference to the current axes
         ax = plt.gca()
+
         # set the xlimits to be the reverse of the current xlimits
         ax.set_xlim(ax.get_xlim()[::-1])
-
-        # current_ylim = ax.get_ylim()
-        # ax.set_ylim(max(90, current_ylim[0]), current_ylim[1])
-
-        # plt.ylim(89.5, 94)
 
         plt.grid()
         plt.xlabel("Learning rate")
