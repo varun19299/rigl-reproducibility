@@ -8,9 +8,9 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=12       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
-#SBATCH --time=6:00:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=10:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
-#SBATCH --array=0-2
+#SBATCH --array=3-3
 
 # Mailing stuff
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -45,9 +45,13 @@ fi
 
 if [ ${1} == "RigL" ]; then
   if [ ${2} == "ERK" ]; then
+#    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL \
+#    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" \
+#    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+
     python main.py dataset=CIFAR10 optimizer=SGD masking=RigL \
     +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" \
-    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+    masking.density=0.0587,0.1145,0.2855 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
