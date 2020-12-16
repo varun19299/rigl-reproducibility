@@ -55,6 +55,13 @@ def momentum_redistribution(masking, name, weight, mask):
     return mean_magnitude
 
 
+def grad_redistribution(masking, name, weight, mask):
+    """Calculates gradient redistribution statistics.
+    """
+    grad = weight.grad
+    mean_grad = torch.abs(grad[mask.bool()]).mean().item()
+    return mean_grad
+
 def magnitude_redistribution(masking, name, weight, mask):
     mean_magnitude = torch.abs(weight)[mask.bool()].mean().item()
     return mean_magnitude
@@ -94,6 +101,7 @@ def variance_redistribution(masking, name, weight, mask):
 
 
 registry = {
+    "grad": grad_redistribution,
     "magnitude": magnitude_redistribution,
     "momentum": momentum_redistribution,
     "nonzero": nonzero_redistribution,
