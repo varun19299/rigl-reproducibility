@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from utils.typing_alias import *
 
 
+@torch.no_grad()
 def get_inference_FLOPs(
     masking: "Masking", input_tensor: "Tensor", param_size: int = 32
 ):

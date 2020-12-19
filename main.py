@@ -1,10 +1,8 @@
 from copy import deepcopy
-from counting import model_inference_FLOPs
 from data import get_dataloaders
 import hydra
 import logging
 from loss import LabelSmoothingCrossEntropy
-import numpy as np
 from omegaconf import DictConfig, OmegaConf
 import os
 from sparselearning.core import Masking
@@ -80,7 +78,7 @@ def train(
         if (
             mask
             and masking_apply_when == "step_end"
-            and (global_step < masking_end_when)
+            and global_step < masking_end_when
             and ((global_step + 1) % masking_interval) == 0
         ):
             mask.update_connections()
@@ -115,10 +113,15 @@ def train(
 
     density = mask.stats.total_density if mask else 1.0
     msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f} Prune Rate {mask.prune_rate if mask else 0:.5f} Density {density:.5f}"
-    logging.info(msg)
 
     if masking_print_FLOPs:
-        msg += f" Inference FLOPs: {mask.inference_FLOPs/mask.dense_FLOPs}x"
+        msg = msg + f" Inference FLOPs: {mask.inference_FLOPs/mask.dense_FLOPs:.4f}x"
+        msg = (
+            msg
+            + f" Avg Inference FLOPs: {mask.avg_inference_FLOPs/mask.dense_FLOPs:.4f}x"
+        )
+
+    logging.info(msg)
 
     return _loss_collector.smooth, global_step
 

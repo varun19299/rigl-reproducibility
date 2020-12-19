@@ -2,8 +2,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
 
-from counting import wrn_22_2_FLOPs, resnet50_FLOPs
-from counting.inference_train_FLOPs import RigL_train_FLOPs
+from counting.inference_train_FLOPs import RigL_train_FLOPs, wrn_22_2_FLOPs, resnet50_FLOPs
 
 # Matplotlib font sizes
 SMALL_SIZE = 12

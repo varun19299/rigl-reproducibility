@@ -1,3 +1,5 @@
+from functools import partial
+
 import torch
 from torch import optim
 
@@ -48,3 +50,17 @@ def model_inference_FLOPs(
     mask.add_module(model)
 
     return get_inference_FLOPs(mask, torch.rand(*input_size))
+
+
+registry = {
+    "RigL": RigL_train_FLOPs,
+    "SET": SET_train_FLOPs,
+    "SNFS": SNFS_train_FLOPs,
+    "Pruning": Pruning_train_FLOPs,
+}
+wrn_22_2_FLOPs = partial(
+    model_inference_FLOPs, model_name="wrn-22-2", input_size=(1, 3, 32, 32)
+)
+resnet50_FLOPs = partial(
+    model_inference_FLOPs, model_name="resnet50", input_size=(1, 3, 32, 32)
+)

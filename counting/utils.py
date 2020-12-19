@@ -25,6 +25,12 @@ def get_pre_activations_dict(net: "nn.Module", input_tensor: "Tensor"):
     for name, module in net.named_modules():
         module.register_forward_hook(_get_activation(name))
 
-    net(input_tensor)
+    device_ll = []
+    for name, weight in net.named_parameters():
+        device_ll.append(weight.device)
+    assert len(set(device_ll)) == 1, "No support for multi-device modules yet!"
+    device = device_ll[0]
+
+    net(input_tensor.to(device))
 
     return activation_dict

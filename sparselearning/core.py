@@ -17,6 +17,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from typing import TYPE_CHECKING
+from utils.smoothen_value import AverageValue
 
 if TYPE_CHECKING:
     from utils.typing_alias import *
@@ -150,8 +151,8 @@ class Masking(object):
 
         # FLOPs
         self._dense_FLOPs = None
-        self._inference_FLOPs = None
         self._input_size = (1, 3, 32, 32)
+        self._inference_FLOPs_collector = AverageValue()
 
         # Assertions
         assert (
@@ -253,6 +254,11 @@ class Masking(object):
             if name in self.masks:
                 weight.grad = weight.grad * self.masks[name]
 
+    @property
+    def avg_inference_FLOPs(self):
+        self._inference_FLOPs_collector.add_value(self.inference_FLOPs)
+        return self._inference_FLOPs_collector.smooth
+
     def calc_growth_redistribution(self):
         residual = 9999
         mean_residual = 0
@@ -319,13 +325,7 @@ class Masking(object):
         """
         Calculates dense inference FLOPs of the model
         """
-        if not self._inference_FLOPs:
-            self._inference_FLOPs = get_inference_FLOPs(
-                self, torch.rand(*self._input_size)
-            )
-            return self._inference_FLOPs
-        else:
-            return self._inference_FLOPs
+        return get_inference_FLOPs(self, torch.rand(*self._input_size))
 
     @torch.no_grad()
     def init(self, lottery_mask_path: "Path"):
