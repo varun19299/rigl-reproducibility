@@ -4,6 +4,7 @@ hydra-joblib-launcher
 hydra-core
 hydra_colorlog
 matplotlib
+millify
 numpy
 torch
 torchvision

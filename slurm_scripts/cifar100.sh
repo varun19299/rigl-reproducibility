@@ -45,19 +45,55 @@ fi
 
 if [ ${1} == "RigL" ]; then
   if [ ${2} == "ERK" ]; then
-#    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
-#    masking=RigL +specific=cifar100_resnet50_masking \
-#    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
-
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
     masking=RigL +specific=cifar100_resnet50_masking \
-    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" masking.density=0.044,0.088,0.298 wandb.use=True -m
+    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+
+#    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+#    masking=RigL +specific=cifar100_resnet50_masking \
+#    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_ERK" masking.density=0.044,0.088,0.298 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
     masking=RigL +specific=cifar100_resnet50_masking \
     seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
+fi
+
+if [ ${1} == "RigL-SG" ]; then
+  if [ ${2} == "ERK" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=RigL +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-SG_ERK" \
+    masking.redistribution_mode=grad \
+    masking.density=0.1,0.2,0.05,0.5 wandb.use=True -m
+  fi
+
+  if [ ${2} == "Random" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=RigL +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-SG_Random" \
+    masking.redistribution_mode=grad \
+    masking.sparse_init=random masking.density=0.1,0.2,0.05,0.5 wandb.use=True -m
+  fi
+fi
+
+if [ ${1} == "RigL-SM" ]; then
+  if [ ${2} == "ERK" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=RigL +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-SM_ERK" \
+    masking.redistribution_mode=momentum \
+    masking.density=0.1,0.2,0.05,0.5 wandb.use=True -m
+  fi
+
+  if [ ${2} == "Random" ]; then
+    python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
+    masking=RigL +specific=cifar100_resnet50_masking \
+    seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-SM_Random" \
+    masking.redistribution_mode=momentum \
+    masking.sparse_init=random masking.density=0.1,0.2,0.05,0.5 wandb.use=True -m
   fi
 fi
 

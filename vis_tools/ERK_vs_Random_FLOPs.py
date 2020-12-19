@@ -1,5 +1,7 @@
+import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
+
 from utils.counting_ops import resnet50_FLOPs, RigL_FLOPs, wrn_22_2_FLOPs
 
 # Matplotlib font sizes
@@ -16,13 +18,13 @@ plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
 plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 # Matplotlib line thickness
-LINE_WIDTH = 2
+LINE_WIDTH = 4
 ALPHA = 0.9
 
 registry = {"wrn-22-2": wrn_22_2_FLOPs, "resnet50": resnet50_FLOPs}
 
 
-def main(model: str = "wrn-22-2"):
+def FLOPs_vs_sparsity(model: str = "wrn-22-2"):
     assert model in ["wrn-22-2", "resnet50"], f"Model {model} not found"
 
     dense_FLOPs = registry[model](density=1.0)
@@ -59,7 +61,7 @@ def main(model: str = "wrn-22-2"):
 
         print("-----------\n")
 
-    plt.figure(figsize=(6, 5))
+    plt.figure(figsize=(4, 5))
     plt.plot(
         train_FLOPs_dict["density"],
         train_FLOPs_dict["ERK"],
@@ -86,6 +88,171 @@ def main(model: str = "wrn-22-2"):
     plt.show()
 
 
+def accuracy_vs_FLOPs():
+    wrn_22_2_dense_FLOPs = wrn_22_2_FLOPs(density=1.0)
+    wrn_22_2_dense_train_FLOPs = (
+        3 * wrn_22_2_dense_FLOPs
+    )  # gradient of param and activation
+
+    resnet50_dense_FLOPs = resnet50_FLOPs(density=1.0)
+    resnet50_dense_train_FLOPs = (
+        3 * resnet50_dense_FLOPs
+    )  # gradient of param and activation
+
+    columns = ["Model", "Init", "FLOPs", "Test Acc Mean", "Test Acc Std"]
+    df = pd.DataFrame(columns=columns)
+
+    # TODO: can we extract these from WandB?
+    df.loc[0] = [
+        "wrn-22-2",
+        "Random",
+        RigL_FLOPs(wrn_22_2_FLOPs("random", 0.1), wrn_22_2_dense_train_FLOPs),
+        91.71666666666665,
+        0.18009256878986557,
+    ]
+    df.loc[1] = [
+        "wrn-22-2",
+        "Random",
+        RigL_FLOPs(wrn_22_2_FLOPs("random", 0.2), wrn_22_2_dense_train_FLOPs),
+        92.60666666666667,
+        0.3100537587795598,
+    ]
+    df.loc[2] = [
+        "wrn-22-2",
+        "Random",
+        RigL_FLOPs(wrn_22_2_FLOPs("random", 0.5), wrn_22_2_dense_train_FLOPs),
+        93.26666666666667,
+        0.07234178138069844,
+    ]
+
+    df.loc[3] = [
+        "wrn-22-2",
+        "ERK",
+        df.loc[0]["FLOPs"],
+        91.43,
+        0.015,
+    ]
+    df.loc[4] = [
+        "wrn-22-2",
+        "ERK",
+        df.loc[1]["FLOPs"],
+        92.22,
+        0.1189,
+    ]
+    df.loc[5] = ["wrn-22-2", "ERK", df.loc[2]["FLOPs"], 93.28, 0.1545]
+
+    df.loc[6] = [
+        "resnet50",
+        "Random",
+        RigL_FLOPs(resnet50_FLOPs("random", 0.1), resnet50_dense_train_FLOPs),
+        71.769513686498,
+        0.3318907357554385,
+    ]
+    df.loc[7] = [
+        "resnet50",
+        "Random",
+        RigL_FLOPs(resnet50_FLOPs("random", 0.2), resnet50_dense_train_FLOPs),
+        73.53639205296834,
+        0.04310600094182424,
+    ]
+    df.loc[8] = [
+        "resnet50",
+        "Random",
+        RigL_FLOPs(resnet50_FLOPs("random", 0.5), resnet50_dense_train_FLOPs),
+        74.27149415016174,
+        0.3129347072329389,
+    ]
+
+    df.loc[9] = [
+        "resnet50",
+        "ERK",
+        df.loc[6]["FLOPs"],
+        71.07,
+        0.3936,
+    ]
+    df.loc[10] = [
+        "resnet50",
+        "ERK",
+        df.loc[7]["FLOPs"],
+        71.98,
+        0.3021,
+    ]
+    df.loc[11] = [
+        "resnet50",
+        "ERK",
+        df.loc[8]["FLOPs"],
+        74.18,
+        0.4284,
+    ]
+
+    WIDTH = 0.3
+
+    plt.figure(figsize=(6, 8))
+
+    sub_df = df.loc[df["Model"] == "wrn-22-2"]
+
+    erk_sub_df = sub_df.loc[sub_df["Init"] == "ERK"]
+    plt.bar(
+        np.arange(1, 4) - WIDTH / 2,
+        erk_sub_df["Test Acc Mean"],
+        width=WIDTH,
+        yerr=erk_sub_df["Test Acc Std"],
+    )
+
+    random_sub_df = sub_df.loc[sub_df["Init"] == "Random"]
+    plt.bar(
+        np.arange(1, 4) + WIDTH / 2,
+        random_sub_df["Test Acc Mean"],
+        width=WIDTH,
+        yerr=random_sub_df["Test Acc Std"],
+    )
+
+    plt.xticks(np.arange(1, 4), [f"{x:.2e}" for x in erk_sub_df["FLOPs"]])
+    plt.ylim(88, 94)
+
+    plt.legend(["ERK", "Random"])
+    plt.xlabel("Train FLOPs")
+    plt.ylabel("Accuracy (Test)")
+
+    plt.savefig(
+        "outputs/plots/wrn-22-2_ERK_vs_Random_acc_vs_train_FLOPs.pdf", dpi=150,
+    )
+
+    plt.show()
+
+    sub_df = df.loc[df["Model"] == "resnet50"]
+
+    erk_sub_df = sub_df.loc[sub_df["Init"] == "ERK"]
+    plt.bar(
+        np.arange(1, 4) - WIDTH / 2,
+        erk_sub_df["Test Acc Mean"],
+        width=WIDTH,
+        yerr=erk_sub_df["Test Acc Std"],
+    )
+
+    random_sub_df = sub_df.loc[sub_df["Init"] == "Random"]
+    plt.bar(
+        np.arange(1, 4) + WIDTH / 2,
+        random_sub_df["Test Acc Mean"],
+        width=WIDTH,
+        yerr=random_sub_df["Test Acc Std"],
+    )
+
+    plt.xticks(np.arange(1, 4), [f"{x:.2e}" for x in erk_sub_df["FLOPs"]])
+    plt.ylim(67, 75)
+
+    plt.legend(["ERK", "Random"])
+    plt.xlabel("Train FLOPs")
+    plt.ylabel("Accuracy (Test)")
+
+    plt.savefig(
+        "outputs/plots/resnet50_ERK_vs_Random_acc_vs_train_FLOPs.pdf", dpi=150,
+    )
+
+    plt.show()
+
+
 if __name__ == "__main__":
-    main("wrn-22-2")
-    main("resnet50")
+    FLOPs_vs_sparsity("wrn-22-2")
+    FLOPs_vs_sparsity("resnet50")
+    # accuracy_vs_FLOPs()

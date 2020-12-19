@@ -8,11 +8,28 @@ from omegaconf import DictConfig
 import os
 import pandas as pd
 from scipy.interpolate import griddata
+import seaborn as sns
 import wandb
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from utils.typing_alias import *
+
+# Seaborn
+sns.set_theme()
+
+# Matplotlib font sizes
+SMALL_SIZE = 12
+MEDIUM_SIZE = 14
+BIGGER_SIZE = 16
+
+plt.rc("font", size=SMALL_SIZE)  # controls default text sizes
+plt.rc("axes", titlesize=SMALL_SIZE)  # fontsize of the axes title
+plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
+plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 
 def get_stats(runs, reorder: bool = True,) -> pd.DataFrame:
@@ -28,6 +45,12 @@ def get_stats(runs, reorder: bool = True,) -> pd.DataFrame:
         "Density",
         "alpha",
         "Delta T",
+        "Val Acc (seed 0)",
+        "Val Acc (seed 1)",
+        "Val Acc (seed 2)",
+        "Test Acc (seed 0)",
+        "Test Acc (seed 1)",
+        "Test Acc (seed 2)",
         "Val Acc",
         "Test Acc",
     ]
@@ -35,22 +58,43 @@ def get_stats(runs, reorder: bool = True,) -> pd.DataFrame:
 
     # Pre-process
     logging.info("Grouping runs by name")
-    for e, run in enumerate(runs):
-        masking = run.config["masking"]["name"]
+    runs_dict = {}
+    for run in runs:
+        if run.name not in runs_dict:
+            runs_dict[run.name] = [run]
+        else:
+            runs_dict[run.name].append(run)
+
+    for e, run_name in enumerate(runs_dict.keys()):
+        run_ll = runs_dict[run_name]
+        masking = run_ll[0].config["masking"]["name"]
         init = (
             "ERK"
-            if run.config["masking"]["sparse_init"] == "erdos-renyi-kernel"
+            if run_ll[0].config["masking"]["sparse_init"] == "erdos-renyi-kernel"
             else "Random"
         )
-        density = run.config["masking"]["density"]
-        alpha = run.config["masking"]["prune_rate"]
-        deltaT = run.config["masking"]["interval"]
-        val_accuracy = run.summary.val_accuracy * 100
-        test_accuracy = run.summary.test_accuracy * 100
+        density = run_ll[0].config["masking"]["density"]
+        alpha = run_ll[0].config["masking"]["prune_rate"]
+        deltaT = run_ll[0].config["masking"]["interval"]
 
-        df.loc[e] = [masking, init, density, alpha, deltaT, val_accuracy, test_accuracy]
+        df.loc[e] = [masking, init, density, alpha, deltaT, *([None, None] * 4)]
+
+        for run in run_ll:
+            val_accuracy = run.summary.val_accuracy * 100
+            test_accuracy = run.summary.test_accuracy * 100
+            seed = run.config["seed"]
+            df.loc[e, f"Val Acc (seed {seed})"] = val_accuracy
+            df.loc[e, f"Test Acc (seed {seed})"] = test_accuracy
+
+        df.loc[e, "Val Acc"] = (
+            df.loc[e][[f"Val Acc (seed {i})" for i in range(3)]].mean().astype(float)
+        )
+        df.loc[e, "Test Acc"] = (
+            df.loc[e][[f"Test Acc (seed {i})" for i in range(3)]].mean().astype(float)
+        )
 
     df = df.sort_values(by=["Method", "Init", "Density", "alpha", "Delta T"])
+    df = df.dropna()
 
     if reorder:
         df = df.reset_index(drop=True)
@@ -63,66 +107,39 @@ def alpha_deltaT_plot(
     init_ll: "List[str]" = ["ERK", "Random"],
     density_ll=[0.1, 0.2, 0.5],
 ):
-    legend = []
-    markers = ["o", "^", "s"]
     for e, (init, density) in enumerate(itertools.product(init_ll, density_ll)):
         sub_df = df.loc[(df["Init"] == init) & (df["Density"] == density)]
-        print(sub_df.loc[sub_df["Test Acc"].idxmax()])
+        row = sub_df.loc[sub_df["Test Acc"].astype(float).idxmax()]
 
-        alpha_ll = sub_df["alpha"]
-        deltaT_ll = sub_df["Delta T"]
-        test_accuracy_ll = sub_df["Test Acc"].to_numpy()
+        print(row)
+        print("\n")
 
-        # xi = np.linspace(0.1, 0.6, 50)
-        # yi = np.linspace(50, 1000, 50)
-        # grid_x, grid_y = np.meshgrid(xi, yi)
-        #
-        # triang = tri.Triangulation(alpha_ll, deltaT_ll)
-        # interpolator = tri.LinearTriInterpolator(triang, test_accuracy_ll)
-        # zi = interpolator(grid_x, grid_y)
-        #
-        # # Perform interpolation on meshgrid
-        # zi = griddata(
-        #     (alpha_ll, deltaT_ll), test_accuracy_ll, (grid_x, grid_y), method="cubic"
-        # )
-        #
-        # plt.contourf(xi, yi, zi, levels=14)
+        alpha_ll = sub_df["alpha"].astype(float)
+        deltaT_ll = sub_df["Delta T"].astype(float)
+        test_accuracy_ll = sub_df["Test Acc"].astype(float).to_numpy()
 
-        z = (test_accuracy_ll - test_accuracy_ll.min() + 1e-12) / (
-            test_accuracy_ll.max() - test_accuracy_ll.min()
-        )
-        z *= 30
-        # plt.scatter(
-        #     alpha_ll, deltaT_ll, s=3 * z ** 2, c=test_accuracy_ll, cmap="plasma", alpha=0.7
-        # )
+        plt.tricontourf(alpha_ll, deltaT_ll, test_accuracy_ll, levels=10, cmap="plasma")
+        # plt.tricontour(alpha_ll, deltaT_ll, test_accuracy_ll, levels=10)
 
-        plt.scatter(
-            alpha_ll,
-            deltaT_ll,
-            s=100,
-            c=test_accuracy_ll,
-            cmap="RdBu",
-            alpha=0.8,
-            marker=markers[e],
+        plt.plot(0.3, 100, "ko", markersize=10)
+
+        # plt.plot(row["alpha"], row["Delta T"], "^", color="#F5F5F5", markersize=8)
+        plt.plot(row["alpha"], row["Delta T"], "^", color="black", markersize=10)
+
+        cbar = plt.colorbar()
+        cbar.set_label("Accuracy (Test)")
+
+        plt.xlabel(r"$\alpha$")
+        plt.ylabel(r"$\Delta T$")
+
+        plt.ylim(50, 1000)
+
+        plt.savefig(
+            f"{hydra.utils.get_original_cwd()}/outputs/plots/{dataset.lower()}_alpha_deltaT_{init}_density_{density}.pdf",
+            dpi=150,
         )
 
-        legend.append(rf"init={init}, $1-s$={density}")
-
-    # plt.tricontourf(alpha_ll, deltaT_ll, test_accuracy_ll, levels=5)
-    # plt.tricontour(alpha_ll, deltaT_ll, test_accuracy_ll, levels=5)
-    cbar = plt.colorbar()
-    cbar.set_label("Rel. Accuracy (Test)")
-
-    plt.xlabel(r"$\alpha$")
-    plt.ylabel(r"$\Delta T$")
-
-    # plt.legend(legend)
-
-    # plt.savefig(
-    #     f"{hydra.utils.get_original_cwd()}/outputs/plots/{dataset.lower()}_alpha_deltaT_{init}_density_{density}.pdf",
-    #     dpi=150,
-    # )
-    plt.show()
+        plt.show()
 
 
 @hydra.main(config_name="config", config_path="../conf")
@@ -150,7 +167,7 @@ def main(cfg: DictConfig):
 
     # Plot it
     alpha_deltaT_plot(
-        df, init_ll=["ERK"], density_ll=[0.1, 0.2, 0.5],
+        df, init_ll=["ERK", "Random"], density_ll=[0.1, 0.2, 0.5],
     )
 
 

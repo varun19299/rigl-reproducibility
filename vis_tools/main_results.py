@@ -89,6 +89,8 @@ def main(cfg: DictConfig):
         runs,
         masking_ll=[
             "RigL",
+            "RigL-SG",
+            "RigL-SM",
             "SNFS",
             "SET",
             "Small_Dense",
@@ -97,7 +99,7 @@ def main(cfg: DictConfig):
             "Pruning",
         ],
         init_ll=["Random", "ERK", None],
-        suffix_ll=[None, "corrected", "no_val", "no_val_c"],
+        suffix_ll=[None, "corrected", "no_val", "2x"],
         density_ll=[0.05, 0.1, 0.2, 0.5, 1],
         dataset_ll=[cfg.dataset.name],
         correct_SET=cfg.dataset.name == "CIFAR10",
@@ -110,14 +112,15 @@ def main(cfg: DictConfig):
     df["Std. Dev"] = df[[f"Acc seed {i}" for i in range(3)]].std(axis=1)
 
     # Set longer length
-    pd.options.display.max_rows = 100
+    pd.options.display.max_rows = 150
 
-    with pd.option_context('display.float_format', '{:.3f}'.format):
+    with pd.option_context("display.float_format", "{:.3f}".format):
         print(df)
 
     df.to_csv(
         f"{hydra.utils.get_original_cwd()}/outputs/csv/{cfg.dataset.name.lower()}_main_results.csv"
     )
+
 
 if __name__ == "__main__":
     main()
