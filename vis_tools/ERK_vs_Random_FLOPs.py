@@ -2,7 +2,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np
 
-from utils.counting_ops import resnet50_FLOPs, RigL_FLOPs, wrn_22_2_FLOPs
+from counting import wrn_22_2_FLOPs, resnet50_FLOPs
+from counting.inference_train_FLOPs import RigL_train_FLOPs
 
 # Matplotlib font sizes
 SMALL_SIZE = 12
@@ -52,7 +53,7 @@ def FLOPs_vs_sparsity(model: str = "wrn-22-2"):
         for sparse_FLOPs, init_name in zip(
             [Random_FLOPs, ERK_FLOPs], ["Random", "ERK"]
         ):
-            rigl_train_FLOPs = RigL_FLOPs(sparse_FLOPs, dense_FLOPs, interval)
+            rigl_train_FLOPs = RigL_train_FLOPs(sparse_FLOPs, dense_FLOPs, interval)
 
             print(
                 f"RigL {init_name.capitalize()} Density: {density:.3f} Train FLOPs:{rigl_train_FLOPs:,} Proportion:{rigl_train_FLOPs / dense_train_FLOPs:.4f}"
@@ -106,21 +107,21 @@ def accuracy_vs_FLOPs():
     df.loc[0] = [
         "wrn-22-2",
         "Random",
-        RigL_FLOPs(wrn_22_2_FLOPs("random", 0.1), wrn_22_2_dense_train_FLOPs),
+        RigL_train_FLOPs(wrn_22_2_FLOPs("random", 0.1), wrn_22_2_dense_train_FLOPs),
         91.71666666666665,
         0.18009256878986557,
     ]
     df.loc[1] = [
         "wrn-22-2",
         "Random",
-        RigL_FLOPs(wrn_22_2_FLOPs("random", 0.2), wrn_22_2_dense_train_FLOPs),
+        RigL_train_FLOPs(wrn_22_2_FLOPs("random", 0.2), wrn_22_2_dense_train_FLOPs),
         92.60666666666667,
         0.3100537587795598,
     ]
     df.loc[2] = [
         "wrn-22-2",
         "Random",
-        RigL_FLOPs(wrn_22_2_FLOPs("random", 0.5), wrn_22_2_dense_train_FLOPs),
+        RigL_train_FLOPs(wrn_22_2_FLOPs("random", 0.5), wrn_22_2_dense_train_FLOPs),
         93.26666666666667,
         0.07234178138069844,
     ]
@@ -144,21 +145,21 @@ def accuracy_vs_FLOPs():
     df.loc[6] = [
         "resnet50",
         "Random",
-        RigL_FLOPs(resnet50_FLOPs("random", 0.1), resnet50_dense_train_FLOPs),
+        RigL_train_FLOPs(resnet50_FLOPs("random", 0.1), resnet50_dense_train_FLOPs),
         71.769513686498,
         0.3318907357554385,
     ]
     df.loc[7] = [
         "resnet50",
         "Random",
-        RigL_FLOPs(resnet50_FLOPs("random", 0.2), resnet50_dense_train_FLOPs),
+        RigL_train_FLOPs(resnet50_FLOPs("random", 0.2), resnet50_dense_train_FLOPs),
         73.53639205296834,
         0.04310600094182424,
     ]
     df.loc[8] = [
         "resnet50",
         "Random",
-        RigL_FLOPs(resnet50_FLOPs("random", 0.5), resnet50_dense_train_FLOPs),
+        RigL_train_FLOPs(resnet50_FLOPs("random", 0.5), resnet50_dense_train_FLOPs),
         74.27149415016174,
         0.3129347072329389,
     ]

@@ -1,3 +1,4 @@
+from counting.ops import get_inference_FLOPs
 from copy import copy, deepcopy
 from dataclasses import dataclass, field
 
@@ -147,6 +148,11 @@ class Masking(object):
         self.name2prune_rate = {}
         self.stats = LayerStats()
 
+        # FLOPs
+        self._dense_FLOPs = None
+        self._inference_FLOPs = None
+        self._input_size = (1, 3, 32, 32)
+
         # Assertions
         assert (
             self.sparse_init in init_registry
@@ -187,6 +193,7 @@ class Masking(object):
         Store dict of parameters to mask
         """
         self.module = module
+        logging.info(f"Dense FLOPs {self.dense_FLOPs:,}")
         for name, weight in self.module.named_parameters():
             self.masks[name] = torch.zeros_like(
                 weight, dtype=torch.float32, requires_grad=False
@@ -205,6 +212,7 @@ class Masking(object):
 
         # Call init
         self.init(lottery_mask_path)
+        logging.info(f"Inference (Sparse) FLOPs (at init) {self.inference_FLOPs:,}")
 
     def adjust_prune_rate(self):
         """
@@ -294,6 +302,30 @@ class Masking(object):
                     )
 
         return name2regrowth
+
+    @property
+    def dense_FLOPs(self):
+        """
+        Calculates dense inference FLOPs of the model
+        """
+        if not self._dense_FLOPs:
+            self._dense_FLOPs = get_inference_FLOPs(self, torch.rand(*self._input_size))
+            return self._dense_FLOPs
+        else:
+            return self._dense_FLOPs
+
+    @property
+    def inference_FLOPs(self):
+        """
+        Calculates dense inference FLOPs of the model
+        """
+        if not self._inference_FLOPs:
+            self._inference_FLOPs = get_inference_FLOPs(
+                self, torch.rand(*self._input_size)
+            )
+            return self._inference_FLOPs
+        else:
+            return self._inference_FLOPs
 
     @torch.no_grad()
     def init(self, lottery_mask_path: "Path"):
@@ -630,7 +662,7 @@ class Masking(object):
                     num_growth = name2regrowth[name]
                 else:
                     feedback = self.adjustments[-1] if self.adjustments else 0
-                    num_growth = self.stats.removed_dict[name] #+ feedback
+                    num_growth = self.stats.removed_dict[name]  # + feedback
 
                 new_mask = self.growth_func(self, name, new_mask, num_growth, weight)
                 new_nonzero = new_mask.sum().item()

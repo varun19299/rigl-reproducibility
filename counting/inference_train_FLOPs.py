@@ -1,0 +1,50 @@
+import torch
+from torch import optim
+
+from counting.ops import get_inference_FLOPs
+from models import registry
+from sparselearning.core import Masking
+from sparselearning.funcs.decay import MagnitudePruneDecay, CosineDecay
+
+
+def RigL_train_FLOPs(sparse_FLOPs: int, dense_FLOPs: int, mask_interval: int = 100):
+    return (2 * sparse_FLOPs + dense_FLOPs + 3 * sparse_FLOPs * mask_interval) / (
+        mask_interval + 1
+    )
+
+
+def SNFS_train_FLOPs(sparse_FLOPs: int, dense_FLOPs: int, mask_interval: int = 100):
+    return 2 * sparse_FLOPs + dense_FLOPs
+
+
+def SET_train_FLOPs(sparse_FLOPs: int, dense_FLOPs: int, mask_interval: int = 100):
+    return 3 * sparse_FLOPs
+
+
+def Pruning_train_FLOPs(
+    dense_FLOPs: int, decay: MagnitudePruneDecay, total_steps: int = 87891
+):
+    avg_sparsity = 0.0
+    for i in range(0, total_steps):
+        avg_sparsity += decay.cumulative_sparsity(i)
+
+    avg_sparsity /= total_steps
+
+    return 3 * dense_FLOPs * (1 - avg_sparsity)
+
+
+def model_inference_FLOPs(
+    sparse_init: str = "random",
+    density: float = 0.2,
+    model_name: str = "wrn-22-2",
+    input_size: "Tuple" = (1, 3, 32, 32),
+) -> int:
+    model_class, args = registry[model_name]
+    model = model_class(*args)
+    decay = CosineDecay()
+    optimizer = optim.SGD(model.parameters(), lr=0.1)
+
+    mask = Masking(optimizer, decay, sparse_init=sparse_init, density=density)
+    mask.add_module(model)
+
+    return get_inference_FLOPs(mask, torch.rand(*input_size))

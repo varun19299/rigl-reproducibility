@@ -1,4 +1,5 @@
 from copy import deepcopy
+from counting import model_inference_FLOPs
 from data import get_dataloaders
 import hydra
 import logging
@@ -45,6 +46,7 @@ def train(
     masking_apply_when: str = "epoch_end",
     masking_interval: int = 1,
     masking_end_when: int = -1,
+    masking_print_FLOPs: bool = False,
 ) -> "Union[float,int]":
     assert masking_apply_when in ["step_end", "epoch_end"]
     model.train()
@@ -114,6 +116,9 @@ def train(
     density = mask.stats.total_density if mask else 1.0
     msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f} Prune Rate {mask.prune_rate if mask else 0:.5f} Density {density:.5f}"
     logging.info(msg)
+
+    if masking_print_FLOPs:
+        msg += f" Inference FLOPs: {mask.inference_FLOPs/mask.dense_FLOPs}x"
 
     return _loss_collector.smooth, global_step
 
@@ -279,6 +284,7 @@ def single_seed_run(cfg: DictConfig) -> float:
                 "masking_apply_when": cfg.masking.apply_when,
                 "masking_interval": cfg.masking.interval,
                 "masking_end_when": cfg.masking.end_when,
+                "masking_print_FLOPs": cfg.masking.get("print_FLOPs", False),
             }
 
         scheduler = lr_scheduler if (epoch >= warmup_epochs) else warmup_scheduler
