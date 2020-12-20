@@ -24,7 +24,7 @@ from utils.train_helper import (
     load_weights,
     save_weights,
 )
-
+from vis_tools import layer_wise_density
 import wandb
 
 
@@ -98,6 +98,7 @@ def train(
         if batch_idx % log_interval == 0:
             msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f}"
             pbar.set_description(msg)
+
             if use_wandb:
                 log_dict = {"train_loss": loss, "lr": lr_scheduler.get_lr()[0]}
                 if mask:
@@ -106,6 +107,7 @@ def train(
                         **log_dict,
                         "prune_rate": mask.prune_rate,
                         "density": density,
+                        "layer-wise-density": layer_wise_density.plot(mask),
                     }
                 wandb.log(
                     log_dict, step=global_step,
@@ -115,11 +117,15 @@ def train(
     msg = f"Train Epoch {epoch} Iters {global_step} Mask Updates {_mask_update_counter} Train loss {_loss_collector.smooth:.6f} Prune Rate {mask.prune_rate if mask else 0:.5f} Density {density:.5f}"
 
     if masking_print_FLOPs:
-        msg = msg + f" Inference FLOPs: {mask.inference_FLOPs/mask.dense_FLOPs:.4f}x"
-        msg = (
-            msg
-            + f" Avg Inference FLOPs: {mask.avg_inference_FLOPs/mask.dense_FLOPs:.4f}x"
-        )
+        log_dict = {
+            "Inference FLOPs": mask.inference_FLOPs / mask.dense_FLOPs,
+            "Avg Inference FLOPs": mask.avg_inference_FLOPs / mask.dense_FLOPs,
+        }
+
+        log_dict_str = " ".join([f"{k}: {v:.4f}" for (k, v) in log_dict.items()])
+        msg = f"{msg} {log_dict_str}"
+        if use_wandb:
+            wandb.log(log_dict, step=global_step)
 
     logging.info(msg)
 
