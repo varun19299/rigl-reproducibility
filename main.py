@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING
 import hydra
 import torch
 import wandb
-from matplotlib import pyplot as plt
 from omegaconf import DictConfig, OmegaConf
 from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
@@ -127,7 +126,10 @@ def train(
         msg = f"{msg} {log_dict_str}"
         if use_wandb:
             wandb.log(
-                {**log_dict, "layer-wise-density": layer_wise_density.plot(mask, plt),},
+                {
+                    **log_dict,
+                    "layer-wise-density": layer_wise_density.wandb_table(mask),
+                },
                 step=global_step,
             )
 

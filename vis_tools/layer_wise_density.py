@@ -31,15 +31,18 @@ def plot(masking: "Masking", plt) -> plt:
 
     return plt
 
+
 def wandb_table(masking: "Masking"):
     non_zero_ll = np.array(list(masking.stats.nonzeros_dict.values()))
     zero_ll = np.array(list(masking.stats.zeros_dict.values()))
 
     density_ll = non_zero_ll / (non_zero_ll + zero_ll)
-    label_ll = np.arange(len(density_ll)) + 1
+    # label_ll = np.arange(len(density_ll)) + 1
+    label_ll = list(masking.stats.nonzeros_dict.keys())
 
     data = [[label, density] for (label, density) in zip(label_ll, density_ll)]
-
+    table = wandb.Table(data=data, columns=["layer name", "density"])
+    return wandb.plot.bar(table, "layer name", "density", title="Layer-wise Density")
 
 
 if __name__ == "__main__":

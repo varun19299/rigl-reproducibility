@@ -10,7 +10,7 @@
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
 #SBATCH --time=32:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
-#SBATCH --array=0-2
+#SBATCH --array=3-3
 
 # Mailing stuff
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -66,7 +66,7 @@ if [ ${1} == "RigL-SG" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
     masking=RigL +specific=cifar100_resnet50_masking \
     seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-SG_ERK" \
-    masking.redistribution_mode=grad \
+    masking.redistribution_mode=grad masking.print_FLOPs=true \
     masking.density=0.1,0.2,0.05,0.5 wandb.use=True -m
   fi
 
@@ -74,7 +74,7 @@ if [ ${1} == "RigL-SG" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
     masking=RigL +specific=cifar100_resnet50_masking \
     seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-SG_Random" \
-    masking.redistribution_mode=grad \
+    masking.redistribution_mode=grad masking.print_FLOPs=true \
     masking.sparse_init=random masking.density=0.1,0.2,0.05,0.5 wandb.use=True -m
   fi
 fi
@@ -84,7 +84,7 @@ if [ ${1} == "RigL-SM" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
     masking=RigL +specific=cifar100_resnet50_masking \
     seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-SM_ERK" \
-    masking.redistribution_mode=momentum \
+    masking.redistribution_mode=momentum masking.print_FLOPs=true \
     masking.density=0.1,0.2,0.05,0.5 wandb.use=True -m
   fi
 
@@ -92,7 +92,7 @@ if [ ${1} == "RigL-SM" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
     masking=RigL +specific=cifar100_resnet50_masking \
     seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-SM_Random" \
-    masking.redistribution_mode=momentum \
+    masking.redistribution_mode=momentum masking.print_FLOPs=true \
     masking.sparse_init=random masking.density=0.1,0.2,0.05,0.5 wandb.use=True -m
   fi
 fi
