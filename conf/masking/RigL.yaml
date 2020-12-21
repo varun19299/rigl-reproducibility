@@ -12,5 +12,7 @@ dense: False  # Enable dense mode. Default: False.
 prune_rate: 0.3  # The pruning rate / prune rate.
 decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
 apply_when: step_end  # or step_end
-end_when: 75000 # Epochs / Training Step till which mask updates are applied (set to 75% total steps)
-interval: 100 # Which epochs or steps to apply at
+end_when: 75000  # Epochs / Training Step till which mask updates are applied (set to 75% total steps)
+interval: 100  # Which epochs or steps to apply at
+
+print_FLOPs: False

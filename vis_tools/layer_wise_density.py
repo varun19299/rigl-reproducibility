@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from utils.typing_alias import *
 
 
-def plot(masking: "Masking") -> plt:
+def plot(masking: "Masking", plt) -> plt:
     """
     Plot layer wise density histogram
     """
@@ -18,6 +18,7 @@ def plot(masking: "Masking") -> plt:
     bin_ll = np.arange(len(density_ll)) + 1
     width = 0.8
 
+    plt.clf()
     plt.bar(bin_ll, density_ll, width, color="b")
 
     # Gets too crowded when including layer names
@@ -51,5 +52,5 @@ if __name__ == "__main__":
     mask.add_module(model)
     mask.gather_statistics()
 
-    plt = plot(mask)
+    plt = plot(mask, plt)
     plt.show()

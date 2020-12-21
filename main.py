@@ -6,6 +6,7 @@ from loss import LabelSmoothingCrossEntropy
 from omegaconf import DictConfig, OmegaConf
 import os
 from sparselearning.core import Masking
+from matplotlib import pyplot as plt
 from models import registry as model_registry
 from sparselearning.funcs.decay import registry as decay_registry
 import torch
@@ -107,7 +108,6 @@ def train(
                         **log_dict,
                         "prune_rate": mask.prune_rate,
                         "density": density,
-                        "layer-wise-density": layer_wise_density.plot(mask),
                     }
                 wandb.log(
                     log_dict, step=global_step,
@@ -125,7 +125,10 @@ def train(
         log_dict_str = " ".join([f"{k}: {v:.4f}" for (k, v) in log_dict.items()])
         msg = f"{msg} {log_dict_str}"
         if use_wandb:
-            wandb.log(log_dict, step=global_step)
+            wandb.log(
+                {**log_dict, "layer-wise-density": layer_wise_density.plot(mask, plt),},
+                step=global_step,
+            )
 
     logging.info(msg)
 
