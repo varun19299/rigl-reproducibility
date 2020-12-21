@@ -4,12 +4,13 @@
     https://arxiv.org/abs/1512.03385v1
 """
 
-from models.benchmark import SparseSpeedupBench
+from typing import TYPE_CHECKING
+
 import numpy as np
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import TYPE_CHECKING
+
+from models.benchmark import SparseSpeedupBench
 
 if TYPE_CHECKING:
     from utils.typing_alias import *

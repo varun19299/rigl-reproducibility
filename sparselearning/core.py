@@ -1,21 +1,19 @@
-from sparselearning.counting.ops import get_inference_FLOPs
-from dataclasses import dataclass, field
-
 import logging
 import math
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
+
 import numpy as np
-
-# Sparse learning funcs
-from sparselearning.funcs.grow import registry as grow_registry
-from sparselearning.funcs.prune import registry as prune_registry
-from sparselearning.funcs.redistribute import registry as redistribute_registry
-from sparselearning.funcs.init_scheme import registry as init_registry
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from typing import TYPE_CHECKING
+from sparselearning.counting.ops import get_inference_FLOPs
+# Sparse learning funcs
+from sparselearning.funcs.grow import registry as grow_registry
+from sparselearning.funcs.init_scheme import registry as init_registry
+from sparselearning.funcs.prune import registry as prune_registry
+from sparselearning.funcs.redistribute import registry as redistribute_registry
 from utils.smoothen_value import AverageValue
 
 if TYPE_CHECKING:

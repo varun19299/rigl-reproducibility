@@ -5,9 +5,9 @@ maskrcnn-benchmark
 
 https://github.com/facebookresearch/maskrcnn-benchmark/blob/master/maskrcnn_benchmark/utils/model_serialization.py
 """
+import logging
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
 from collections import OrderedDict
-import logging
 
 import torch
 

@@ -1,16 +1,17 @@
 import logging
-from pathlib import Path
 import re
+from pathlib import Path
+from typing import TYPE_CHECKING
+
 import torch
 from torch import nn
 from torch import optim
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from utils.typing_alias import *
 
 from utils.model_serialization import load_state_dict
 from utils.warmup_scheduler import WarmUpLR
+
+if TYPE_CHECKING:
+    from utils.typing_alias import *
 
 
 def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, Tuple[lr_scheduler]]":

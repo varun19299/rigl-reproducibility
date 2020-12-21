@@ -1,6 +1,6 @@
 import math
+
 import torch
-import logging
 
 
 def magnitude_prune(masking, mask, weight, name):

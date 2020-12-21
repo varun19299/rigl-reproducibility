@@ -1,7 +1,7 @@
-from models.benchmark import SparseSpeedupBench
 import torch.nn as nn
 import torch.nn.functional as F
 
+from models.benchmark import SparseSpeedupBench
 
 VGG_CONFIGS = {
     # M for MaxPool, Number for channels

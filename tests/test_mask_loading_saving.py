@@ -1,9 +1,9 @@
+import torch
+from torch.nn import functional as F
+
 from models.wide_resnet import WideResNet
 from sparselearning.core import Masking
 from sparselearning.funcs.decay import CosineDecay
-
-import torch
-from torch.nn import functional as F
 
 
 def save(model, optimizer, mask, step):

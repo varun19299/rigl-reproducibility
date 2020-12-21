@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
+import wandb
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -29,6 +30,16 @@ def plot(masking: "Masking", plt) -> plt:
     plt.xlabel("Layer Number")
 
     return plt
+
+def wandb_table(masking: "Masking"):
+    non_zero_ll = np.array(list(masking.stats.nonzeros_dict.values()))
+    zero_ll = np.array(list(masking.stats.zeros_dict.values()))
+
+    density_ll = non_zero_ll / (non_zero_ll + zero_ll)
+    label_ll = np.arange(len(density_ll)) + 1
+
+    data = [[label, density] for (label, density) in zip(label_ll, density_ll)]
+
 
 
 if __name__ == "__main__":

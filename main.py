@@ -1,23 +1,21 @@
-from copy import deepcopy
-from data import get_dataloaders
-import hydra
 import logging
-from loss import LabelSmoothingCrossEntropy
-from omegaconf import DictConfig, OmegaConf
 import os
-from sparselearning.core import Masking
-from matplotlib import pyplot as plt
-from models import registry as model_registry
-from sparselearning.funcs.decay import registry as decay_registry
-import torch
-from torch.nn import functional as F
-from torch.cuda.amp import autocast, GradScaler
-from tqdm import tqdm
+from copy import deepcopy
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from utils.typing_alias import *
+import hydra
+import torch
+import wandb
+from matplotlib import pyplot as plt
+from omegaconf import DictConfig, OmegaConf
+from torch.cuda.amp import autocast, GradScaler
+from tqdm import tqdm
 
+from data import get_dataloaders
+from loss import LabelSmoothingCrossEntropy
+from models import registry as model_registry
+from sparselearning.core import Masking
+from sparselearning.funcs.decay import registry as decay_registry
 from utils.accuracy_helper import get_topk_accuracy
 from utils.smoothen_value import SmoothenValue
 from utils.train_helper import (
@@ -26,7 +24,10 @@ from utils.train_helper import (
     save_weights,
 )
 from vis_tools import layer_wise_density
-import wandb
+
+
+if TYPE_CHECKING:
+    from utils.typing_alias import *
 
 
 def train(

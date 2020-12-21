@@ -1,5 +1,6 @@
-from torch.optim.lr_scheduler import _LRScheduler
 from typing import TYPE_CHECKING
+
+from torch.optim.lr_scheduler import _LRScheduler
 
 if TYPE_CHECKING:
     from utils.typing_alias import *

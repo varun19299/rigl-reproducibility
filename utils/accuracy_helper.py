@@ -1,5 +1,6 @@
-import torch
 from typing import TYPE_CHECKING
+
+import torch
 
 if TYPE_CHECKING:
     from utils.typing_alias import *

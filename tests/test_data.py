@@ -4,13 +4,14 @@ Try testing salient dataset features:
     2. Does the loader work
     3. Does the loader have data in your desired format?
 """
-import data
-from data import get_dataloaders, DatasetSplitter, registry
-import pytest
 from pathlib import Path
+
+import pytest
 import torch
 from torch.utils.data import TensorDataset
 from tqdm import tqdm
+
+from data import get_dataloaders, DatasetSplitter, registry
 
 
 def test_splitter():

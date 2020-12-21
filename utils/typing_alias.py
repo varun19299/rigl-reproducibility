@@ -1,6 +1,6 @@
 """
 Meant to be imported as
-from utils.typing_helper import *
+from utils.typing_alias import *
 
 To ease # imports for typing.
 """
