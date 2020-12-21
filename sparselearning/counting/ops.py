@@ -1,10 +1,10 @@
 import logging
 
-from counting.utils import get_pre_activations_dict
+from sparselearning.counting.utils import get_pre_activations_dict
 import torch
 from torch import nn
 from typing import TYPE_CHECKING
-import counting.micronet_challenge.counting as counting
+from sparselearning.counting import micronet_challenge as counting
 
 if TYPE_CHECKING:
     from utils.typing_alias import *

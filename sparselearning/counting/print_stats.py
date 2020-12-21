@@ -1,7 +1,7 @@
 from functools import partial
 
-from counting import model_inference_FLOPs
-from counting.inference_train_FLOPs import RigL_train_FLOPs, SNFS_train_FLOPs, SET_train_FLOPs, Pruning_train_FLOPs
+from sparselearning.counting import model_inference_FLOPs
+from sparselearning.counting.inference_train_FLOPs import RigL_train_FLOPs, SNFS_train_FLOPs, SET_train_FLOPs, Pruning_train_FLOPs
 from sparselearning.funcs.decay import MagnitudePruneDecay
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:

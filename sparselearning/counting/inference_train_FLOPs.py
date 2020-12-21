@@ -3,7 +3,7 @@ from functools import partial
 import torch
 from torch import optim
 
-from counting.ops import get_inference_FLOPs
+from sparselearning.counting.ops import get_inference_FLOPs
 from models import registry
 from sparselearning.core import Masking
 from sparselearning.funcs.decay import MagnitudePruneDecay, CosineDecay

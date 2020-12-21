@@ -1,5 +1,4 @@
-from counting.ops import get_inference_FLOPs
-from copy import copy, deepcopy
+from sparselearning.counting.ops import get_inference_FLOPs
 from dataclasses import dataclass, field
 
 import logging
