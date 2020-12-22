@@ -128,7 +128,15 @@ def train(
             wandb.log(
                 {
                     **log_dict,
-                    "layer-wise-density": layer_wise_density.wandb_table(mask),
+                    # TODO: revert to W&B.bar plots once
+                    # https://github.com/wandb/client/issues/1525
+                    # is fixed.
+                    "layer-wise-density": [
+                        wandb.Image(
+                            layer_wise_density.plot_as_image(mask),
+                            caption="Layer-wise Density",
+                        )
+                    ],
                 },
                 step=global_step,
             )
