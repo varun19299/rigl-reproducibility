@@ -1,0 +1,26 @@
+# @package _group_
+name: RigL_reinit
+
+density: 0.05  # The density of the overall sparse network.
+sparse_init: lottery-ticket
+init_exp_name: RigL-SM_ERK
+
+lottery_mask_path: "${hydra:runtime.cwd}/outputs/${dataset.name}/${masking.init_exp_name}/\
+  ${masking.density}/\
+  +specific=cifar10_wrn_22_2_masking,masking.redistribution_mode=momentum,seed=${seed}/\
+  ${ckpt_dir}/epoch_250.pth"
+
+dense_gradients: False
+
+growth_mode: absolute-gradient  # Growth mode. Choose from: momentum, random, and momentum_neuron.
+prune_mode: magnitude  # Prune mode / pruning mode. Choose from: magnitude, SET.
+redistribution_mode: none  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
+dense: False  # Enable dense mode. Default: False.
+
+prune_rate: 0.3  # The pruning rate / prune rate.
+decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear
+apply_when: step_end  # or step_end
+end_when: 75000  # Epochs / Training Step till which mask updates are applied (set to 75% total steps)
+interval: 100  # Which epochs or steps to apply at
+
+print_FLOPs: True

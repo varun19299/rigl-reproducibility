@@ -131,12 +131,7 @@ def train(
                     # TODO: revert to W&B.bar plots once
                     # https://github.com/wandb/client/issues/1525
                     # is fixed.
-                    "layer-wise-density": [
-                        wandb.Image(
-                            layer_wise_density.plot_as_image(mask),
-                            caption="Layer-wise Density",
-                        )
-                    ],
+                    "layer-wise-density": layer_wise_density.wandb_bar(mask),
                 },
                 step=global_step,
             )
@@ -295,9 +290,24 @@ def single_seed_run(cfg: DictConfig) -> float:
     )
 
     # Train model
-    epoch = None
+    epoch = 0
     warmup_steps = cfg.optimizer.get("warmup_steps", 0)
     warmup_epochs = warmup_steps / len(train_loader)
+
+    if cfg.wandb.use and (start_epoch, step == (0, 0)):
+        # Log initial inference flops etc
+        log_dict = {
+            "Inference FLOPs": mask.inference_FLOPs / mask.dense_FLOPs,
+            "Avg Inference FLOPs": mask.avg_inference_FLOPs / mask.dense_FLOPs,
+            "layer-wise-density": layer_wise_density.wandb_bar(mask),
+            # "layer-wise-density": [
+            #     wandb.Image(
+            #         layer_wise_density.plot_as_image(mask),
+            #         caption="Layer-wise Density",
+            #     )
+            # ],
+        }
+        wandb.log(log_dict, step=0)
 
     for epoch in range(start_epoch, cfg.optimizer.epochs):
         # step here is training iters not global steps

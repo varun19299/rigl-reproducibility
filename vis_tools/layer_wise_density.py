@@ -34,7 +34,7 @@ def plot(masking: "Masking", plt) -> plt:
     return plt
 
 
-def wandb_table(masking: "Masking"):
+def wandb_bar(masking: "Masking"):
     non_zero_ll = np.array(list(masking.stats.nonzeros_dict.values()))
     zero_ll = np.array(list(masking.stats.zeros_dict.values()))
 
