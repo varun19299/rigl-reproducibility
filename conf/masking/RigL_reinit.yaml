@@ -4,10 +4,10 @@ name: RigL_reinit
 density: 0.05  # The density of the overall sparse network.
 sparse_init: lottery-ticket
 init_exp_name: RigL-SM_ERK
-
+override_dir: +specific=cifar10_wrn_22_2_masking,masking.redistribution_mode=momentum,seed=${seed}
 lottery_mask_path: "${hydra:runtime.cwd}/outputs/${dataset.name}/${masking.init_exp_name}/\
   ${masking.density}/\
-  +specific=cifar10_wrn_22_2_masking,masking.redistribution_mode=momentum,seed=${seed}/\
+  ${masking.override_dir}/\
   ${ckpt_dir}/epoch_250.pth"
 
 dense_gradients: False

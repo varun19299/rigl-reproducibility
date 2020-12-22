@@ -15,3 +15,5 @@ apply_when: step_end  # or step_end
 start_when: 700 # training steps
 end_when: 65918 # Epochs / Training Step till which mask updates are applied (set to 75% total steps)
 interval: 100 # Which epochs or steps to apply at
+
+print_FLOPs: True

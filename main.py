@@ -294,7 +294,7 @@ def single_seed_run(cfg: DictConfig) -> float:
     warmup_steps = cfg.optimizer.get("warmup_steps", 0)
     warmup_epochs = warmup_steps / len(train_loader)
 
-    if cfg.wandb.use and (start_epoch, step == (0, 0)):
+    if (cfg.masking.print_FLOPs and cfg.wandb.use) and (start_epoch, step == (0, 0)):
         # Log initial inference flops etc
         log_dict = {
             "Inference FLOPs": mask.inference_FLOPs / mask.dense_FLOPs,

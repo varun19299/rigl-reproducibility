@@ -10,11 +10,7 @@ wandb:
 masking:
   sparse_init: lottery-ticket
   init_exp_name: RigL-SM_ERK
-  lottery_mask_path: "${hydra:runtime.cwd}/outputs/${dataset.name}/${masking.init_exp_name}/\
-    ${masking.density}/\
-    +specific=cifar100_resnet50_masking,masking.redistribution_mode=momentum,seed=${seed}/\
-    ${ckpt_dir}/epoch_250.pth"
-
+  override_dir: +specific=cifar100_resnet50_masking,masking.redistribution_mode=momentum,seed=${seed}
   density: 0.2  # The density of the overall sparse network.
   prune_rate: 0.3  # The pruning rate / prune rate.
   decay_schedule: cosine  # The decay schedule for the pruning rate. Default: cosine. Choose from: cosine, linear

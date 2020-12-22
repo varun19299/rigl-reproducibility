@@ -24,6 +24,8 @@ hydra:
           - dataset
           - masking
           - masking.density
+          - masking.sparse_init
+          - masking.print_FLOPs
           - optimizer
           - hydra.verbose
           - wandb.use

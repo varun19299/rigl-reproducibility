@@ -1,6 +1,6 @@
 import logging
 
-from sparselearning.counting.utils import get_pre_activations_dict
+from sparselearning.counting.helper import get_pre_activations_dict
 import torch
 from torch import nn
 from typing import TYPE_CHECKING

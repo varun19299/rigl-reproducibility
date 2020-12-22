@@ -100,16 +100,16 @@ fi
 if [ ${1} == "RigL-reinit" ]; then
   if [ ${2} == "ERK" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD masking=RigL_reinit \
-    +specific=ccifar100_resnet50_masking_reinit seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-reinit_ERK" \
+    +specific=cifar100_resnet50_masking_reinit seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-reinit_ERK" \
     masking.init_exp_name=RigL-SM_ERK \
-    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+    masking.density=0.1,0.2,0.05 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD masking=RigL_reinit \
     +specific=cifar100_resnet50_masking_reinit seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-reinit_Random" \
     masking.init_exp_name=RigL-SM_Random \
-    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+    masking.density=0.1,0.2,0.05 wandb.use=True -m
   fi
 fi
 

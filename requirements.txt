@@ -9,4 +9,4 @@ numpy
 torch
 torchvision
 tqdm
-wandb
+git+git://github.com/wandb/client.git@task/joblib#egg=wandb
