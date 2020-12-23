@@ -53,7 +53,7 @@ def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
                 f"SET {init_name.capitalize()} Density: {density} Train FLOPs:{set_train_FLOPs:,} Proportion:{set_train_FLOPs / dense_train_FLOPs:.4f}"
             )
             print(
-                f"SNFS {init_name.capitalize()} Density: {density} Train FLOPs:{snfs_train_FLOPs:,} Proportion:{snfs_train_FLOPs / dense_train_FLOPs:.4f}"
+                f"SNFS at init {init_name.capitalize()} Density: {density} Train FLOPs:{snfs_train_FLOPs:,} Proportion:{snfs_train_FLOPs / dense_train_FLOPs:.4f}"
             )
             print(
                 f"RigL {init_name.capitalize()} Density: {density} Train FLOPs:{rigl_train_FLOPs:,} Proportion:{rigl_train_FLOPs / dense_train_FLOPs:.4f}"
