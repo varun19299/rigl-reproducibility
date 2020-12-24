@@ -26,7 +26,7 @@ __all__ = [
     "Union",
 ]
 
-from models import SparseSpeedupBench
+from models.benchmark import SparseSpeedupBench
 from numpy import ndarray as Array
 from pathlib import Path
 from sparselearning.core import Masking

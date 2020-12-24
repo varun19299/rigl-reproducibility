@@ -15,7 +15,7 @@ from sparselearning.funcs.grow import registry as grow_registry
 from sparselearning.funcs.init_scheme import registry as init_registry
 from sparselearning.funcs.prune import registry as prune_registry
 from sparselearning.funcs.redistribute import registry as redistribute_registry
-from sparselearning.utils import AverageValue
+from sparselearning.utils.smoothen_value import AverageValue
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
@@ -337,7 +337,7 @@ class Masking(object):
         for name, module in self.module.named_modules():
             if hasattr(module, "weight"):
                 total_size += module.weight.numel()
-            if getattr(module, "bias", None):
+            if getattr(module, "bias", None) is not None:
                 total_size += module.bias.numel()
         logging.info(f"Total Model parameters: {total_size}.")
 

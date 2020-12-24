@@ -1,12 +1,12 @@
 import logging
 from dataclasses import dataclass
 from math import floor
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from torchvision import datasets, transforms
-
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
