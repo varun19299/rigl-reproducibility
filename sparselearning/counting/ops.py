@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 from sparselearning.counting import micronet_challenge as counting
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
 @torch.no_grad()

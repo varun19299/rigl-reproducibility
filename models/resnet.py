@@ -13,7 +13,7 @@ import torch.nn.functional as F
 from models.benchmark import SparseSpeedupBench
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
 class BasicBlock(nn.Module):

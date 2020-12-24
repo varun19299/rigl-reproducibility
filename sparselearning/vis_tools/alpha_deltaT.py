@@ -2,18 +2,15 @@ import hydra
 import itertools
 import logging
 from matplotlib import pyplot as plt
-import matplotlib.tri as tri
-import numpy as np
 from omegaconf import DictConfig
 import os
 import pandas as pd
-from scipy.interpolate import griddata
 import seaborn as sns
 import wandb
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 # Seaborn
 sns.set_theme()
@@ -142,7 +139,7 @@ def alpha_deltaT_plot(
         plt.show()
 
 
-@hydra.main(config_name="config", config_path="../conf")
+@hydra.main(config_name="config", config_path="../../conf")
 def main(cfg: DictConfig):
     # Authenticate API
     with open(cfg.wandb.api_key) as f:

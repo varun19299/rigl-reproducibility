@@ -8,25 +8,22 @@ import torch
 import wandb
 from omegaconf import DictConfig, OmegaConf
 from torch.cuda.amp import autocast, GradScaler
-from tqdm import tqdm
 
 from data import get_dataloaders
 from loss import LabelSmoothingCrossEntropy
 from models import registry as model_registry
-from sparselearning.core import Masking
 from sparselearning.funcs.decay import registry as decay_registry
-from utils.accuracy_helper import get_topk_accuracy
-from utils.smoothen_value import SmoothenValue
-from utils.train_helper import (
+from sparselearning.utils.accuracy_helper import get_topk_accuracy
+from sparselearning.utils.smoothen_value import SmoothenValue
+from sparselearning.utils.train_helper import (
     get_optimizer,
     load_weights,
     save_weights,
 )
-from vis_tools import layer_wise_density
-
+from sparselearning.vis_tools import layer_wise_density
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
 def train(
@@ -126,7 +123,7 @@ def train(
         msg = f"{msg} {log_dict_str}"
         if use_wandb:
             wandb.log(
-                {**log_dict, "layer-wise-density": layer_wise_density.wandb_bar(mask),},
+                {**log_dict, "layer-wise-density": layer_wise_density.wandb_bar(mask), },
                 step=global_step,
             )
 

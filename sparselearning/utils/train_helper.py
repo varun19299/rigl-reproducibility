@@ -1,17 +1,15 @@
 import logging
 import re
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import torch
 from torch import nn
-from torch import optim
 
-from utils.model_serialization import load_state_dict
-from utils.warmup_scheduler import WarmUpLR
+from sparselearning.utils import load_state_dict
+from sparselearning.utils import WarmUpLR
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
 def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, Tuple[lr_scheduler]]":

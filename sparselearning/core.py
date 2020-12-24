@@ -9,15 +9,16 @@ import torch.nn as nn
 import torch.optim as optim
 
 from sparselearning.counting.ops import get_inference_FLOPs
+
 # Sparse learning funcs
 from sparselearning.funcs.grow import registry as grow_registry
 from sparselearning.funcs.init_scheme import registry as init_registry
 from sparselearning.funcs.prune import registry as prune_registry
 from sparselearning.funcs.redistribute import registry as redistribute_registry
-from utils.smoothen_value import AverageValue
+from sparselearning.utils import AverageValue
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
 @dataclass
@@ -336,9 +337,8 @@ class Masking(object):
         for name, module in self.module.named_modules():
             if hasattr(module, "weight"):
                 total_size += module.weight.numel()
-            if hasattr(module, "bias"):
-                if module.bias is not None:
-                    total_size += module.bias.numel()
+            if getattr(module, "bias", None):
+                total_size += module.bias.numel()
         logging.info(f"Total Model parameters: {total_size}.")
 
         total_size = 0

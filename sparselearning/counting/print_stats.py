@@ -5,7 +5,7 @@ from sparselearning.counting.inference_train_FLOPs import RigL_train_FLOPs, SNFS
 from sparselearning.funcs.decay import MagnitudePruneDecay
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
     _model_FLOPs = partial(model_inference_FLOPs, model_name=model_name, input_size=input_size)

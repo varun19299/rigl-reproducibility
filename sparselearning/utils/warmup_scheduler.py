@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from torch.optim.lr_scheduler import _LRScheduler
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
 class WarmUpLR(_LRScheduler):

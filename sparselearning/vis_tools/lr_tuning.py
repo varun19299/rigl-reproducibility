@@ -9,7 +9,7 @@ import wandb
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
 # Matplotlib font sizes
@@ -172,7 +172,7 @@ def lr_tuning_plot(
         plt.show()
 
 
-@hydra.main(config_name="config", config_path="../conf")
+@hydra.main(config_name="config", config_path="../../conf")
 def main(cfg: DictConfig):
     # Authenticate API
     with open(cfg.wandb.api_key) as f:

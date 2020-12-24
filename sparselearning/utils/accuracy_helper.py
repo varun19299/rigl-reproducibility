@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import torch
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
 def get_topk_accuracy(output: "Tensor", target: "Tensor", topk: "Tuple" = (1,)):

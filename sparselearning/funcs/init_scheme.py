@@ -6,10 +6,10 @@ import numpy as np
 import torch
 
 if TYPE_CHECKING:
-    from utils.typing_alias import *
+    from sparselearning.utils.typing_alias import *
 
 
-def erdos_renyi(masking: "Masking", is_kernel: bool = True, **kwargs):
+def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
     # Same as Erdos Renyi with modification for conv
     # initialization used in sparse evolutionary training
     # scales the number of non-zero weights linearly proportional
@@ -107,6 +107,7 @@ def erdos_renyi(masking: "Masking", is_kernel: bool = True, **kwargs):
 
 
 def lottery_ticket_init(masking: "Masking", lottery_mask_path: "Path"):
+    assert lottery_mask_path.is_file(), f"No .pth file at {lottery_mask_path}"
     state_dict = torch.load(lottery_mask_path, map_location="cpu")
     assert "mask" in state_dict, f"No mask found at {lottery_mask_path}"
     setattr(masking, "masks", state_dict["mask"]["masks"])
@@ -168,8 +169,8 @@ def resume_init(masking: "Masking", **kwargs):
 
 
 registry = {
-    "erdos-renyi": partial(erdos_renyi, is_kernel=False),
-    "erdos-renyi-kernel": partial(erdos_renyi, is_kernel=True),
+    "erdos-renyi": partial(erdos_renyi_init, is_kernel=False),
+    "erdos-renyi-kernel": partial(erdos_renyi_init, is_kernel=True),
     "lottery-ticket": lottery_ticket_init,
     "random": random_init,
     "resume": resume_init,
