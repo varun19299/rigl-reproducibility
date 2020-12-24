@@ -1,6 +1,7 @@
 import logging
 import os
 from copy import deepcopy
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import hydra
@@ -8,10 +9,12 @@ import torch
 import wandb
 from omegaconf import DictConfig, OmegaConf
 from torch.cuda.amp import autocast, GradScaler
+from tqdm import tqdm
 
 from data import get_dataloaders
 from loss import LabelSmoothingCrossEntropy
 from models import registry as model_registry
+from sparselearning.core import Masking
 from sparselearning.funcs.decay import registry as decay_registry
 from sparselearning.utils.accuracy_helper import get_topk_accuracy
 from sparselearning.utils.smoothen_value import SmoothenValue
@@ -123,7 +126,7 @@ def train(
         msg = f"{msg} {log_dict_str}"
         if use_wandb:
             wandb.log(
-                {**log_dict, "layer-wise-density": layer_wise_density.wandb_bar(mask), },
+                {**log_dict, "layer-wise-density": layer_wise_density.wandb_bar(mask),},
                 step=global_step,
             )
 
@@ -272,7 +275,7 @@ def single_seed_run(cfg: DictConfig) -> float:
             redistribution_mode=cfg.masking.redistribution_mode,
         )
         # Support for lottery mask
-        lottery_mask_path = cfg.masking.get("lottery_mask_path", None)
+        lottery_mask_path = Path(cfg.masking.get("lottery_mask_path", ""))
         mask.add_module(model, lottery_mask_path)
 
     # Load from checkpoint

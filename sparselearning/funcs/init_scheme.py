@@ -7,6 +7,7 @@ import torch
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
+from sparselearning.utils.ops import random_perm
 
 
 def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
@@ -106,7 +107,12 @@ def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
         masking.baseline_nonzero += (masking.masks[name] != 0).sum().int().item()
 
 
-def lottery_ticket_init(masking: "Masking", lottery_mask_path: "Path"):
+def lottery_ticket_init(
+    masking: "Masking", lottery_mask_path: "Path", shuffle: bool = False
+):
+    """
+    Shuffle: use layer wise densities, but not exact mask
+    """
     assert lottery_mask_path.is_file(), f"No .pth file at {lottery_mask_path}"
     state_dict = torch.load(lottery_mask_path, map_location="cpu")
     assert "mask" in state_dict, f"No mask found at {lottery_mask_path}"
@@ -116,6 +122,9 @@ def lottery_ticket_init(masking: "Masking", lottery_mask_path: "Path"):
         # Skip modules we arent masking
         if name not in masking.masks:
             continue
+
+        if shuffle:
+            masking.masks[name] = random_perm(masking.masks[name])
 
         masking.baseline_nonzero += masking.masks[name].sum().int().item()
         masking.total_params += weight.numel()
@@ -172,6 +181,7 @@ registry = {
     "erdos-renyi": partial(erdos_renyi_init, is_kernel=False),
     "erdos-renyi-kernel": partial(erdos_renyi_init, is_kernel=True),
     "lottery-ticket": lottery_ticket_init,
+    "lottery-ticket-dist": partial(lottery_ticket_init, shuffle=True),
     "random": random_init,
     "resume": resume_init,
 }

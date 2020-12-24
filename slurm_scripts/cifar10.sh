@@ -10,7 +10,7 @@
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
 #SBATCH --time=10:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
-#SBATCH --array=3-3
+#SBATCH --array=0-2
 
 # Mailing stuff
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -105,6 +105,22 @@ if [ ${1} == "RigL-reinit" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=RigL_reinit \
     +specific=cifar10_wrn_22_2_masking_reinit seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-reinit_Random" \
     masking.init_exp_name=RigL-SM_Random \
+    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
+fi
+
+if [ ${1} == "RigL-reinit-dist" ]; then
+  if [ ${2} == "ERK" ]; then
+    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL_reinit \
+    +specific=cifar10_wrn_22_2_masking_reinit seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-reinit-dist_ERK" \
+    masking.init_exp_name=RigL-SM_ERK masking.sparse_init=lottery-ticket-dist \
+    masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  fi
+
+  if [ ${2} == "Random" ]; then
+    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL_reinit \
+    +specific=cifar10_wrn_22_2_masking_reinit seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-reinit-dist_Random" \
+    masking.init_exp_name=RigL-SM_Random masking.sparse_init=lottery-ticket-dist \
     masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 fi

@@ -1,12 +1,13 @@
 import logging
+from pathlib import Path
 import re
 from typing import TYPE_CHECKING
 
 import torch
-from torch import nn
+from torch import nn, optim
 
-from sparselearning.utils import load_state_dict
-from sparselearning.utils import WarmUpLR
+from sparselearning.utils.model_serialization import load_state_dict
+from sparselearning.utils.warmup_scheduler import WarmUpLR
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
