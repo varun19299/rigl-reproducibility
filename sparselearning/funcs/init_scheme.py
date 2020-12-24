@@ -106,8 +106,7 @@ def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
         logging.debug(f"ERK {name}: {weight.shape} prob {prob:.4f}")
 
         masking.masks[name] = (torch.rand(weight.shape) < prob).float().data
-        masking.baseline_nonzero += (masking.masks[name]
-                                     != 0).sum().int().item()
+        masking.baseline_nonzero += (masking.masks[name] != 0).sum().int().item()
 
 
 def lottery_ticket_init(
@@ -155,8 +154,7 @@ def random_init(masking: "Masking", **kwargs):
         if name not in masking.masks:
             continue
 
-        masking.masks[name] = (torch.rand(weight.shape)
-                               < masking.density).float().data
+        masking.masks[name] = (torch.rand(weight.shape) < masking.density).float().data
         masking.baseline_nonzero += masking.masks[name].sum().int().item()
         masking.total_params += weight.numel()
 
@@ -178,8 +176,7 @@ def resume_init(masking: "Masking", **kwargs):
             f"{name} shape : {weight.shape} non-zero: {(weight != 0.0).sum().int().item()} density: {(weight != 0.0).sum().int().item() / weight.numel()}"
         )
 
-    logging.info(
-        f"Overall sparsity {masking.baseline_nonzero / masking.total_params}")
+    logging.info(f"Overall sparsity {masking.baseline_nonzero / masking.total_params}")
 
 
 def block_random_init(masking: "Masking", **kwargs):
