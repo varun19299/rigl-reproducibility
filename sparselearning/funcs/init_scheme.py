@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
+from torch import nn
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
@@ -72,7 +73,8 @@ def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
                     # Note that raw_probabilities[mask] * n_param gives the individual
                     # elements of the divisor.
                 else:
-                    n_in, n_out = mask.shape[:2]  # Cin and Cout for a conv kernel
+                    # Cin and Cout for a conv kernel
+                    n_in, n_out = mask.shape[:2]
                     raw_probabilities[name] = (n_in + n_out) / (n_in * n_out)
                 divisor += raw_probabilities[name] * n_param
         # By multipliying individual probabilites with epsilon, we should get the
@@ -103,7 +105,8 @@ def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
         logging.debug(f"ERK {name}: {weight.shape} prob {prob:.4f}")
 
         masking.masks[name] = (torch.rand(weight.shape) < prob).float().data
-        masking.baseline_nonzero += (masking.masks[name] != 0).sum().int().item()
+        masking.baseline_nonzero += (masking.masks[name]
+                                     != 0).sum().int().item()
 
 
 def lottery_ticket_init(masking: "Masking", lottery_mask_path: "Path"):
@@ -143,7 +146,8 @@ def random_init(masking: "Masking", **kwargs):
         if name not in masking.masks:
             continue
 
-        masking.masks[name] = (torch.rand(weight.shape) < masking.density).float().data
+        masking.masks[name] = (torch.rand(weight.shape)
+                               < masking.density).float().data
         masking.baseline_nonzero += masking.masks[name].sum().int().item()
         masking.total_params += weight.numel()
 
@@ -165,7 +169,44 @@ def resume_init(masking: "Masking", **kwargs):
             f"{name} shape : {weight.shape} non-zero: {(weight != 0.0).sum().int().item()} density: {(weight != 0.0).sum().int().item() / weight.numel()}"
         )
 
-    logging.info(f"Overall sparsity {masking.baseline_nonzero / masking.total_params}")
+    logging.info(
+        f"Overall sparsity {masking.baseline_nonzero / masking.total_params}")
+
+
+def block_random_init(masking: "Masking", **kwargs):
+
+    n_fc = 0
+    n_conv = 0
+
+    for i, (name, module) in enumerate(masking.module.named_modules()):
+        weight = module.weight
+
+        # Skip dense layers for now
+        if isinstance(module, nn.Linear):
+            masking.remove_weight(name)
+            logging.info(
+                f"Removing layer {name} of size {weight.numel()} parameters."
+            )
+            n_fc += weight.numel()
+            continue
+
+        if isinstance(module, nn.Conv2d):
+            n_conv += weight.numel()
+
+    new_density = (masking.density * (n_conv + n_fc) - n_fc) / n_conv
+
+    for i, (name, weight) in enumerate(masking.named_parameters()):
+        # Skip modules we arent masking
+        if name not in masking.masks:
+            continue
+
+        A = (torch.rand(*weight.shape[:2], 1, 1) < new_density).float().data
+        A = A.repeat(1, 1, *weight.shape[2:])
+
+        masking.masks[name] = A
+
+        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.total_params += weight.numel()
 
 
 registry = {
@@ -174,4 +215,5 @@ registry = {
     "lottery-ticket": lottery_ticket_init,
     "random": random_init,
     "resume": resume_init,
+    "block_random": block_random_init,
 }
