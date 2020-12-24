@@ -188,23 +188,22 @@ def block_random_init(masking: "Masking", **kwargs):
     n_conv = 0
 
     for i, (name, module) in enumerate(masking.module.named_modules()):
-        weight = module.weight
 
         # Skip dense layers for now
         if isinstance(module, nn.Linear):
             masking.remove_weight(name)
             logging.info(
-                f"Removing layer {name} of size {weight.numel()} parameters."
+                f"Removing layer {name} of size {module.weight.numel()} parameters."
             )
-            n_fc += weight.numel()
+            n_fc += module.weight.numel()
             continue
 
         if isinstance(module, nn.Conv2d):
-            n_conv += weight.numel()
+            n_conv += module.weight.numel()
 
     new_density = (masking.density * (n_conv + n_fc) - n_fc) / n_conv
 
-    for i, (name, weight) in enumerate(masking.named_parameters()):
+    for i, (name, weight) in enumerate(masking.module.named_parameters()):
         # Skip modules we arent masking
         if name not in masking.masks:
             continue
