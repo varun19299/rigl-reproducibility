@@ -506,12 +506,11 @@ plot_y(
 
 method_inits_colors = [
     ("Pruning", "Random", COLORS["Pruning"]),    
-    ("RigL_2x", "Random", COLORS["RigL"]),
-
-
-    ("SNFS", "ERK", COLORS["SNFS"]),
     ("RigL", "ERK", COLORS["RigL"]),
+    ("RigL_2x", "Random", "violet"),
     ("RigL_2x", "ERK", "violet"),
+    ("SNFS", "ERK", COLORS["SNFS"]),
+
 ]
 
 for method, init, color in method_inits_colors:
@@ -539,7 +538,7 @@ for method, init, color in method_inits_colors:
     )
 
 
-plt.ylim((70,76) if dataset == "cifar100" else ylimits)
+plt.ylim((70, 76) if dataset == "cifar100" else ylimits)
 plt.xlabel("Density (1 - sparsity)")
 plt.ylabel("Accuracy (Test)")
 legend = plt.legend(frameon=True)
