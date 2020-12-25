@@ -136,7 +136,7 @@ def magnitude_and_negativity_prune(masking, mask, weight, name):
 
 
 def magnitude_variance_pruning(masking, mask, weight, name):
-    """ Prunes weights which have high gradient variance and low magnitude.
+    """Prunes weights which have high gradient variance and low magnitude.
 
     Intuition: Weights that are large are important but there is also a dimension
     of reliability. If a large weight makes a large correct prediction 8/10 times
@@ -185,9 +185,32 @@ def magnitude_variance_pruning(masking, mask, weight, name):
     return mask
 
 
+def block_magnitude_prune(masking, mask, weight, name, criterion):
+
+    kernel_size = weight.shape[-1] ** 2
+
+    num_remove = math.ceil(
+        masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name] / kernel_size
+    )
+
+    if num_remove == 0.0:
+        return mask
+
+    num_zeros = masking.stats.zeros_dict[name] / kernel_size
+    k = int(num_zeros + num_remove)
+
+    reduced = criterion(weight.data.view(*weight.shape[:2], -1), axis=-1)
+
+    x, idx = torch.sort(torch.abs(reduced.view(-1)))
+
+    mask.data.view(-1, *weight.shape[-2:])[idx[:k], :, :] = 0.0
+    return mask
+
+
 registry = {
     "global-magnitude": global_magnitude_prune,
     "magnitude": magnitude_prune,
     "magnitude-negativity": magnitude_and_negativity_prune,
     "SET": magnitude_and_negativity_prune,
+    "block-magnitude": block_magnitude_prune,
 }
