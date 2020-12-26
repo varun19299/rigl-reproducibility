@@ -185,7 +185,7 @@ def magnitude_variance_pruning(masking, mask, weight, name):
     return mask
 
 
-def block_magnitude_prune(masking, mask, weight, name, criterion):
+def struct_magnitude_prune(masking, mask, weight, name, criterion):
 
     kernel_size = weight.shape[-1] ** 2
 
@@ -212,5 +212,5 @@ registry = {
     "magnitude": magnitude_prune,
     "magnitude-negativity": magnitude_and_negativity_prune,
     "SET": magnitude_and_negativity_prune,
-    "block-magnitude": block_magnitude_prune,
+    "struct-magnitude": struct_magnitude_prune,
 }

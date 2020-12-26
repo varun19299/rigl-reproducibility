@@ -206,7 +206,7 @@ def global_momentum_growth(masking, total_regrowth):
     return total_new_nonzeros
 
 
-def block_abs_grad_growth(masking, name, new_mask, total_regrowth, weight, criterion):
+def struct_abs_grad_growth(masking, name, new_mask, total_regrowth, weight, criterion):
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -239,5 +239,5 @@ registry = {
     "momentum-neuron": momentum_neuron_growth,
     "none": no_growth,
     "random": random_growth,
-    "block-absolute-gradient": block_abs_grad_growth,
+    "struct-absolute-gradient": struct_abs_grad_growth,
 }
