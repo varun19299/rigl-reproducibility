@@ -1,11 +1,11 @@
 import pytest
 import torch
-from models import registry as model_registry
-from sparselearning.funcs.decay import CosineDecay
-from sparselearning.core import Masking
-from torch import optim
 from einops import repeat
-from sparselearning.funcs.init_scheme import registry as init_registry
+from torch import optim
+
+from models import registry as model_registry
+from sparselearning.core import Masking
+from sparselearning.funcs.decay import CosineDecay
 
 
 def is_channel_sparse(mask):
