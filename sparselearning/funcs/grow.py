@@ -1,9 +1,21 @@
+from einops import rearrange
+from functools import partial
 import math
+from typing import TYPE_CHECKING, Callable
 
 import torch
 
+if TYPE_CHECKING:
+    from sparselearning.utils.typing_alias import *
 
-def momentum_growth(masking, name, new_mask, total_regrowth, weight):
+
+def momentum_growth(
+    masking: "Masking",
+    name: str,
+    new_mask: "Tensor",
+    total_regrowth: int,
+    weight: "Tensor",
+):
     """Grows weights in places where the momentum is largest.
 
     Growth function in the sparse learning library work by
@@ -78,7 +90,13 @@ def momentum_growth(masking, name, new_mask, total_regrowth, weight):
     return new_mask
 
 
-def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
+def abs_grad_growth(
+    masking: "Masking",
+    name: str,
+    new_mask: "Tensor",
+    total_regrowth: int,
+    weight: "Tensor",
+):
     """Grows weights in places where the abs(grad) is largest. (among present zero'ed weights)"""
     # If dense, skip
     n = (new_mask == 0).sum().item()
@@ -99,7 +117,13 @@ def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
     return new_mask
 
 
-def random_growth(masking, name, new_mask, total_regrowth, weight):
+def random_growth(
+    masking: "Masking",
+    name: str,
+    new_mask: "Tensor",
+    total_regrowth: int,
+    weight: "Tensor",
+):
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -118,7 +142,13 @@ def random_growth(masking, name, new_mask, total_regrowth, weight):
     return new_mask
 
 
-def momentum_neuron_growth(masking, name, new_mask, total_regrowth, weight):
+def momentum_neuron_growth(
+    masking: "Masking",
+    name: str,
+    new_mask: "Tensor",
+    total_regrowth: int,
+    weight: "Tensor",
+):
     grad = masking.get_momentum_for_weight(weight)
 
     M = torch.abs(grad)
@@ -151,14 +181,20 @@ def momentum_neuron_growth(masking, name, new_mask, total_regrowth, weight):
     return new_mask
 
 
-def no_growth(masking, name, new_mask, total_regrowth, weight):
+def no_growth(
+    masking: "Masking",
+    name: str,
+    new_mask: "Tensor",
+    total_regrowth: int,
+    weight: "Tensor",
+):
     """
     No growth
     """
     return new_mask
 
 
-def global_momentum_growth(masking, total_regrowth):
+def global_momentum_growth(masking: "Masking", total_regrowth: int):
     togrow = total_regrowth
     total_grown = 0
     last_grown = 0
@@ -206,7 +242,14 @@ def global_momentum_growth(masking, total_regrowth):
     return total_new_nonzeros
 
 
-def struct_abs_grad_growth(masking, name, new_mask, total_regrowth, weight, criterion):
+def struct_abs_grad_growth(
+    masking: "Masking",
+    name: str,
+    new_mask: "Tensor",
+    total_regrowth: int,
+    weight: "Tensor",
+    criterion: Callable = torch.mean,
+):
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -218,16 +261,17 @@ def struct_abs_grad_growth(masking, name, new_mask, total_regrowth, weight, crit
     else:
         grad = grad * (new_mask == 0).float()
 
-    kernel_size = grad.shape[-1] ** 2
+    c_in, c_out, h, w = weight.shape
+    kernel_size = h * w
 
-    reduced = criterion(grad.view(*grad.shape[:2], -1), axis=-1)
+    reduced = criterion(rearrange(grad, "c_in c_out h w -> c_in c_out (h w)"), axis=-1)
 
     y, idx = torch.sort(torch.abs(reduced).flatten(), descending=True)
 
-    new_mask.data.view(-1, *weight.shape[-2:])[idx[: int(total_regrowth)], :, :] = 1.0
+    new_mask.data.view(-1, h, w)[idx[: int(total_regrowth)], :, :] = 1.0
 
     # init new weights to 0
-    weight.data.view(-1, *weight.shape[-2:])[idx[: int(total_regrowth)], :, :] = 0.0
+    weight.data.view(-1, h, w)[idx[: int(total_regrowth)], :, :] = 0.0
 
     return new_mask
 
@@ -239,5 +283,10 @@ registry = {
     "momentum-neuron": momentum_neuron_growth,
     "none": no_growth,
     "random": random_growth,
-    "struct-absolute-gradient": struct_abs_grad_growth,
+    "struct-absolute-gradient-mean": partial(
+        struct_abs_grad_growth, criterion=torch.mean
+    ),
+    "struct-absolute-gradient-min": partial(
+        struct_abs_grad_growth, criterion=torch.min
+    ),
 }

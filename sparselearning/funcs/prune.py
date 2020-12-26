@@ -1,9 +1,15 @@
+from einops import rearrange
+from functools import partial
 import math
+from typing import TYPE_CHECKING, Callable
 
 import torch
 
+if TYPE_CHECKING:
+    from sparselearning.utils.typing_alias import *
 
-def magnitude_prune(masking, mask, weight, name):
+
+def magnitude_prune(masking: "Masking", mask: "Tensor", weight: "Tensor", name: str):
     """Prunes the weights with smallest magnitude.
 
     The pruning functions in this sparse learning library
@@ -67,7 +73,7 @@ def magnitude_prune(masking, mask, weight, name):
     return mask
 
 
-def global_magnitude_prune(masking):
+def global_magnitude_prune(masking: "Masking"):
     tokill = math.ceil(masking.prune_rate * masking.baseline_nonzero)
     if tokill <= 0:
         return 0
@@ -110,7 +116,9 @@ def global_magnitude_prune(masking):
     return int(total_removed)
 
 
-def magnitude_and_negativity_prune(masking, mask, weight, name):
+def magnitude_and_negativity_prune(
+    masking: "Masking", mask: "Tensor", weight: "Tensor", name: str
+):
     num_remove = math.ceil(
         masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name]
     )
@@ -135,7 +143,9 @@ def magnitude_and_negativity_prune(masking, mask, weight, name):
     return mask
 
 
-def magnitude_variance_pruning(masking, mask, weight, name):
+def magnitude_variance_pruning(
+    masking: "Masking", mask: "Tensor", weight: "Tensor", name: str
+):
     """Prunes weights which have high gradient variance and low magnitude.
 
     Intuition: Weights that are large are important but there is also a dimension
@@ -185,9 +195,12 @@ def magnitude_variance_pruning(masking, mask, weight, name):
     return mask
 
 
-def struct_magnitude_prune(masking, mask, weight, name, criterion):
+def struct_magnitude_prune(
+    masking: "Masking", mask: "Tensor", weight: "Tensor", name: str, criterion: Callable= torch.mean
+):
+    c_in, c_out, h, w = weight.shape
 
-    kernel_size = weight.shape[-1] ** 2
+    kernel_size = h * w
 
     num_remove = math.ceil(
         masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name] / kernel_size
@@ -199,7 +212,9 @@ def struct_magnitude_prune(masking, mask, weight, name, criterion):
     num_zeros = masking.stats.zeros_dict[name] / kernel_size
     k = int(num_zeros + num_remove)
 
-    reduced = criterion(weight.data.view(*weight.shape[:2], -1), axis=-1)
+    reduced = criterion(
+        rearrange(weight.data, "c_in c_out h w -> c_in c_out (h w)"), dim=-1
+    )
 
     x, idx = torch.sort(torch.abs(reduced.view(-1)))
 
@@ -212,5 +227,6 @@ registry = {
     "magnitude": magnitude_prune,
     "magnitude-negativity": magnitude_and_negativity_prune,
     "SET": magnitude_and_negativity_prune,
-    "struct-magnitude": struct_magnitude_prune,
+    "struct-magnitude-max": partial(struct_magnitude_prune, criterion=torch.max),
+    "struct-magnitude-mean": partial(struct_magnitude_prune, criterion=torch.mean),
 }

@@ -120,7 +120,7 @@ if [ ${1} == "RigL-struct" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
     masking=RigL +specific=cifar100_resnet50_masking \
     seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-struct_ERK" \
-    masking.sparse_init=struct-erdos-renyi masking.growth_mode=struct-absolute-gradient masking.prune_mode=struct-magnitude \
+    masking.sparse_init=struct-erdos-renyi masking.growth_mode=struct-absolute-gradient-mean masking.prune_mode=struct-magnitude-mean \
     masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 
@@ -128,7 +128,7 @@ if [ ${1} == "RigL-struct" ]; then
     python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
     masking=RigL +specific=cifar100_resnet50_masking \
     seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-struct_Random" \
-    masking.sparse_init=struct-random masking.growth_mode=struct-absolute-gradient masking.prune_mode=struct-magnitude \
+    masking.sparse_init=struct-random masking.growth_mode=struct-absolute-gradient-mean masking.prune_mode=struct-magnitude-mean \
     masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 fi
