@@ -218,18 +218,16 @@ def struct_abs_grad_growth(masking, name, new_mask, total_regrowth, weight, crit
     else:
         grad = grad * (new_mask == 0).float()
 
-    c_in, c_out, h, w = weight.shape
+    kernel_size = grad.shape[-1] ** 2
 
-    kernel_size = h * w
-
-    reduced = criterion(grad.view(c_in, c_out, -1), axis=-1)
+    reduced = criterion(grad.view(*grad.shape[:2], -1), axis=-1)
 
     y, idx = torch.sort(torch.abs(reduced).flatten(), descending=True)
 
-    new_mask.data.view(-1, h, w)[idx[: int(total_regrowth)], :, :] = 1.0
+    new_mask.data.view(-1, *weight.shape[-2:])[idx[: int(total_regrowth)], :, :] = 1.0
 
     # init new weights to 0
-    weight.data.view(-1, h, w)[idx[: int(total_regrowth)], :, :] = 0.0
+    weight.data.view(-1, *weight.shape[-2:])[idx[: int(total_regrowth)], :, :] = 0.0
 
     return new_mask
 
