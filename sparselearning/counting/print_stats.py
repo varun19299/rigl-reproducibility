@@ -1,18 +1,28 @@
 from functools import partial
 
-from sparselearning.counting import model_inference_FLOPs
-from sparselearning.counting.inference_train_FLOPs import RigL_train_FLOPs, SNFS_train_FLOPs, SET_train_FLOPs, Pruning_train_FLOPs
+from sparselearning.counting.inference_train_FLOPs import (
+    model_inference_FLOPs,
+    Pruning_inference_FLOPs,
+    Pruning_train_FLOPs,
+    RigL_train_FLOPs,
+    SNFS_train_FLOPs,
+    SET_train_FLOPs,
+)
 from sparselearning.funcs.decay import MagnitudePruneDecay
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
 
+
 def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
-    _model_FLOPs = partial(model_inference_FLOPs, model_name=model_name, input_size=input_size)
+    _model_FLOPs = partial(
+        model_inference_FLOPs, model_name=model_name, input_size=input_size
+    )
 
     dense_FLOPs = _model_FLOPs(density=1.0)
     dense_train_FLOPs = 3 * dense_FLOPs  # gradient of param and activation
-    print(f"Resnet50 Dense FLOPS: {dense_FLOPs:,} \n")
+    print(f"{model_name} Dense FLOPS: {dense_FLOPs:,} \n")
 
     # Pruning & Masking
     total_steps = 87891
@@ -38,6 +48,13 @@ def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
         )
         print(
             f"ERK Density: {density} Inference FLOPs:{ERK_FLOPs:,} Proportion:{ERK_FLOPs / dense_FLOPs:.4f}"
+        )
+
+        pruning_inference_FLOPs = Pruning_inference_FLOPs(
+            dense_FLOPs, pruning_decay, total_steps=total_steps
+        )
+        print(
+            f"Pruning Density: {density} Inference FLOPs:{pruning_inference_FLOPs:,} Proportion:{pruning_inference_FLOPs / dense_FLOPs:.4f}"
         )
 
         print("\n")
@@ -69,6 +86,7 @@ def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
         )
 
         print("-----------\n")
+
 
 if __name__ == "__main__":
     print_stats("wrn-22-2")
