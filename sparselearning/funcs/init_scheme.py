@@ -2,6 +2,7 @@ import logging
 from functools import partial
 from typing import TYPE_CHECKING
 
+from einops import repeat
 import numpy as np
 import torch
 from torch import nn
@@ -11,21 +12,39 @@ if TYPE_CHECKING:
 from sparselearning.utils.ops import random_perm
 
 
-def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
+def _remove_fc_adjust_density(masking: "Masking"):
+    n_fc = 0
+    n_conv = 0
+
+    for i, (name, module) in enumerate(masking.module.named_modules()):
+
+        # Skip dense layers for now
+        if isinstance(module, nn.Linear):
+            masking.remove_weight(name)
+            logging.info(
+                f"Removing layer {name} of size {module.weight.numel()} parameters."
+            )
+            n_fc += module.weight.numel()
+            continue
+
+        if isinstance(module, nn.Conv2d):
+            n_conv += module.weight.numel()
+
+    masking.density = (masking.density * (n_conv + n_fc) - n_fc) / n_conv
+
+
+def get_erdos_renyi_dist(
+    masking: "Masking", is_kernel: bool = True
+) -> "Dict[str, float]":
     # Same as Erdos Renyi with modification for conv
     # initialization used in sparse evolutionary training
     # scales the number of non-zero weights linearly proportional
     # to the product of all dimensions, that is input*output
     # for fully connected layers, and h*w*in_c*out_c for conv
     # layers.
-
-    for e, (name, weight) in enumerate(masking.module.named_parameters()):
-        if name not in masking.masks:
-            continue
-        masking.total_params += weight.numel()
-
     _erk_power_scale = 1.0
 
+    epsilon = 1.0
     is_epsilon_valid = False
     # # The following loop will terminate worst case when all masks are in the
     # custom_sparsity_map. This should probably never happen though, since once
@@ -94,6 +113,7 @@ def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
         else:
             is_epsilon_valid = True
 
+    prob_dict = {}
     # With the valid epsilon, we can set sparsities of the remaning layers.
     for name, weight in masking.module.named_parameters():
         if name not in masking.masks:
@@ -103,10 +123,24 @@ def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
             prob = 1.0
         else:
             prob = epsilon * raw_probabilities[name]
+
+        prob_dict[name] = prob
+
+    return prob_dict
+
+
+def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
+    prob_dict = get_erdos_renyi_dist(masking, is_kernel)
+
+    for name, weight in masking.module.named_parameters():
+        if name not in masking.masks:
+            continue
+        prob = prob_dict[name]
         logging.debug(f"ERK {name}: {weight.shape} prob {prob:.4f}")
 
         masking.masks[name] = (torch.rand(weight.shape) < prob).float().data
         masking.baseline_nonzero += (masking.masks[name] != 0).sum().int().item()
+        masking.total_params += weight.numel()
 
 
 def lottery_ticket_init(
@@ -154,6 +188,10 @@ def random_init(masking: "Masking", **kwargs):
         if name not in masking.masks:
             continue
 
+        logging.debug(
+            f"Structured Random {name}: {weight.shape} prob {masking.density:.4f}"
+        )
+
         masking.masks[name] = (torch.rand(weight.shape) < masking.density).float().data
         masking.baseline_nonzero += masking.masks[name].sum().int().item()
         masking.total_params += weight.numel()
@@ -179,34 +217,46 @@ def resume_init(masking: "Masking", **kwargs):
     logging.info(f"Overall sparsity {masking.baseline_nonzero / masking.total_params}")
 
 
-def block_random_init(masking: "Masking", **kwargs):
+def struct_erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
+    _remove_fc_adjust_density(masking)
 
-    n_fc = 0
-    n_conv = 0
-
-    for i, (name, module) in enumerate(masking.module.named_modules()):
-
-        # Skip dense layers for now
-        if isinstance(module, nn.Linear):
-            masking.remove_weight(name)
-            logging.info(
-                f"Removing layer {name} of size {module.weight.numel()} parameters."
-            )
-            n_fc += module.weight.numel()
-            continue
-
-        if isinstance(module, nn.Conv2d):
-            n_conv += module.weight.numel()
-
-    new_density = (masking.density * (n_conv + n_fc) - n_fc) / n_conv
+    prob_dict = get_erdos_renyi_dist(masking, is_kernel)
 
     for i, (name, weight) in enumerate(masking.module.named_parameters()):
         # Skip modules we arent masking
         if name not in masking.masks:
             continue
 
-        A = (torch.rand(*weight.shape[:2], 1, 1) < new_density).float().data
-        A = A.repeat(1, 1, *weight.shape[2:])
+        prob = prob_dict[name]
+        logging.debug(f"Structured ERK {name}: {weight.shape} prob {prob:.4f}")
+
+        # Allocate channel wise
+        c_in, c_out, h, w = weight.shape
+        A = (torch.rand(c_in, c_out, 1, 1) < prob).float()
+        A = repeat(A, f"c_in c_out 1 1 -> c_in c_out {h} {w}")
+
+        masking.masks[name] = A
+
+        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.total_params += weight.numel()
+
+
+def struct_random_init(masking: "Masking", **kwargs):
+    _remove_fc_adjust_density(masking)
+
+    for i, (name, weight) in enumerate(masking.module.named_parameters()):
+        # Skip modules we arent masking
+        if name not in masking.masks:
+            continue
+
+        logging.debug(
+            f"Structured Random {name}: {weight.shape} prob {masking.density:.4f}"
+        )
+
+        # Allocate channel wise
+        c_in, c_out, h, w = weight.shape
+        A = (torch.rand(c_in, c_out, 1, 1) < masking.density).float()
+        A = repeat(A, f"c_in c_out 1 1 -> c_in c_out {h} {w}")
 
         masking.masks[name] = A
 
@@ -221,5 +271,7 @@ registry = {
     "lottery-ticket-dist": partial(lottery_ticket_init, shuffle=True),
     "random": random_init,
     "resume": resume_init,
-    "block_random": block_random_init,
+    "struct-erdos-renyi": partial(struct_erdos_renyi_init, is_kernel=False),
+    "struct-erdos-renyi-kernel": partial(struct_erdos_renyi_init, is_kernel=True),
+    "struct-random": struct_random_init,
 }
