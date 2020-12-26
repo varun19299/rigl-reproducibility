@@ -12,6 +12,7 @@ from sparselearning.funcs.decay import MagnitudePruneDecay, CosineDecay
 def Pruning_inference_FLOPs(
     dense_FLOPs: int, decay: MagnitudePruneDecay, total_steps: int = 87891
 ):
+    # TODO: load a mask and check
     avg_sparsity = 0.0
     for i in range(0, total_steps):
         avg_sparsity += decay.cumulative_sparsity(i)
