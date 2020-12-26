@@ -1,3 +1,4 @@
+from pathlib import Path
 import torch
 from torch.nn import functional as F
 
@@ -13,12 +14,14 @@ def save(model, optimizer, mask, step):
         "mask": mask.state_dict(),
         "optimizer": optimizer.state_dict(),
     }
-
-    torch.save(state_dict, f"tests/test_save_{step}.pth")
+    save_path = Path(f"/tmp/tests/test_save_{step}.pth")
+    save_path.parent.mkdir(exist_ok=True, parents=True)
+    torch.save(state_dict, save_path)
 
 
 def load(model, optimizer, mask, step):
-    state_dict = torch.load(f"tests/test_save_{step}.pth", map_location="cpu")
+    save_path = Path(f"/tmp/tests/test_save_{step}.pth")
+    state_dict = torch.load(save_path, map_location="cpu")
 
     step = state_dict["step"]
     mask.load_state_dict(state_dict["mask"])
@@ -82,6 +85,7 @@ def test_save_load():
     decay = CosineDecay()
     mask = Masking(optimizer, decay)
     mask.add_module(model)
+
 
 if __name__ == "__main__":
     test_save_load()
