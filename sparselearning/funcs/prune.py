@@ -187,7 +187,9 @@ def magnitude_variance_pruning(masking, mask, weight, name):
 
 def struct_magnitude_prune(masking, mask, weight, name, criterion):
 
-    kernel_size = weight.shape[-1] ** 2
+    c_in, c_out, h, w = weight.shape
+
+    kernel_size = h * w
 
     num_remove = math.ceil(
         masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name] / kernel_size
@@ -199,11 +201,11 @@ def struct_magnitude_prune(masking, mask, weight, name, criterion):
     num_zeros = masking.stats.zeros_dict[name] / kernel_size
     k = int(num_zeros + num_remove)
 
-    reduced = criterion(weight.data.view(*weight.shape[:2], -1), axis=-1)
+    reduced = criterion(weight.data.view(c_in, c_out, -1), axis=-1)
 
     x, idx = torch.sort(torch.abs(reduced.view(-1)))
 
-    mask.data.view(-1, *weight.shape[-2:])[idx[:k], :, :] = 0.0
+    mask.data.view(-1, h, w)[idx[:k], :, :] = 0.0
     return mask
 
 
