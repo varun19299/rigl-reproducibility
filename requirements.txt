@@ -1,4 +1,5 @@
 black
+einops
 hydra-ax-sweeper
 hydra-joblib-launcher
 hydra-core
