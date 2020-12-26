@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
+from torch import nn
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
@@ -73,7 +74,8 @@ def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
                     # Note that raw_probabilities[mask] * n_param gives the individual
                     # elements of the divisor.
                 else:
-                    n_in, n_out = mask.shape[:2]  # Cin and Cout for a conv kernel
+                    # Cin and Cout for a conv kernel
+                    n_in, n_out = mask.shape[:2]
                     raw_probabilities[name] = (n_in + n_out) / (n_in * n_out)
                 divisor += raw_probabilities[name] * n_param
         # By multipliying individual probabilites with epsilon, we should get the
@@ -177,6 +179,41 @@ def resume_init(masking: "Masking", **kwargs):
     logging.info(f"Overall sparsity {masking.baseline_nonzero / masking.total_params}")
 
 
+def block_random_init(masking: "Masking", **kwargs):
+
+    n_fc = 0
+    n_conv = 0
+
+    for i, (name, module) in enumerate(masking.module.named_modules()):
+
+        # Skip dense layers for now
+        if isinstance(module, nn.Linear):
+            masking.remove_weight(name)
+            logging.info(
+                f"Removing layer {name} of size {module.weight.numel()} parameters."
+            )
+            n_fc += module.weight.numel()
+            continue
+
+        if isinstance(module, nn.Conv2d):
+            n_conv += module.weight.numel()
+
+    new_density = (masking.density * (n_conv + n_fc) - n_fc) / n_conv
+
+    for i, (name, weight) in enumerate(masking.module.named_parameters()):
+        # Skip modules we arent masking
+        if name not in masking.masks:
+            continue
+
+        A = (torch.rand(*weight.shape[:2], 1, 1) < new_density).float().data
+        A = A.repeat(1, 1, *weight.shape[2:])
+
+        masking.masks[name] = A
+
+        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.total_params += weight.numel()
+
+
 registry = {
     "erdos-renyi": partial(erdos_renyi_init, is_kernel=False),
     "erdos-renyi-kernel": partial(erdos_renyi_init, is_kernel=True),
@@ -184,4 +221,5 @@ registry = {
     "lottery-ticket-dist": partial(lottery_ticket_init, shuffle=True),
     "random": random_init,
     "resume": resume_init,
+    "block_random": block_random_init,
 }

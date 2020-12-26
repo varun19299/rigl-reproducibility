@@ -79,8 +79,7 @@ def momentum_growth(masking, name, new_mask, total_regrowth, weight):
 
 
 def abs_grad_growth(masking, name, new_mask, total_regrowth, weight):
-    """Grows weights in places where the abs(grad) is largest. (among present zero'ed weights)
-    """
+    """Grows weights in places where the abs(grad) is largest. (among present zero'ed weights)"""
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -207,6 +206,32 @@ def global_momentum_growth(masking, total_regrowth):
     return total_new_nonzeros
 
 
+def block_abs_grad_growth(masking, name, new_mask, total_regrowth, weight, criterion):
+    # If dense, skip
+    n = (new_mask == 0).sum().item()
+    if n == 0:
+        return new_mask
+
+    grad = weight.grad
+    if grad.dtype == torch.float16:
+        grad = grad * (new_mask == 0).half()
+    else:
+        grad = grad * (new_mask == 0).float()
+
+    kernel_size = grad.shape[-1] ** 2
+
+    reduced = criterion(grad.view(*grad.shape[:2], -1), axis=-1)
+
+    y, idx = torch.sort(torch.abs(reduced).flatten(), descending=True)
+
+    new_mask.data.view(-1, *weight.shape[-2:])[idx[: int(total_regrowth)], :, :] = 1.0
+
+    # init new weights to 0
+    weight.data.view(-1, *weight.shape[-2:])[idx[: int(total_regrowth)], :, :] = 0.0
+
+    return new_mask
+
+
 registry = {
     "absolute-gradient": abs_grad_growth,
     "global-momentum-growth": global_momentum_growth,
@@ -214,4 +239,5 @@ registry = {
     "momentum-neuron": momentum_neuron_growth,
     "none": no_growth,
     "random": random_growth,
+    "block-absolute-gradient": block_abs_grad_growth,
 }
