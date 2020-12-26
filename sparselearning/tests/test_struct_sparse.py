@@ -31,18 +31,18 @@ def test_struct_init(init_scheme):
     decay = CosineDecay()
     optimizer = optim.SGD(model.parameters(), lr=0.2)
 
-    mask = Masking(
+    masking = Masking(
         optimizer,
         decay,
         redistribution_mode="none",
         sparse_init=init_scheme,
         density=0.5,
     )
-    mask.add_module(model)
-    mask.gather_statistics()
-    mask.adjust_prune_rate()
+    masking.add_module(model)
+    masking.gather_statistics()
+    masking.adjust_prune_rate()
 
-    for mask in mask.masks.values():
+    for mask in masking.masks.values():
         assert is_channel_sparse(mask)
 
 
@@ -58,7 +58,7 @@ def test_struct_prune_growth(prune_mode, growth_mode):
     decay = CosineDecay()
     optimizer = optim.SGD(model.parameters(), lr=0.2)
 
-    mask = Masking(
+    masking = Masking(
         optimizer,
         decay,
         redistribution_mode="none",
@@ -68,9 +68,9 @@ def test_struct_prune_growth(prune_mode, growth_mode):
         density=0.5,
     )
 
-    mask.add_module(model)
-    mask.gather_statistics()
-    mask.adjust_prune_rate()
+    masking.add_module(model)
+    masking.gather_statistics()
+    masking.adjust_prune_rate()
 
     inp = torch.randn(16, 3, 32, 32)
 
@@ -78,8 +78,8 @@ def test_struct_prune_growth(prune_mode, growth_mode):
     loss = model(inp).abs().mean()
     loss.backward()
 
-    mask.step()
-    mask.update_connections()
+    masking.step()
+    masking.update_connections()
 
-    for mask in mask.masks.values():
+    for mask in masking.masks.values():
         assert is_channel_sparse(mask)
