@@ -218,7 +218,7 @@ def struct_magnitude_prune(
 
     x, idx = torch.sort(torch.abs(reduced.view(-1)))
 
-    mask.data.view(-1, *weight.shape[-2:])[idx[:k], :, :] = 0.0
+    mask.data.view(-1, h, w)[idx[:k], :, :] = 0.0
     return mask
 
 
