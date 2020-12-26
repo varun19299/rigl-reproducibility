@@ -287,6 +287,6 @@ registry = {
         struct_abs_grad_growth, criterion=torch.mean
     ),
     "struct-absolute-gradient-min": partial(
-        struct_abs_grad_growth, criterion=torch.min
+        struct_abs_grad_growth, criterion=lambda x, **kwargs: torch.min(x, **kwargs)[0]
     ),
 }

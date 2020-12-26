@@ -196,7 +196,11 @@ def magnitude_variance_pruning(
 
 
 def struct_magnitude_prune(
-    masking: "Masking", mask: "Tensor", weight: "Tensor", name: str, criterion: Callable= torch.mean
+    masking: "Masking",
+    mask: "Tensor",
+    weight: "Tensor",
+    name: str,
+    criterion: Callable = torch.mean,
 ):
     c_in, c_out, h, w = weight.shape
 
@@ -227,6 +231,8 @@ registry = {
     "magnitude": magnitude_prune,
     "magnitude-negativity": magnitude_and_negativity_prune,
     "SET": magnitude_and_negativity_prune,
-    "struct-magnitude-max": partial(struct_magnitude_prune, criterion=torch.max),
+    "struct-magnitude-max": partial(
+        struct_magnitude_prune, criterion=lambda x, **kwargs: torch.max(x, **kwargs)[0]
+    ),
     "struct-magnitude-mean": partial(struct_magnitude_prune, criterion=torch.mean),
 }
