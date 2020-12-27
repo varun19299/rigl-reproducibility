@@ -1,9 +1,15 @@
+from einops import rearrange
+from functools import partial
 import math
+from typing import TYPE_CHECKING, Callable
 
 import torch
 
+if TYPE_CHECKING:
+    from sparselearning.utils.typing_alias import *
 
-def magnitude_prune(masking, mask, weight, name):
+
+def magnitude_prune(masking: "Masking", mask: "Tensor", weight: "Tensor", name: str):
     """Prunes the weights with smallest magnitude.
 
     The pruning functions in this sparse learning library
@@ -67,7 +73,7 @@ def magnitude_prune(masking, mask, weight, name):
     return mask
 
 
-def global_magnitude_prune(masking):
+def global_magnitude_prune(masking: "Masking"):
     tokill = math.ceil(masking.prune_rate * masking.baseline_nonzero)
     if tokill <= 0:
         return 0
@@ -110,7 +116,9 @@ def global_magnitude_prune(masking):
     return int(total_removed)
 
 
-def magnitude_and_negativity_prune(masking, mask, weight, name):
+def magnitude_and_negativity_prune(
+    masking: "Masking", mask: "Tensor", weight: "Tensor", name: str
+):
     num_remove = math.ceil(
         masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name]
     )
@@ -135,8 +143,10 @@ def magnitude_and_negativity_prune(masking, mask, weight, name):
     return mask
 
 
-def magnitude_variance_pruning(masking, mask, weight, name):
-    """ Prunes weights which have high gradient variance and low magnitude.
+def magnitude_variance_pruning(
+    masking: "Masking", mask: "Tensor", weight: "Tensor", name: str
+):
+    """Prunes weights which have high gradient variance and low magnitude.
 
     Intuition: Weights that are large are important but there is also a dimension
     of reliability. If a large weight makes a large correct prediction 8/10 times
@@ -185,9 +195,44 @@ def magnitude_variance_pruning(masking, mask, weight, name):
     return mask
 
 
+def struct_magnitude_prune(
+    masking: "Masking",
+    mask: "Tensor",
+    weight: "Tensor",
+    name: str,
+    criterion: Callable = torch.mean,
+):
+    c_in, c_out, h, w = weight.shape
+
+    kernel_size = h * w
+
+    num_remove = math.ceil(
+        masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name] / kernel_size
+    )
+
+    if num_remove == 0.0:
+        return mask
+
+    num_zeros = masking.stats.zeros_dict[name] / kernel_size
+    k = int(num_zeros + num_remove)
+
+    reduced = criterion(
+        rearrange(weight.data, "c_in c_out h w -> c_in c_out (h w)"), dim=-1
+    )
+
+    x, idx = torch.sort(torch.abs(reduced.view(-1)))
+
+    mask.data.view(-1, h, w)[idx[:k], :, :] = 0.0
+    return mask
+
+
 registry = {
     "global-magnitude": global_magnitude_prune,
     "magnitude": magnitude_prune,
     "magnitude-negativity": magnitude_and_negativity_prune,
     "SET": magnitude_and_negativity_prune,
+    "struct-magnitude-max": partial(
+        struct_magnitude_prune, criterion=lambda x, **kwargs: torch.max(x, **kwargs)[0]
+    ),
+    "struct-magnitude-mean": partial(struct_magnitude_prune, criterion=torch.mean),
 }

@@ -22,6 +22,15 @@ Copy your WandB API key to `wandb_api.key`.
 Will be used to login to your dashboard for visualisation. 
 Alternatively, you can skip W&B visualisation.
 
+## Unit Tests
+
+All tests can be found at `sparselearning/tests/`.
+
+Run as: `pytest sparselearning/tests/ -s` or `pytest -k <param key> <test_path>` for passing parameterized keys.
+Eg: `pytest -k CIFAR10 tests/test_data.py -s`.
+
+# Example Code
+
 ## Print Current Config
 
 We use [hydra](https://hydra.cc/docs/intro) to handle configs.
@@ -32,15 +41,15 @@ python main.py --cfg job
 
 See `conf/configs` for a detailed list of default configs, and under each folder of `conf` for possible options.
 
-## MNIST with SNFS
+## CIFAR10 with SNFS
 
 ```
 python main.py
 ```
 
-See `outputs/SNFS` for checkpoints etc. 
+See `outputs/CIFAR10/SNFS` for checkpoints etc. 
 
-## Understanding the config setup
+# Understanding the config setup
 
 We split configs into various config groups for brevity.
 
@@ -52,14 +61,13 @@ etc.
 
 Hydra allows us to override these either group-wise or globally as described below.
  
-### Overrriding specific options
+## Overrriding specific options / group configs
 
- 
-### Overriding group configs
+`python main.py masking=RigL wandb.use=True`
 
-`python main.py masking=RigL`
+Refer to hydra's documentation for more details.
 
-### Using specific configs
+## Using specific configs
 
 Sometimes, we want to store the specific config of a run with tuned options across mutliple groups (masking, optimizer etc.)
 
@@ -72,5 +80,3 @@ To do so:
 Syntax:
 
 `python main.py +specific=cifar_wrn_22_2_rigl`
-
---train_dir "${SCRATCH}/${SLURM_JOB_NAME}_seed_${SLURM_ARRAY_TASK_ID}"

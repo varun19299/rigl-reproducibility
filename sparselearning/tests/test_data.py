@@ -4,6 +4,7 @@ Try testing salient dataset features:
     2. Does the loader work
     3. Does the loader have data in your desired format?
 """
+import logging
 from pathlib import Path
 
 import pytest
@@ -24,7 +25,7 @@ def test_splitter():
         print(e_info)
 
 
-@pytest.mark.parametrize("dataset", ["CIFAR10", "CIFAR100", "MNIST", "Mini-Imagenet"])
+@pytest.mark.parametrize("dataset", ["CIFAR10", "CIFAR100", "MNIST"])
 def test_registry(dataset):
     full_dataset, test_dataset = registry[dataset](root=Path(f"datasets/{dataset}"))
 
@@ -35,8 +36,9 @@ def loader_loop(loader):
         assert len(y.shape) == 1  # class ID
 
 
-@pytest.mark.parametrize("dataset", ["CIFAR10", "CIFAR100", "MNIST", "Mini-Imagenet"])
+@pytest.mark.parametrize("dataset", ["CIFAR10", "CIFAR100", "MNIST"])
 def test_get_loaders(dataset):
+    logging.info(f"Loading dataloaders for {dataset}")
     loaders = get_dataloaders(
         dataset,
         root=f"datasets/{dataset}",
@@ -45,5 +47,6 @@ def test_get_loaders(dataset):
         validation_split=0.1,
         fixed_shuffle=True,
     )
+    logging.info(f"Looping through dataset {dataset}")
     for loader in loaders:
         loader_loop(loader)
