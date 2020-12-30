@@ -3,7 +3,12 @@ name: Lottery
 
 density: 0.05  # The density of the overall sparse network.
 sparse_init: lottery-ticket
-lottery_mask_path: ${hydra:runtime.cwd}/outputs/${dataset.name}/Pruning/+specific=cifar_wrn_22_2_pruning,masking.final_density=${masking.density},seed=${seed}/${ckpt_dir}/epoch_250.pth
+init_exp_name: Pruning
+override_dir: +specific=cifar_wrn_22_2_pruning,masking.final_density=${masking.density},seed=${seed}
+lottery_mask_path: "${hydra:runtime.cwd}/outputs/${dataset.name}/${masking.init_exp_name}/\
+  1.0/\
+  ${masking.override_dir}/\
+  ${ckpt_dir}/epoch_250.pth"
 dense_gradients: True
 
 growth_mode: momentum  # Growth mode. Choose from: momentum, random, and momentum_neuron.

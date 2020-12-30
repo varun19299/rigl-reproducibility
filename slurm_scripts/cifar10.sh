@@ -200,6 +200,13 @@ if [ ${1} == "Pruning" ]; then
   masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
 fi
 
+if [ ${1} == "Pruning-warmup" ]; then
+  python main.py dataset=CIFAR10 optimizer=SGD \
+  +specific=cifar10_wrn_22_2_pruning exp_name='Pruning-warmup' seed=$SLURM_ARRAY_TASK_ID  \
+  optimizer.warmup_steps= 3500 \
+  masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
+fi
+
 if [ ${1} == "Lottery" ]; then
   python main.py dataset=CIFAR10 optimizer=SGD masking=Lottery \
   +specific=cifar10_wrn_22_2_lottery exp_name='Lottery' seed=$SLURM_ARRAY_TASK_ID  \

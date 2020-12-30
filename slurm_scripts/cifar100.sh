@@ -10,7 +10,7 @@
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
 #SBATCH --time=32:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
-#SBATCH --array=3-3
+#SBATCH --array=0-2
 
 # Mailing stuff
 #SBATCH --mail-type=BEGIN,END,FAIL

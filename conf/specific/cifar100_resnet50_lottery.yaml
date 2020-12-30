@@ -11,6 +11,9 @@ dataset:
   batch_size: 128
   validation_split: 0.1
 
+masking:
+  override_dir: +specific=cifar100_resnet50_pruning,masking.final_density=${masking.density},seed=${seed}
+
 optimizer:
   epochs: 250
   lr: 0.1

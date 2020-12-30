@@ -23,6 +23,8 @@ masking:
   redistribution_mode: none  # Redistribution mode. Choose from: momentum, magnitude, nonzeros, or none.
   dense: False  # Enable dense mode. Default: False.
 
+  print_FLOPs: True
+
 dataset:
   batch_size: 128
   validation_split: 0.1
