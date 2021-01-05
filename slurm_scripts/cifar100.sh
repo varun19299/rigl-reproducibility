@@ -8,9 +8,9 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=12       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --mem-per-cpu=4G         # memory per cpu-core
-#SBATCH --time=32:00:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=1-20:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --gres=gpu:gtx1080:1     # GPU needed
-#SBATCH --array=0-2
+#SBATCH --array=3-3
 
 # Mailing stuff
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -190,12 +190,12 @@ fi
 if [ ${1} == "Pruning" ]; then
   python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD \
   +specific=cifar100_resnet50_pruning exp_name='Pruning' \
-  seed=$SLURM_ARRAY_TASK_ID  masking.final_density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  seed=$SLURM_ARRAY_TASK_ID  masking.final_density=0.1,0.2,0.05,0.5 wandb.use=True -m
 fi
 
 if [ ${1} == "Lottery" ]; then
   python main.py hydra/launcher=basic dataset=CIFAR100 optimizer=SGD masking=Lottery \
   +specific=cifar100_resnet50_lottery exp_name='Lottery' \
-  seed=$SLURM_ARRAY_TASK_ID  masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
+  seed=$SLURM_ARRAY_TASK_ID  masking.density=0.2,0.5 wandb.use=True -m
 fi
 #wait

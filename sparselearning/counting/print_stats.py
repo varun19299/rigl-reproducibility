@@ -56,6 +56,7 @@ def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
         print(
             f"Pruning Density: {density} Inference FLOPs:{pruning_inference_FLOPs:,} Proportion:{pruning_inference_FLOPs / dense_FLOPs:.4f}"
         )
+        print(f"[PS: This is approximate, assuming final dist is nearly random like.]")
 
         print("\n")
 
@@ -84,6 +85,7 @@ def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
         print(
             f"Pruning Density: {density} Train FLOPs:{pruning_train_FLOPs:,} Proportion:{pruning_train_FLOPs / dense_train_FLOPs:.4f}"
         )
+        print(f"[PS: This is approximate, assuming final dist is nearly random like.]")
 
         print("-----------\n")
 

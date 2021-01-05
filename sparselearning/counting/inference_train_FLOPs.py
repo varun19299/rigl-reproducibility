@@ -31,7 +31,7 @@ def Pruning_train_FLOPs(
 
     avg_sparsity /= total_steps
 
-    return dense_FLOPs * (1 - avg_sparsity) + 2 * dense_FLOPs
+    return 2 * dense_FLOPs * (1 - avg_sparsity) + dense_FLOPs
 
 
 def RigL_train_FLOPs(sparse_FLOPs: int, dense_FLOPs: int, mask_interval: int = 100):

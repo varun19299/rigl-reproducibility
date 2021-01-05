@@ -4,7 +4,7 @@ name: Lottery
 density: 0.05  # The density of the overall sparse network.
 sparse_init: lottery-ticket
 init_exp_name: Pruning
-override_dir: +specific=cifar_wrn_22_2_pruning,masking.final_density=${masking.density},seed=${seed}
+override_dir: +specific=cifar10_wrn_22_2_pruning,masking.final_density=${masking.density},optimizer.warmup_steps=3500,seed=${seed}
 lottery_mask_path: "${hydra:runtime.cwd}/outputs/${dataset.name}/${masking.init_exp_name}/\
   1.0/\
   ${masking.override_dir}/\
