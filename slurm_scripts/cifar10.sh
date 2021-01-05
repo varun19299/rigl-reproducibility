@@ -61,6 +61,15 @@ if [ ${1} == "RigL" ]; then
   fi
 fi
 
+if [ ${1} == "RigL-3x" ]; then
+  if [ ${2} == "Random" ]; then
+    python main.py dataset=CIFAR10 optimizer=SGD masking=RigL \
+    optimizer.training_multiplier=3 dataset.max_threads=11 \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-3x_Random" \
+    masking.sparse_init=random masking.density=${3} wandb.use=True
+  fi
+fi
+
 if [ ${1} == "RigL-SG" ]; then
   if [ ${2} == "ERK" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=RigL \
