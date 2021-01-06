@@ -21,9 +21,6 @@ import numpy as np
 import os
 
 # %%
-line_alpha = 0.75
-
-# %%
 # Matplotlib font sizes
 TINY_SIZE = 8
 SMALL_SIZE = 12
@@ -39,8 +36,10 @@ plt.rc("legend", fontsize=MEDIUM_SIZE)  # legend fontsize
 plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 plt.rc("axes", grid=True)
-plt.rc("lines", linewidth=3)
+plt.rc("lines", linewidth=4)
 plt.rc("savefig", facecolor="white")
+
+line_alpha = 0.8
 
 
 # %%
@@ -102,35 +101,38 @@ for i, k in enumerate(names):
     COLORS[k] = default_mpl_cycle[i]
 
 # %%
+from brokenaxes import brokenaxes
+
+# %%
 name = f"cifar100_inference_flops"
 plt.figure(figsize=(5, 5))
 
+bax = brokenaxes(xlims=((-1000, 20100), (70000, 90100)), wspace=0.35)
 
-plt.axhline(
+
+bax.axhline(
     rigl_random_flops, label=random_name, alpha=line_alpha, color=COLORS[random_name]
 )
-plt.axhline(rigl_erk_flops, label=erk_name, alpha=line_alpha, color=COLORS[erk_name])
-plt.plot(
+bax.axhline(rigl_erk_flops, label=erk_name, alpha=line_alpha, color=COLORS[erk_name])
+bax.plot(
     *get_steps_and_col(sg_history, flop_col),
     label=sg_name,
     alpha=line_alpha,
     color=COLORS[sg_name],
 )
-plt.plot(
+bax.plot(
     *get_steps_and_col(sm_history, flop_col),
     label=sm_name,
     alpha=line_alpha,
     color=COLORS[sm_name],
 )
 
-# plt.ylim(ylimits)
-plt.xlim(-1000, 25000)
-plt.xlabel("Step")
-plt.ylabel("Inference Flops")
+bax.set_xlabel("Step")
+bax.set_ylabel("Inference Flops")
 
-
-# legend = plt.legend(bbox_to_anchor=(1, 1), loc="upper left", frameon=False)
-legend = plt.legend()
+# plt.subplots_adjust(left=0.18)
+# legend = bax.legend(bbox_to_anchor=(1, 1), loc="upper left", frameon=False)
+legend = bax.legend(loc="upper right")
 export_legend(legend, f"figs/pdfs/{name}_legend.pdf")
 
 plt.savefig(f"figs/pdfs/{name}.pdf", bbox_inches="tight")
@@ -138,5 +140,7 @@ plt.savefig(f"figs/pngs/{name}.png", bbox_inches="tight")
 
 
 plt.show()
+
+# %%
 
 # %%
