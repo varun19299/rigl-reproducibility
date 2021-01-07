@@ -49,6 +49,12 @@ python main.py
 
 See `outputs/CIFAR10/SNFS` for checkpoints etc. 
 
+## Report Runs
+
+## Visualization Code
+
+TODO: write docs for each python file in `sparselearning/vis_tools/`
+
 # Understanding the config setup
 
 We split configs into various config groups for brevity.

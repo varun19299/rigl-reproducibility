@@ -35,9 +35,6 @@ def tim_ERK(module, density, tolerance: int = 5, growth_factor: float = 0.5):
 
     target_params = total_params * density
     current_params = 0
-    # TODO: is the below needed
-    # Can we do this more elegantly?
-    # new_nonzeros = 0
     epsilon = 10.0
 
     # searching for the right epsilon for a specific sparsity level

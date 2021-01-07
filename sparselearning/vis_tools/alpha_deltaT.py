@@ -1,3 +1,8 @@
+"""
+Run as:
+
+python sparselearning/vis_tools/alpha_deltaT.py wandb.project="cifar10 optuna multiseed" dataset=CIFAR10
+"""
 import hydra
 import itertools
 import logging

@@ -1,3 +1,7 @@
+"""
+Run as:
+python sparselearning/vis_tools/erk_vs_random_FLOPs.py
+"""
 import pandas as pd
 from matplotlib import pyplot as plt
 import numpy as np

@@ -1,3 +1,8 @@
+"""
+Run as:
+
+python sparselearning/vis_tools/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
+"""
 import hydra
 import itertools
 import logging
@@ -152,7 +157,7 @@ def lr_tuning_plot(
             plt.semilogx(lr_ll, test_acc_ll, linewidth=LINE_WIDTH, alpha=ALPHA)
             legend.append(rf"$\alpha=${alpha},$\Delta T=${deltaT}")
 
-        plt.legend(legend)
+        plt.legend(legend, loc="lower left")
         plt.xticks(lr_ll, lr_ll)
 
         # grab a reference to the current axes

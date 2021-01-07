@@ -1,3 +1,10 @@
+"""
+Run as:
+
+python sparselearning/vis_tools/main_results.py wandb.project=cifar10 dataset=CIFAR10
+
+python sparselearning/vis_tools/main_results.py wandb.project=cifar100 dataset=CIFAR100
+"""
 import hydra
 import itertools
 import logging
@@ -55,6 +62,9 @@ def get_stats(
             if not ("test_accuracy" in run.summary):
                 continue
 
+            # Admit seeds 0,1,2 only
+            if run.config["seed"] > 2:
+                continue
             accuracy_ll[run.config["seed"]] = run.summary.test_accuracy * 100
 
             if correct_SET:
@@ -99,7 +109,7 @@ def main(cfg: DictConfig):
             "Pruning",
         ],
         init_ll=["Random", "ERK", None],
-        suffix_ll=[None, "corrected", "no_val", "2x"],
+        suffix_ll=[None, "corrected", "no_val", "2x", "3x"],
         density_ll=[0.05, 0.1, 0.2, 0.5, 1],
         dataset_ll=[cfg.dataset.name],
         correct_SET=cfg.dataset.name == "CIFAR10",
