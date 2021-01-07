@@ -1,3 +1,6 @@
+"""
+python sparselearning/vis_tools/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
+"""
 from typing import TYPE_CHECKING, List, Union
 
 import torch
@@ -13,16 +16,17 @@ if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
 
 # Matplotlib font sizes
+TINY_SIZE = 8
 SMALL_SIZE = 12
 MEDIUM_SIZE = 14
-BIGGER_SIZE = 16
+BIGGER_SIZE = 18
 
 plt.rc("font", size=SMALL_SIZE)  # controls default text sizes
 plt.rc("axes", titlesize=SMALL_SIZE)  # fontsize of the axes title
-plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
-plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
+plt.rc("axes", labelsize=BIGGER_SIZE)  # fontsize of the x and y labels
+plt.rc("xtick", labelsize=TINY_SIZE)  # fontsize of the tick labels
 plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
-plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
+plt.rc("legend", fontsize=MEDIUM_SIZE)  # legend fontsize
 plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 # Matplotlib line thickness
@@ -74,7 +78,7 @@ if __name__ == "__main__":
     ]
     WIDTH = 0.2
     SPACING = 0.2
-    plt.figure(figsize=(16, 6))
+    plt.figure(figsize=(14, 5))
 
     for e, path in enumerate(path_ll):
         name_ll, density_ll = get_layer_wise_density(path)
@@ -88,9 +92,9 @@ if __name__ == "__main__":
     plt.xticks(np.arange(1, len(density_ll) + 1), name_ll, rotation=25, ha="right")
 
     plt.legend(legend_ll)
-    plt.xlabel("Layer")
-    plt.ylabel("Density")
-    plt.subplots_adjust(bottom=0.2)
+    # plt.xlabel("Layer")
+    plt.ylabel("Density", labelpad=10)
+    plt.subplots_adjust(bottom=0.15)
     plt.savefig("outputs/plots/density_dist_rand_erk_redist.pdf", dpi=150)
 
     plt.show()

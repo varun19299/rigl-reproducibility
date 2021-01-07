@@ -7,14 +7,14 @@ from sparselearning.counting.inference_train_FLOPs import RigL_train_FLOPs, wrn_
 # Matplotlib font sizes
 SMALL_SIZE = 12
 MEDIUM_SIZE = 14
-BIGGER_SIZE = 16
+BIGGER_SIZE = 18
 
 plt.rc("font", size=SMALL_SIZE)  # controls default text sizes
 plt.rc("axes", titlesize=SMALL_SIZE)  # fontsize of the axes title
-plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+plt.rc("axes", labelsize=BIGGER_SIZE)  # fontsize of the x and y labels
 plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
 plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
-plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
+plt.rc("legend", fontsize=MEDIUM_SIZE)  # legend fontsize
 plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 # Matplotlib line thickness
@@ -36,7 +36,7 @@ def FLOPs_vs_sparsity(model: str = "wrn-22-2"):
 
     train_FLOPs_dict = {"Random": [], "ERK": [], "density": []}
 
-    for density in np.linspace(0.01, 0.6, num=20):
+    for density in np.linspace(0.01, 0.6, num=15):
         Random_FLOPs = registry[model]("random", density)
         ERK_FLOPs = registry[model]("erdos-renyi-kernel", density)
 
@@ -61,7 +61,7 @@ def FLOPs_vs_sparsity(model: str = "wrn-22-2"):
 
         print("-----------\n")
 
-    plt.figure(figsize=(4, 5))
+    plt.figure(figsize=(4, 6))
     plt.plot(
         train_FLOPs_dict["density"],
         train_FLOPs_dict["ERK"],
@@ -76,10 +76,11 @@ def FLOPs_vs_sparsity(model: str = "wrn-22-2"):
     )
 
     plt.legend(["ERK", "Random"])
-    # plt.grid()
 
     plt.xlabel("Density (1-sparsity)")
     plt.ylabel("Train FLOPs")
+
+    plt.subplots_adjust(left=0.15, bottom=0.125)
 
     plt.savefig(
         f"outputs/plots/{model}_ERK_vs_Random_train_FLOPs.pdf", dpi=150,
@@ -102,7 +103,6 @@ def accuracy_vs_FLOPs():
     columns = ["Model", "Init", "FLOPs", "Test Acc Mean", "Test Acc Std"]
     df = pd.DataFrame(columns=columns)
 
-    # TODO: can we extract these from WandB?
     df.loc[0] = [
         "wrn-22-2",
         "Random",
@@ -187,7 +187,7 @@ def accuracy_vs_FLOPs():
 
     WIDTH = 0.3
 
-    plt.figure(figsize=(6, 8))
+    plt.figure(figsize=(8, 6))
 
     sub_df = df.loc[df["Model"] == "wrn-22-2"]
 
@@ -219,6 +219,8 @@ def accuracy_vs_FLOPs():
     )
 
     plt.show()
+
+    plt.figure(figsize=(8, 6))
 
     sub_df = df.loc[df["Model"] == "resnet50"]
 
@@ -255,4 +257,4 @@ def accuracy_vs_FLOPs():
 if __name__ == "__main__":
     FLOPs_vs_sparsity("wrn-22-2")
     FLOPs_vs_sparsity("resnet50")
-    # accuracy_vs_FLOPs()
+    accuracy_vs_FLOPs()

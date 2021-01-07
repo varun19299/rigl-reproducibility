@@ -13,12 +13,14 @@
 #     name: conda-env-sparse-learning-py
 # ---
 
-# %%
-import wandb
-import pandas as pd
+import os
+
+from brokenaxes import brokenaxes
 import matplotlib.pyplot as plt
 import numpy as np
-import os
+
+# %%
+import wandb
 
 # %%
 line_alpha = 0.75
@@ -38,9 +40,9 @@ plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
 plt.rc("legend", fontsize=MEDIUM_SIZE)  # legend fontsize
 plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-plt.rc("axes", grid=True)
+plt.rc("axes", grid=False)
 plt.rc("lines", linewidth=3)
-plt.rc("savefig", facecolor="white")
+# plt.rc("savefig", facecolor="white")
 
 
 # %%
@@ -61,6 +63,10 @@ def get_steps_and_col(df, col):
 
 # %%
 MAX_SAMPLES = 1000000
+
+with open("wandb_api.key") as f:
+    os.environ["WANDB_API_KEY"] = f.read()
+
 api = wandb.Api()
 
 # %%
@@ -105,18 +111,24 @@ for i, k in enumerate(names):
 name = f"cifar100_inference_flops"
 plt.figure(figsize=(5, 5))
 
+bax = brokenaxes(
+    xlims=((0, 10000), (80000, 90000)),
+    hspace=0.15,
+    # xticks=[0, 5e3, 1e4, 8e4, 9e4],
+    # xticklabels=["0", "5k", "10k", "80k", "90k"],
+)
 
-plt.axhline(
+bax.axhline(
     rigl_random_flops, label=random_name, alpha=line_alpha, color=COLORS[random_name]
 )
-plt.axhline(rigl_erk_flops, label=erk_name, alpha=line_alpha, color=COLORS[erk_name])
-plt.plot(
+bax.axhline(rigl_erk_flops, label=erk_name, alpha=line_alpha, color=COLORS[erk_name])
+bax.plot(
     *get_steps_and_col(sg_history, flop_col),
     label=sg_name,
     alpha=line_alpha,
     color=COLORS[sg_name],
 )
-plt.plot(
+bax.plot(
     *get_steps_and_col(sm_history, flop_col),
     label=sm_name,
     alpha=line_alpha,
@@ -124,17 +136,17 @@ plt.plot(
 )
 
 # plt.ylim(ylimits)
-plt.xlim(-1000, 25000)
-plt.xlabel("Step")
-plt.ylabel("Inference Flops")
+# plt.xlim(-1000, 25000)
+bax.set_xlabel("Step", labelpad=30)
+bax.set_ylabel("Inference Flops", labelpad=35)
 
 
 # legend = plt.legend(bbox_to_anchor=(1, 1), loc="upper left", frameon=False)
-legend = plt.legend()
-export_legend(legend, f"figs/pdfs/{name}_legend.pdf")
+bax.legend(loc="upper right")
+# export_legend(legend, f"figs/pdfs/{name}_legend.pdf")
 
-plt.savefig(f"figs/pdfs/{name}.pdf", bbox_inches="tight")
-plt.savefig(f"figs/pngs/{name}.png", bbox_inches="tight")
+# plt.subplots_adjust(left=0.18, bottom=0.18)
+plt.savefig(f"outputs/plots/{name}.pdf", dpi=150)
 
 
 plt.show()

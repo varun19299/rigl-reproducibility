@@ -1,4 +1,5 @@
 black
+brokenaxes
 einops
 hydra-ax-sweeper
 hydra-joblib-launcher

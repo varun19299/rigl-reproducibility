@@ -15,14 +15,14 @@ if TYPE_CHECKING:
 # Matplotlib font sizes
 SMALL_SIZE = 12
 MEDIUM_SIZE = 14
-BIGGER_SIZE = 16
+BIGGER_SIZE = 18
 
 plt.rc("font", size=SMALL_SIZE)  # controls default text sizes
 plt.rc("axes", titlesize=SMALL_SIZE)  # fontsize of the axes title
-plt.rc("axes", labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+plt.rc("axes", labelsize=BIGGER_SIZE)  # fontsize of the x and y labels
 plt.rc("xtick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
 plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
-plt.rc("legend", fontsize=SMALL_SIZE)  # legend fontsize
+plt.rc("legend", fontsize=MEDIUM_SIZE)  # legend fontsize
 plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 # Matplotlib line thickness
@@ -164,6 +164,8 @@ def lr_tuning_plot(
         plt.grid()
         plt.xlabel("Learning rate")
         plt.ylabel("Accuracy (Test)")
+
+        plt.subplots_adjust(bottom=0.125)
         # plt.title(f"RigL {init}, $1-s=${density}")
         plt.savefig(
             f"{hydra.utils.get_original_cwd()}/outputs/plots/{dataset.lower()}_lr_tuning_{init}_density_{density}.pdf",
