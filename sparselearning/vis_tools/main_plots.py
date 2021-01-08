@@ -24,7 +24,7 @@ os.makedirs("figs/pdfs", exist_ok=True)
 os.makedirs("figs/pngs", exist_ok=True)
 
 # %%
-dataset = "cifar100"
+dataset = "cifar10"
 
 # %%
 data_to_ylim = {
@@ -462,7 +462,7 @@ if dataset == "cifar10":
             f"{method}_2x",
             init=init,
             color=COLORS[method],
-            label=method,
+            label=f"{method}_2x",
             alpha=line_alpha,
         )
 
