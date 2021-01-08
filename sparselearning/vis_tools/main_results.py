@@ -5,14 +5,15 @@ python sparselearning/vis_tools/main_results.py wandb.project=cifar10 dataset=CI
 
 python sparselearning/vis_tools/main_results.py wandb.project=cifar100 dataset=CIFAR100
 """
-import hydra
 import itertools
 import logging
-from omegaconf import DictConfig
 import os
+from typing import TYPE_CHECKING
+
+import hydra
 import pandas as pd
 import wandb
-from typing import TYPE_CHECKING
+from omegaconf import DictConfig
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class SmoothenValue(object):
-    "Create a smooth moving average for a value (loss, etc) using `beta`."
+    "Create a exponentially smooth moving average for a value (loss, etc) using `beta`."
 
     beta: float = 0.9
     n: int = 0
@@ -20,7 +20,7 @@ class SmoothenValue(object):
 
 @dataclass
 class AverageValue(object):
-    "Create a moving average for a value (loss, etc)."
+    "Create a simple running average for a value (loss, etc)."
     n: int = 0
 
     def __post_init__(self):

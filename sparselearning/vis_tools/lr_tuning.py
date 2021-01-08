@@ -3,15 +3,16 @@ Run as:
 
 python sparselearning/vis_tools/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
 """
-import hydra
 import itertools
 import logging
-from matplotlib import pyplot as plt
-from omegaconf import DictConfig
 import os
+from typing import TYPE_CHECKING
+
+import hydra
 import pandas as pd
 import wandb
-from typing import TYPE_CHECKING
+from matplotlib import pyplot as plt
+from omegaconf import DictConfig
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *

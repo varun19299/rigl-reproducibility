@@ -42,7 +42,7 @@ def test_struct_init(init_scheme):
     masking.gather_statistics()
     masking.adjust_prune_rate()
 
-    for mask in masking.masks.values():
+    for mask in masking.mask_dict.values():
         assert is_channel_sparse(mask)
 
 
@@ -81,5 +81,5 @@ def test_struct_prune_growth(prune_mode, growth_mode):
     masking.step()
     masking.update_connections()
 
-    for mask in masking.masks.values():
+    for mask in masking.mask_dict.values():
         assert is_channel_sparse(mask)

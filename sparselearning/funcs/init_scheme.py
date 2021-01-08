@@ -13,12 +13,16 @@ from sparselearning.utils.ops import random_perm
 
 
 def _remove_fc_adjust_density(masking: "Masking"):
+    """
+    Remove fully connected layers from masking
+    (make it dense)
+    and lower density of remaining layers to
+    retain previous density.
+    """
     n_fc = 0
     n_conv = 0
 
     for i, (name, module) in enumerate(masking.module.named_modules()):
-
-        # Skip dense layers for now
         if isinstance(module, nn.Linear):
             masking.remove_weight(name)
             logging.info(
@@ -36,6 +40,17 @@ def _remove_fc_adjust_density(masking: "Masking"):
 def get_erdos_renyi_dist(
     masking: "Masking", is_kernel: bool = True
 ) -> "Dict[str, float]":
+    """
+    Get layer-wise densities distributed according to
+    ER or ERK (erdos-renyi or erdos-renyi-kernel).
+
+    Ensures resulting densities do not cross 1
+    for any layer.
+
+    :param masking: Masking instance
+    :param is_kernel: use ERK (True), ER (False)
+    :return: Layer-wise density dict
+    """
     # Same as Erdos Renyi with modification for conv
     # initialization used in sparse evolutionary training
     # scales the number of non-zero weights linearly proportional
@@ -71,7 +86,7 @@ def get_erdos_renyi_dist(
         divisor = 0
         rhs = 0
         raw_probabilities = {}
-        for name, mask in masking.masks.items():
+        for name, mask in masking.mask_dict.items():
             n_param = np.prod(mask.shape)
             n_zeros = int(n_param * (1 - masking.density))
             n_ones = int(n_param * masking.density)
@@ -116,7 +131,7 @@ def get_erdos_renyi_dist(
     prob_dict = {}
     # With the valid epsilon, we can set sparsities of the remaning layers.
     for name, weight in masking.module.named_parameters():
-        if name not in masking.masks:
+        if name not in masking.mask_dict:
             continue
 
         if name in _dense_layers:
@@ -133,13 +148,13 @@ def erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs):
     prob_dict = get_erdos_renyi_dist(masking, is_kernel)
 
     for name, weight in masking.module.named_parameters():
-        if name not in masking.masks:
+        if name not in masking.mask_dict:
             continue
         prob = prob_dict[name]
         logging.debug(f"ERK {name}: {weight.shape} prob {prob:.4f}")
 
-        masking.masks[name] = (torch.rand(weight.shape) < prob).float().data
-        masking.baseline_nonzero += (masking.masks[name] != 0).sum().int().item()
+        masking.mask_dict[name] = (torch.rand(weight.shape) < prob).float().data
+        masking.baseline_nonzero += (masking.mask_dict[name] != 0).sum().int().item()
         masking.total_params += weight.numel()
 
 
@@ -156,13 +171,13 @@ def lottery_ticket_init(
 
     for name, weight in masking.module.named_parameters():
         # Skip modules we arent masking
-        if name not in masking.masks:
+        if name not in masking.mask_dict:
             continue
 
         if shuffle:
-            masking.masks[name] = random_perm(masking.masks[name])
+            masking.mask_dict[name] = random_perm(masking.mask_dict[name])
 
-        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.baseline_nonzero += masking.mask_dict[name].sum().int().item()
         masking.total_params += weight.numel()
 
     logging.info(
@@ -185,15 +200,15 @@ def random_init(masking: "Masking", **kwargs):
             continue
 
         # Skip modules we arent masking
-        if name not in masking.masks:
+        if name not in masking.mask_dict:
             continue
 
         logging.debug(
             f"Structured Random {name}: {weight.shape} prob {masking.density:.4f}"
         )
 
-        masking.masks[name] = (torch.rand(weight.shape) < masking.density).float().data
-        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.mask_dict[name] = (torch.rand(weight.shape) < masking.density).float().data
+        masking.baseline_nonzero += masking.mask_dict[name].sum().int().item()
         masking.total_params += weight.numel()
 
 
@@ -204,11 +219,11 @@ def resume_init(masking: "Masking", **kwargs):
     # save the mask.
     for name, weight in masking.module.named_parameters():
         # Skip modules we arent masking
-        if name not in masking.masks:
+        if name not in masking.mask_dict:
             continue
 
-        masking.masks[name] = (weight != 0.0).float().data
-        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.mask_dict[name] = (weight != 0.0).float().data
+        masking.baseline_nonzero += masking.mask_dict[name].sum().int().item()
         masking.total_params += weight.numel()
         logging.debug(
             f"{name} shape : {weight.shape} non-zero: {(weight != 0.0).sum().int().item()} density: {(weight != 0.0).sum().int().item() / weight.numel()}"
@@ -224,7 +239,7 @@ def struct_erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs
 
     for i, (name, weight) in enumerate(masking.module.named_parameters()):
         # Skip modules we arent masking
-        if name not in masking.masks:
+        if name not in masking.mask_dict:
             continue
 
         prob = prob_dict[name]
@@ -235,9 +250,9 @@ def struct_erdos_renyi_init(masking: "Masking", is_kernel: bool = True, **kwargs
         A = (torch.rand(c_in, c_out, 1, 1) < prob).float()
         A = repeat(A, f"c_in c_out 1 1 -> c_in c_out {h} {w}")
 
-        masking.masks[name] = A
+        masking.mask_dict[name] = A
 
-        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.baseline_nonzero += masking.mask_dict[name].sum().int().item()
         masking.total_params += weight.numel()
 
 
@@ -246,7 +261,7 @@ def struct_random_init(masking: "Masking", **kwargs):
 
     for i, (name, weight) in enumerate(masking.module.named_parameters()):
         # Skip modules we arent masking
-        if name not in masking.masks:
+        if name not in masking.mask_dict:
             continue
 
         logging.debug(
@@ -258,9 +273,9 @@ def struct_random_init(masking: "Masking", **kwargs):
         A = (torch.rand(c_in, c_out, 1, 1) < masking.density).float()
         A = repeat(A, f"c_in c_out 1 1 -> c_in c_out {h} {w}")
 
-        masking.masks[name] = A
+        masking.mask_dict[name] = A
 
-        masking.baseline_nonzero += masking.masks[name].sum().int().item()
+        masking.baseline_nonzero += masking.mask_dict[name].sum().int().item()
         masking.total_params += weight.numel()
 
 

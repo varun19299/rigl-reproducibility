@@ -205,10 +205,10 @@ def global_momentum_growth(masking: "Masking", total_regrowth: int):
         total_possible = 0
         for module in masking.modules:
             for name, weight in module.named_parameters():
-                if name not in masking.masks:
+                if name not in masking.mask_dict:
                     continue
 
-                new_mask = masking.masks[name]
+                new_mask = masking.mask_dict[name]
                 grad = masking.get_momentum_for_weight(weight)
                 grad = grad * (new_mask == 0).float()
                 possible = (grad != 0.0).sum().item()
@@ -229,13 +229,13 @@ def global_momentum_growth(masking: "Masking", total_regrowth: int):
     total_new_nonzeros = 0
     for module in masking.modules:
         for name, weight in module.named_parameters():
-            if name not in masking.masks:
+            if name not in masking.mask_dict:
                 continue
 
-            new_mask = masking.masks[name]
+            new_mask = masking.mask_dict[name]
             grad = masking.get_momentum_for_weight(weight)
             grad = grad * (new_mask == 0).float()
-            masking.masks[name][:] = (
+            masking.mask_dict[name][:] = (
                 new_mask.bool() | (torch.abs(grad.data) > masking.growth_threshold)
             ).float()
             total_new_nonzeros += new_mask.sum().item()

@@ -4,6 +4,9 @@ from tqdm import tqdm
 
 
 class TqdmLoggingHandler(logging.StreamHandler):
+    """
+    Handler to pass tqdm outputs to the output file
+    """
     def emit(self, record):
         try:
             msg = self.format(record)

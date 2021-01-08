@@ -1,22 +1,33 @@
 # Define macros
+UNAME_S := $(shell uname -s)
 PYTHON := python
-HYDRA_FLAGS = -m
-SEED = 0
 
-.PHONY: help rigl
+## HYDRA_FLAGS : set as -m for multirun
+HYDRA_FLAGS := -m
+USE_WANDB := True
+SEED := 0
+
+## DENSITY : pass multiple densities via commandline
+DENSITY := 0.2
+
+.PHONY: help
 
 .DEFAULT: help
-help:
-	@echo "make venv"
-	@echo "       prepare development environment, use only once"
-	@echo "make lint"
-	@echo "       run pylint"
-	@echo "make run"
-	@echo "       run project"
 
-rigl:
-	${PYTHON} main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=${SEED} exp_name="RigL_ERK" masking.density=0.05,0.1,0.2,0.5 wandb.use=True ${HYDRA_FLAGS}
+## install: install all dependencies
+install:
+	pip install -r requirements.txt
 
-	${PYTHON} main.py dataset=CIFAR10 optimizer=SGD masking=RigL +specific=cifar_wrn_22_2_masking seed=${SEED} exp_name="RigL_Random" masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True ${HYDRA_FLAGS}
+help : Makefile makefiles/*.mk
+    ifeq ($(UNAME_S),Linux)
+		@sed -ns -e '$$a\\' -e 's/^##//p' $^
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        ifneq (, $(shell which gsed))
+			@gsed -sn -e 's/^##//p' -e '$$a\\' $^
+        else
+			@sed -n 's/^##//p' $^
+        endif
+    endif
 
-cifar10: rigl
+include makefiles/*.mk

@@ -61,11 +61,11 @@ if [ ${1} == "RigL" ]; then
   fi
 fi
 
-if [ ${1} == "RigL-3x" ]; then
+if [ ${1} == "RigL_3x" ]; then
   if [ ${2} == "Random" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=RigL \
     optimizer.training_multiplier=3 dataset.max_threads=11 \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL-3x_Random" \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="RigL_3x_Random" \
     masking.sparse_init=random masking.density=${3} wandb.use=True
   fi
 fi
@@ -153,13 +153,13 @@ fi
 if [ ${1} == "SNFS" ]; then
   if [ ${2} == "ERK" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_corrected_ERK" \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_ERK" \
     masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=SNFS \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_corrected_Random" \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name="SNFS_Random" \
     masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 fi
@@ -167,13 +167,13 @@ fi
 if [ ${1} == "SET" ]; then
   if [ ${2} == "ERK" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=SET \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_corrected_ERK' \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_ERK' \
     masking.sparse_init=erdos-renyi-kernel masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 
   if [ ${2} == "Random" ]; then
     python main.py dataset=CIFAR10 optimizer=SGD masking=SET \
-    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_corrected_Random' \
+    +specific=cifar10_wrn_22_2_masking seed=$SLURM_ARRAY_TASK_ID exp_name='SET_Random' \
     masking.sparse_init=random masking.density=0.05,0.1,0.2,0.5 wandb.use=True -m
   fi
 fi

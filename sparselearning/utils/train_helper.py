@@ -52,6 +52,9 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, Tuple[lr_schedu
 
 
 def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
+    """
+    Excludes batchnorm and bias from weight decay
+    """
     decay = []
     no_decay = []
     for name, param in model.named_parameters():

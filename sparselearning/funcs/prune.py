@@ -88,7 +88,7 @@ def global_magnitude_prune(masking: "Masking"):
         while abs(total_removed - tokill) > tokill * masking.tolerance:
             total_removed = 0
             for name, weight in masking.module.named_parameters():
-                if name not in masking.masks:
+                if name not in masking.mask_dict:
                     continue
                 remain = (torch.abs(weight.data) > masking.prune_threshold).sum().item()
                 total_removed += masking.stats.nonzeros_dict[name] - remain
@@ -109,9 +109,9 @@ def global_magnitude_prune(masking: "Masking"):
                 increment *= 0.99
 
         for name, weight in masking.module.named_parameters():
-            if name not in masking.masks:
+            if name not in masking.mask_dict:
                 continue
-            masking.masks[name][:] = torch.abs(weight.data) > masking.prune_threshold
+            masking.mask_dict[name][:] = torch.abs(weight.data) > masking.prune_threshold
 
     return int(total_removed)
 

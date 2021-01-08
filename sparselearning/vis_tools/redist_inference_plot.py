@@ -111,12 +111,8 @@ for i, k in enumerate(names):
 name = f"cifar100_inference_flops"
 plt.figure(figsize=(5, 5))
 
-bax = brokenaxes(
-    xlims=((0, 10000), (80000, 90000)),
-    hspace=0.15,
-    # xticks=[0, 5e3, 1e4, 8e4, 9e4],
-    # xticklabels=["0", "5k", "10k", "80k", "90k"],
-)
+bax = brokenaxes(xlims=((-1000, 20100), (70000, 90100)), wspace=0.35)
+
 
 bax.axhline(
     rigl_random_flops, label=random_name, alpha=line_alpha, color=COLORS[random_name]
@@ -135,17 +131,14 @@ bax.plot(
     color=COLORS[sm_name],
 )
 
-# plt.ylim(ylimits)
-# plt.xlim(-1000, 25000)
-bax.set_xlabel("Step", labelpad=30)
-bax.set_ylabel("Inference Flops", labelpad=35)
-
+bax.set_xlabel("Step", labelpad=-10)
+bax.set_ylabel("Inference Flops", labelpad=40)
 
 # legend = plt.legend(bbox_to_anchor=(1, 1), loc="upper left", frameon=False)
 bax.legend(loc="upper right")
 # export_legend(legend, f"figs/pdfs/{name}_legend.pdf")
 
-# plt.subplots_adjust(left=0.18, bottom=0.18)
+plt.tight_layout()
 plt.savefig(f"outputs/plots/{name}.pdf", dpi=150)
 
 
