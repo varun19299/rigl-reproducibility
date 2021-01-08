@@ -1,5 +1,5 @@
 """
-python sparselearning/vis_tools/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
+python sparselearning/visualization/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
 """
 from typing import TYPE_CHECKING, List, Union
 

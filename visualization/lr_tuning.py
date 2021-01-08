@@ -1,7 +1,7 @@
 """
 Run as:
 
-python sparselearning/vis_tools/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
+python sparselearning/visualization/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
 """
 import itertools
 import logging
@@ -180,7 +180,7 @@ def lr_tuning_plot(
         plt.show()
 
 
-@hydra.main(config_name="config", config_path="../../conf")
+@hydra.main(config_name="config", config_path="../conf")
 def main(cfg: DictConfig):
     # Authenticate API
     with open(cfg.wandb.api_key) as f:

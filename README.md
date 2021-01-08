@@ -56,7 +56,7 @@ See `outputs/CIFAR10/SNFS` for checkpoints etc.
 
 ## Report Runs
 
-## Visualization Code
+### Visualization Code
 
 TODO: write docs for each python file in `sparselearning/vis_tools/`
 

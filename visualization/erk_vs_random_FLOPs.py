@@ -1,6 +1,6 @@
 """
 Run as:
-python sparselearning/vis_tools/erk_vs_random_FLOPs.py
+python sparselearning/visualization/erk_vs_random_FLOPs.py
 """
 import pandas as pd
 from matplotlib import pyplot as plt

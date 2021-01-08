@@ -1,7 +1,7 @@
 """
 Run as:
 
-python sparselearning/vis_tools/alpha_deltaT.py wandb.project="cifar10 optuna multiseed" dataset=CIFAR10
+python sparselearning/visualization/alpha_deltaT.py wandb.project="cifar10 optuna multiseed" dataset=CIFAR10
 """
 import hydra
 import itertools
@@ -144,7 +144,7 @@ def alpha_deltaT_plot(
         plt.show()
 
 
-@hydra.main(config_name="config", config_path="../../conf")
+@hydra.main(config_name="config", config_path="../conf")
 def main(cfg: DictConfig):
     # Authenticate API
     with open(cfg.wandb.api_key) as f:

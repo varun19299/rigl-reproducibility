@@ -1,9 +1,9 @@
 """
 Run as:
 
-python sparselearning/vis_tools/main_results.py wandb.project=cifar10 dataset=CIFAR10
+python sparselearning/visualization/main_results.py wandb.project=cifar10 dataset=CIFAR10
 
-python sparselearning/vis_tools/main_results.py wandb.project=cifar100 dataset=CIFAR100
+python sparselearning/visualization/main_results.py wandb.project=cifar100 dataset=CIFAR100
 """
 import itertools
 import logging
@@ -86,7 +86,7 @@ def get_stats(
     return df
 
 
-@hydra.main(config_name="config", config_path="../../conf")
+@hydra.main(config_name="config", config_path="../conf")
 def main(cfg: DictConfig):
     # Authenticate API
     with open(cfg.wandb.api_key) as f:
