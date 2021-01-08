@@ -4,19 +4,25 @@
 
 ## Install 
 
-* `pytorch`: 1.7.0+
+* `pytorch`: 1.7.0+ (GPU support preferable).
+
+Then,
+* `make install`
+
+OR:
 * `pip install -r requirements.txt`
+* `pip install -e .`
 
 Install as a library:
 * `pip install -e .`
 
-## Installing Optuna
+### Installing Optuna
 
 Clone hydra from https://github.com/toshihikoyanase/hydra/tree/add-optuna-sweeper.
 
 Install `optuna` under `plugins`. Note that this might be merged into master hydra soon.
 
-## W&B API key
+### W&B API key
 
 Copy your WandB API key to `wandb_api.key`.
 Will be used to login to your dashboard for visualisation. 
@@ -24,10 +30,9 @@ Alternatively, you can skip W&B visualisation.
 
 ## Unit Tests
 
-All tests can be found at `sparselearning/tests/`.
+`make test`
 
-Run as: `pytest sparselearning/tests/ -s` or `pytest -k <param key> <test_path>` for passing parameterized keys.
-Eg: `pytest -k CIFAR10 tests/test_data.py -s`.
+Run `make help` to see specific make commands.
 
 # Example Code
 
@@ -44,7 +49,7 @@ See `conf/configs` for a detailed list of default configs, and under each folder
 ## CIFAR10 with SNFS
 
 ```
-python main.py
+make cifar10.ERK.SNFS DENSITY=0.2 SEED=0
 ```
 
 See `outputs/CIFAR10/SNFS` for checkpoints etc. 
