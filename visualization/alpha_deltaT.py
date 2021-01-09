@@ -1,7 +1,7 @@
 """
 Run as:
 
-python sparselearning/visualization/alpha_deltaT.py wandb.project="cifar10 optuna multiseed" dataset=CIFAR10
+python visualization/alpha_deltaT.py wandb.project="cifar10 optuna multiseed" dataset=CIFAR10
 """
 import hydra
 import itertools
@@ -113,19 +113,12 @@ def alpha_deltaT_plot(
         sub_df = df.loc[(df["Init"] == init) & (df["Density"] == density)]
         row = sub_df.loc[sub_df["Test Acc"].astype(float).idxmax()]
 
-        print(row)
-        print("\n")
-
         alpha_ll = sub_df["alpha"].astype(float)
         deltaT_ll = sub_df["Delta T"].astype(float)
         test_accuracy_ll = sub_df["Test Acc"].astype(float).to_numpy()
 
         plt.tricontourf(alpha_ll, deltaT_ll, test_accuracy_ll, levels=10, cmap="plasma")
-        # plt.tricontour(alpha_ll, deltaT_ll, test_accuracy_ll, levels=10)
-
         plt.plot(0.3, 100, "ko", markersize=10)
-
-        # plt.plot(row["alpha"], row["Delta T"], "^", color="#F5F5F5", markersize=8)
         plt.plot(row["alpha"], row["Delta T"], "^", color="black", markersize=10)
 
         cbar = plt.colorbar()

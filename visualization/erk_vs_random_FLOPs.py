@@ -1,6 +1,6 @@
 """
 Run as:
-python sparselearning/visualization/erk_vs_random_FLOPs.py
+python visualization/erk_vs_random_FLOPs.py
 """
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -107,6 +107,7 @@ def accuracy_vs_FLOPs():
     columns = ["Model", "Init", "FLOPs", "Test Acc Mean", "Test Acc Std"]
     df = pd.DataFrame(columns=columns)
 
+    # TODO: can we fetch this directly form W&B
     df.loc[0] = [
         "wrn-22-2",
         "Random",

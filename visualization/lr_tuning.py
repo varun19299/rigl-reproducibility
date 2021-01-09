@@ -1,7 +1,7 @@
 """
 Run as:
 
-python sparselearning/visualization/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
+python visualization/lr_tuning.py wandb.project="cifar10 grid lr" dataset=CIFAR10
 """
 import itertools
 import logging
@@ -172,7 +172,6 @@ def lr_tuning_plot(
         plt.ylabel("Accuracy (Test)")
 
         plt.subplots_adjust(bottom=0.125)
-        # plt.title(f"RigL {init}, $1-s=${density}")
         plt.savefig(
             f"{hydra.utils.get_original_cwd()}/outputs/plots/{dataset.lower()}_lr_tuning_{init}_density_{density}.pdf",
             dpi=150,
@@ -192,7 +191,9 @@ def main(cfg: DictConfig):
 
     df = get_stats(
         runs,
-        masking_ll=["RigL",],
+        masking_ll=[
+            "RigL",
+        ],
         init_ll=["Random", "ERK"],
         density_ll=[0.1, 0.2, 0.5],
         dataset_ll=[cfg.dataset.name],

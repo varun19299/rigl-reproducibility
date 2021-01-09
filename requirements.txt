@@ -7,7 +7,6 @@ hydra_colorlog
 hydra-joblib-launcher
 hydra-optuna-sweeper
 matplotlib
-millify
 multipledispatch
 numpy
 pytest
