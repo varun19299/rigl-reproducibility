@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
 
 
-def get_stats(
+def get_stats_table(
     runs,
     masking_ll: "List[str]" = ["RigL"],
     init_ll: "List[str]" = ["Random"],
@@ -83,6 +83,13 @@ def get_stats(
 
     if reorder:
         df = df.reset_index(drop=True)
+
+    # Compute Mean
+    df["Mean Acc"] = df[[f"Acc seed {i}" for i in range(3)]].mean(axis=1)
+
+    # Compute std dev
+    df["Std. Dev"] = df[[f"Acc seed {i}" for i in range(3)]].std(axis=1)
+
     return df
 
 
@@ -96,7 +103,7 @@ def main(cfg: DictConfig):
     api = wandb.Api()
     runs = api.runs(f"{cfg.wandb.entity}/{cfg.wandb.project}")
 
-    df = get_stats(
+    df = get_stats_table(
         runs,
         masking_ll=[
             "RigL",
@@ -115,12 +122,6 @@ def main(cfg: DictConfig):
         dataset_ll=[cfg.dataset.name],
         correct_SET=cfg.dataset.name == "CIFAR10",
     )
-
-    # Compute Mean
-    df["Mean Acc"] = df[[f"Acc seed {i}" for i in range(3)]].mean(axis=1)
-
-    # Compute std dev
-    df["Std. Dev"] = df[[f"Acc seed {i}" for i in range(3)]].std(axis=1)
 
     # Set longer length
     pd.options.display.max_rows = 150

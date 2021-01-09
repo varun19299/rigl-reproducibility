@@ -1,10 +1,7 @@
 black
 brokenaxes
 einops
-# --pre hydra-ax-sweeper
-# --pre hydra_colorlog
-# --pre hydra-core
-# --pre hydra-joblib-launcher
+
 # Hydra Dependencies
 git+https://github.com/facebookresearch/hydra.git#egg=hydra-ax-sweeper&subdirectory=plugins/hydra_colorlog
 git+https://github.com/facebookresearch/hydra.git#egg=hydra_colorlog&subdirectory=plugins/hydra_colorlog

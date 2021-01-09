@@ -16,7 +16,7 @@ DENSITY := 0.2
 
 ## install: install all dependencies
 install:
-	pip install -r requirements.txt
+	pip install -r requirements.txt --upgrade
 	pip install -e .
 
 help : Makefile makefiles/*.mk
