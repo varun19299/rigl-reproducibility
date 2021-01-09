@@ -44,7 +44,7 @@ class DatasetSplitter(Dataset):
         return self.parent_dataset[index]
 
 
-def _get_CIFAR10_dataset(root: "Path") -> "Union[Dataset,Dataset]":
+def _get_CIFAR10_dataset(root: "Path") -> "Tuple[Dataset,Dataset]":
     """
     Returns CIFAR10 Dataset
 
@@ -75,7 +75,7 @@ def _get_CIFAR10_dataset(root: "Path") -> "Union[Dataset,Dataset]":
     return full_dataset, test_dataset
 
 
-def _get_CIFAR100_dataset(root: "Path") -> "Union[Dataset,Dataset]":
+def _get_CIFAR100_dataset(root: "Path") -> "Tuple[Dataset,Dataset]":
     """
     Returns CIFAR100 Dataset
 
@@ -105,7 +105,7 @@ def _get_CIFAR100_dataset(root: "Path") -> "Union[Dataset,Dataset]":
     return full_dataset, test_dataset
 
 
-def _get_Mini_Imagenet_dataset(root: "Path") -> "Union[Dataset,Dataset]":
+def _get_Mini_Imagenet_dataset(root: "Path") -> "Tuple[Dataset,Dataset]":
     """
     Returns Mini-Imagenet Dataset
     (https://github.com/yaoyao-liu/mini-imagenet-tools)
@@ -137,7 +137,7 @@ def _get_Mini_Imagenet_dataset(root: "Path") -> "Union[Dataset,Dataset]":
     return full_dataset, test_dataset
 
 
-def _get_MNIST_dataset(root: "Path") -> "Union[Dataset,Dataset]":
+def _get_MNIST_dataset(root: "Path") -> "Tuple[Dataset,Dataset]":
     """
     Returns MNIST Dataset
 
@@ -161,7 +161,7 @@ def get_dataloaders(
     validation_split: float = 0.0,
     max_threads: int = 3,
     fixed_shuffle: bool = False,
-)-> "Union[DataLoader, DataLoader, DataLoader]":
+)-> "Tuple[DataLoader, DataLoader, DataLoader]":
     """
     Creates augmented train, validation, and test data loaders.
 
