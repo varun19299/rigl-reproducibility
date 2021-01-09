@@ -1,7 +1,10 @@
 import torch.nn as nn
 import torch.nn.functional as F
+from typing import TYPE_CHECKING
+# from models.benchmark import SparseSpeedupBench
 
-from models.benchmark import SparseSpeedupBench
+if TYPE_CHECKING:
+    from sparselearning.utils.typing_alias import *
 
 
 class AlexNet(nn.Module):
@@ -21,8 +24,8 @@ class AlexNet(nn.Module):
 
     def __init__(
         self,
-        config="s",
-        num_classes=1000,
+        config: str = "s",
+        num_classes: int = 1000,
         bench_model: bool = False,
     ):
         super(AlexNet, self).__init__()
@@ -58,7 +61,7 @@ class AlexNet(nn.Module):
             nn.Linear(1024 * factor, num_classes),
         )
 
-    def forward(self, x):
+    def forward(self, x: "Tensor") -> "Tensor":
         for layer_id, layer in enumerate(self.features):
             if self.bench and isinstance(layer, nn.Conv2d):
                 x = self.bench.forward(layer, x, layer_id)

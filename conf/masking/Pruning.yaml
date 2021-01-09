@@ -1,4 +1,4 @@
-# @package _group_
+# @package masking
 name: Pruning
 density: 1.0  # The density of the overall sparse network.
 sparse_init: random

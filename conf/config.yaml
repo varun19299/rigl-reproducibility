@@ -3,9 +3,9 @@ defaults:
   - dataset: CIFAR10
   - optimizer: SGD
   - hydra
-  - hydra/job_logging: colorlog
-  - hydra/hydra_logging: colorlog
-  - hydra/launcher: joblib
+  - override hydra/launcher: joblib
+  - override hydra/job_logging: colorlog
+  - override hydra/hydra_logging: colorlog
 
 exp_name: ${masking.name}
 seed: 0

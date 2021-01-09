@@ -1,4 +1,4 @@
-# @package _group_
+# @package masking
 name: SET
 
 density: 0.05  # The density of the overall sparse network.

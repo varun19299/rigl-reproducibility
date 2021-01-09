@@ -1,4 +1,4 @@
-# @package _group_
+# @package dataset
 name: MNIST
 root: ${hydra:runtime.cwd}/datasets/MNIST/
 batch_size: 64

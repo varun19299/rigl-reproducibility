@@ -1,4 +1,4 @@
-# @package _group_
+# @package hydra.sweeper
 optuna_config:
   direction: maximize
   study_name: cifar10-alpha-deltaT-${masking.sparse_init}-density-${masking.density}

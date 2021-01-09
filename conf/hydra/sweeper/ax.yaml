@@ -1,4 +1,4 @@
-# @package _group_
+# @package hydra.sweeper
 ax_config:
   # max_trials is application-specific. Tune it for your use case
   max_trials: 20

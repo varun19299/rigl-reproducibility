@@ -1,10 +1,12 @@
 import logging
 import os
 from copy import deepcopy
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import hydra
 import torch
+from tqdm import tqdm
 import wandb
 from omegaconf import DictConfig, OmegaConf
 from torch.cuda.amp import autocast, GradScaler
@@ -12,6 +14,7 @@ from torch.cuda.amp import autocast, GradScaler
 from data import get_dataloaders
 from loss import LabelSmoothingCrossEntropy
 from models import registry as model_registry
+from sparselearning.core import Masking
 from sparselearning.funcs.decay import registry as decay_registry
 from sparselearning.utils.accuracy_helper import get_topk_accuracy
 from sparselearning.utils.smoothen_value import SmoothenValue
@@ -107,7 +110,8 @@ def train(
                         "density": density,
                     }
                 wandb.log(
-                    log_dict, step=global_step,
+                    log_dict,
+                    step=global_step,
                 )
 
     density = mask.stats.total_density if mask else 1.0
@@ -123,7 +127,10 @@ def train(
         msg = f"{msg} {log_dict_str}"
         if use_wandb:
             wandb.log(
-                {**log_dict, "layer-wise-density": layer_wise_density.wandb_bar(mask), },
+                {
+                    **log_dict,
+                    "layer-wise-density": layer_wise_density.wandb_bar(mask),
+                },
                 step=global_step,
             )
 
@@ -326,7 +333,12 @@ def single_seed_run(cfg: DictConfig) -> float:
         # Run validation
         if epoch % cfg.val_interval == 0:
             val_loss, val_accuracy = evaluate(
-                model, val_loader, step, epoch + 1, device, use_wandb=cfg.wandb.use,
+                model,
+                val_loader,
+                step,
+                epoch + 1,
+                device,
+                use_wandb=cfg.wandb.use,
             )
 
             # Save weights
@@ -363,7 +375,12 @@ def single_seed_run(cfg: DictConfig) -> float:
         # Run val anyway
         epoch = cfg.optimizer.epochs - 1
         val_loss, val_accuracy = evaluate(
-            model, val_loader, step, epoch + 1, device, use_wandb=cfg.wandb.use,
+            model,
+            val_loader,
+            step,
+            epoch + 1,
+            device,
+            use_wandb=cfg.wandb.use,
         )
 
     evaluate(

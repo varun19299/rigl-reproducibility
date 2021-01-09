@@ -1,4 +1,4 @@
-# @package _group_
+# @package dataset
 name: CIFAR100
 root: ${hydra:runtime.cwd}/datasets/CIFAR100/
 batch_size: 128
