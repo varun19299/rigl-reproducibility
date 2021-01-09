@@ -9,21 +9,15 @@
 Then,
 * `make install`
 
-OR:
-* `pip install -r requirements.txt`
-* `pip install -e .`
-
 ### W&B API key
 
 Copy your WandB API key to `wandb_api.key`.
 Will be used to login to your dashboard for visualisation. 
-Alternatively, you can skip W&B visualisation.
+Alternatively, you can skip W&B visualisation, use `wandb.use=False` while running the python code or `USE_WANDB=False` while running make commands.
 
 ### Unit Tests
 
-`make test`
-
-Run `make help` to see specific make commands.
+`make test`. Run `make help` to see specific make commands.
 
 ## Example Code
 
@@ -71,7 +65,7 @@ It may be preferable to run specific make commands in parallel for this reason. 
 
 ### Visualization & Plotting Code
 
-Run `make vis`
+Run `make vis`.
 
 ## Misc
 
@@ -92,6 +86,10 @@ Hydra allows us to override these either group-wise or globally as described bel
 `python main.py masking=RigL wandb.use=True`
 
 Refer to hydra's documentation for more details.
+
+### Exhaustive config options
+
+See `conf/config.yaml` and the defaults it uses (eg: `dataset: CIFAR10`, `optimizer: SGD`, etc.).
 
 ### Using specific configs
 
