@@ -6,12 +6,12 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="sparselearning", # Replace with your own username
     version="0.1",
-    author="Varun Sundar, Rajat Vadiraj",
-    author_email="vsundar4@wisc.edu, rajatvd@gmail.com",
+    author="Anonymous hippo, Anonymous potato",
+    author_email="hippo@lemon.edu, potato@lemon.com",
     description="Rethinking Dynamic Sparse learning techniques.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/varun19299/rethinking-sparse-learning",
+    url="https://github.com/hippo/rethinking-sparse-learning",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
