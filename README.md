@@ -1,8 +1,8 @@
 # README
 
-# Getting Started
+## Getting Started
 
-## Install 
+### Install 
 
 * `pytorch`: 1.7.0+ (GPU support preferable).
 
@@ -13,30 +13,21 @@ OR:
 * `pip install -r requirements.txt`
 * `pip install -e .`
 
-Install as a library:
-* `pip install -e .`
-
-### Installing Optuna
-
-Clone hydra from https://github.com/toshihikoyanase/hydra/tree/add-optuna-sweeper.
-
-Install `optuna` under `plugins`. Note that this might be merged into master hydra soon.
-
 ### W&B API key
 
 Copy your WandB API key to `wandb_api.key`.
 Will be used to login to your dashboard for visualisation. 
 Alternatively, you can skip W&B visualisation.
 
-## Unit Tests
+### Unit Tests
 
 `make test`
 
 Run `make help` to see specific make commands.
 
-# Example Code
+## Example Code
 
-## Print Current Config
+### Print Current Config
 
 We use [hydra](https://hydra.cc/docs/intro) to handle configs.
 
@@ -46,21 +37,45 @@ python main.py --cfg job
 
 See `conf/configs` for a detailed list of default configs, and under each folder of `conf` for possible options.
 
-## CIFAR10 with SNFS
+### CIFAR10 with RigL
+
+```
+make cifar10.ERK.RigL DENSITY=0.2 SEED=0
+```
+
+See `outputs/CIFAR10/RigL/0.2` for checkpoints etc. 
+
+### CIFAR10 with SNFS
 
 ```
 make cifar10.ERK.SNFS DENSITY=0.2 SEED=0
 ```
 
-See `outputs/CIFAR10/SNFS` for checkpoints etc. 
+See `outputs/CIFAR10/SNFS/0.2` for checkpoints etc. 
 
-## Report Runs
+### Paper Runs
 
-### Visualization Code
+The following make command runs all the main results described in our reproducibility report.
 
-TODO: write docs for each python file in `sparselearning/vis_tools/`
+```
+make cifar10 DENSITY=0.05,0.1,0.2,0.5
+make cifar100 DENSITY=0.05,0.1,0.2,0.5
+make cifar10_tune DENSITY=0.05,0.1,0.2,0.5
+```
 
-# Understanding the config setup
+Use the `-n` flag to see which commands are executed.
+Note that these runs are executed sequentially, although we include parallel processes for cifar10 runs of a particular method.
+Eg: `cifar10.Random.RigL` runs RigL Random for densities `0.05,0.1,0.2,0.5`, `seed=0` in parallel.
+
+It may be preferable to run specific make commands in parallel for this reason. See `make help` for an exhaustive list.
+
+### Visualization & Plotting Code
+
+Run `make vis`
+
+## Misc
+
+### Understanding the config setup
 
 We split configs into various config groups for brevity.
 
@@ -72,13 +87,13 @@ etc.
 
 Hydra allows us to override these either group-wise or globally as described below.
  
-## Overrriding specific options / group configs
+### Overrriding specific options / group configs
 
 `python main.py masking=RigL wandb.use=True`
 
 Refer to hydra's documentation for more details.
 
-## Using specific configs
+### Using specific configs
 
 Sometimes, we want to store the specific config of a run with tuned options across mutliple groups (masking, optimizer etc.)
 

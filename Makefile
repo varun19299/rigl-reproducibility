@@ -17,6 +17,7 @@ DENSITY := 0.2
 ## install: install all dependencies
 install:
 	pip install -r requirements.txt
+	pip install -e .
 
 help : Makefile makefiles/*.mk
     ifeq ($(UNAME_S),Linux)

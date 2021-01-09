@@ -2,9 +2,10 @@ black
 brokenaxes
 einops
 hydra-ax-sweeper
-hydra-joblib-launcher
-hydra-core
 hydra_colorlog
+--pre hydra-core
+hydra-joblib-launcher
+hydra-optuna-sweeper
 matplotlib
 millify
 multipledispatch

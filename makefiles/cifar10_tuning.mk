@@ -39,3 +39,6 @@ cifar10_Random_alpha_deltaT_optuna:
     masking.density=$(DENSITY) multi_seed='[0,1,2]' \
     'masking.prune_rate=interval(0.1,0.6)' 'masking.interval=range(50,1000,50)' \
     masking.sparse_init=random wandb.use=$(USE_WANDB) -m
+
+## cifar10_tune: Run all tuning experiments for CIFAR10
+cifar10_tune: cifar10_lr_grid cifar10_ERK_alpha_deltaT_optuna cifar10_Random_alpha_deltaT_optuna
