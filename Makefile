@@ -32,3 +32,5 @@ help : Makefile makefiles/*.mk
     endif
 
 include makefiles/*.mk
+
+all: cifar10 cifar100 cifar10_tune vis
