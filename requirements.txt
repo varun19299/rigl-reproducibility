@@ -1,5 +1,4 @@
 black
-brokenaxes
 einops
 
 # Hydra Dependencies
