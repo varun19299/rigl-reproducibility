@@ -1,3 +1,17 @@
+"""
+Implements Growth function.
+
+Modifies binary mask to enable gradient flow.
+New weights by default 0 and it can
+be changed in the function.
+
+Functions have access to the masking object
+enabling greater flexibility in designing
+custom growth modes.
+
+Signature:
+<func>(masking, name, new_mask, total_regrowth, weight: "Tensor")
+"""
 from einops import rearrange
 from functools import partial
 import math
@@ -18,15 +32,10 @@ def momentum_growth(
 ):
     """Grows weights in places where the momentum is largest.
 
-    Growth function in the sparse learning library work by
-    changing 0s to 1s in a binary mask which will enable
-    gradient flow. Weights default value are 0 and it can
-    be changed in this function. The number of parameters
-    to be regrown is determined by the total_regrowth
-    parameter. The masking object in conjunction with the name
-    of the layer enables the access to further statistics
-    and objects that allow more flexibility to implement
-    custom growth functions.
+
+
+    Operates in-place manner, with new_mask modified.
+
 
     Args:
         masking     Masking class with state about current
@@ -97,7 +106,19 @@ def abs_grad_growth(
     total_regrowth: int,
     weight: "Tensor",
 ):
-    """Grows weights in places where the abs(grad) is largest. (among present zero'ed weights)"""
+    """
+    Grows weights in places where the abs(grad) is largest.
+    (among present zero'ed weights)
+
+    Operates in-place manner, with new_mask modified.
+
+    :param masking: Masking instance
+    :param name: layer name
+    :param new_mask: output boolean tensor
+    :param total_regrowth: amount to re-grow
+    :param weight: layer weight
+    :return:
+    """
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -124,6 +145,16 @@ def random_growth(
     total_regrowth: int,
     weight: "Tensor",
 ):
+    """
+    Random growth
+
+    :param masking: Masking instance
+    :param name: layer name
+    :param new_mask: output boolean tensor
+    :param total_regrowth: amount to re-grow
+    :param weight: layer weight
+    :return:
+    """
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -142,45 +173,6 @@ def random_growth(
     return new_mask
 
 
-def momentum_neuron_growth(
-    masking: "Masking",
-    name: str,
-    new_mask: "Tensor",
-    total_regrowth: int,
-    weight: "Tensor",
-):
-    grad = masking.get_momentum_for_weight(weight)
-
-    M = torch.abs(grad)
-    if len(M.shape) == 2:
-        sum_dim = [1]
-    elif len(M.shape) == 4:
-        sum_dim = [1, 2, 3]
-
-    v = M.mean(sum_dim).data
-    v /= v.sum()
-
-    slots_per_neuron = (new_mask == 0).sum(sum_dim)
-
-    M = M * (new_mask == 0).float()
-    for i, fraction in enumerate(v):
-        neuron_regrowth = math.floor(fraction.item() * total_regrowth)
-        available = slots_per_neuron[i].item()
-
-        y, idx = torch.sort(M[i].flatten())
-        if neuron_regrowth > available:
-            neuron_regrowth = available
-        # TODO: Work into more stable growth method
-        threshold = y[-(neuron_regrowth)].item()
-        if threshold == 0.0:
-            continue
-        if neuron_regrowth < 10:
-            continue
-        new_mask[i] = new_mask[i] | (M[i] > threshold)
-
-    return new_mask
-
-
 def no_growth(
     masking: "Masking",
     name: str,
@@ -190,56 +182,15 @@ def no_growth(
 ):
     """
     No growth
+
+    :param masking: Masking instance
+    :param name: layer name
+    :param new_mask: output boolean tensor
+    :param total_regrowth: amount to re-grow
+    :param weight: layer weight
+    :return:
     """
     return new_mask
-
-
-def global_momentum_growth(masking: "Masking", total_regrowth: int):
-    togrow = total_regrowth
-    total_grown = 0
-    last_grown = 0
-    while total_grown < togrow * (1.0 - masking.tolerance) or (
-        total_grown > togrow * (1.0 + masking.tolerance)
-    ):
-        total_grown = 0
-        total_possible = 0
-        for module in masking.modules:
-            for name, weight in module.named_parameters():
-                if name not in masking.mask_dict:
-                    continue
-
-                new_mask = masking.mask_dict[name]
-                grad = masking.get_momentum_for_weight(weight)
-                grad = grad * (new_mask == 0).float()
-                possible = (grad != 0.0).sum().item()
-                total_possible += possible
-                grown = (torch.abs(grad.data) > masking.growth_threshold).sum().item()
-                total_grown += grown
-        if total_grown == last_grown:
-            break
-        last_grown = total_grown
-
-        if total_grown > togrow * (1.0 + masking.tolerance):
-            masking.growth_threshold *= 1.02
-            # masking.growth_increment *= 0.95
-        elif total_grown < togrow * (1.0 - masking.tolerance):
-            masking.growth_threshold *= 0.98
-            # masking.growth_increment *= 0.95
-
-    total_new_nonzeros = 0
-    for module in masking.modules:
-        for name, weight in module.named_parameters():
-            if name not in masking.mask_dict:
-                continue
-
-            new_mask = masking.mask_dict[name]
-            grad = masking.get_momentum_for_weight(weight)
-            grad = grad * (new_mask == 0).float()
-            masking.mask_dict[name][:] = (
-                new_mask.bool() | (torch.abs(grad.data) > masking.growth_threshold)
-            ).float()
-            total_new_nonzeros += new_mask.sum().item()
-    return total_new_nonzeros
 
 
 def struct_abs_grad_growth(
@@ -250,6 +201,18 @@ def struct_abs_grad_growth(
     weight: "Tensor",
     criterion: Callable = torch.mean,
 ):
+    """
+    Performs absolute gradient growth channel-wise
+
+    :param masking: Masking instance
+    :param name: layer name
+    :param new_mask: output boolean tensor
+    :param total_regrowth: amount to re-grow
+    :param weight: layer weight
+    :param criterion: callable to perform reduction
+    :return:
+    """
+
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -278,9 +241,7 @@ def struct_abs_grad_growth(
 
 registry = {
     "absolute-gradient": abs_grad_growth,
-    "global-momentum-growth": global_momentum_growth,
     "momentum": momentum_growth,
-    "momentum-neuron": momentum_neuron_growth,
     "none": no_growth,
     "random": random_growth,
     "struct-absolute-gradient-mean": partial(
