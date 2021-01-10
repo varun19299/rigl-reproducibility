@@ -10,7 +10,7 @@ enabling greater flexibility in designing
 custom growth modes.
 
 Signature:
-<func>(masking, name, new_mask, total_regrowth, weight: "Tensor")
+<func>(masking, name, new_mask, total_regrowth, weight)
 """
 from einops import rearrange
 from functools import partial
@@ -31,62 +31,15 @@ def momentum_growth(
     weight: "Tensor",
 ):
     """Grows weights in places where the momentum is largest.
+    
+    Operates in-place, with new_mask modified.
 
-
-
-    Operates in-place manner, with new_mask modified.
-
-
-    Args:
-        masking     Masking class with state about current
-                    layers and the entire sparse network.
-
-        name        The name of the layer. This can be used to
-                    access layer-specific statistics in the
-                    masking class.
-
-        new_mask    The binary mask. 1s indicated active weights.
-                    This binary mask has already been pruned in the
-                    pruning step that preceeds the growth step.
-
-        total_regrowth    This variable determines the number of
-                    parameters to regrowtn in this function.
-                    It is automatically determined by the
-                    redistribution function and algorithms
-                    internal to the sparselearning library.
-
-        weight      The weight of the respective sparse layer.
-                    This is a torch parameter.
-
-    Returns:
-        mask        Binary mask with newly grown weights.
-                    1s indicated active weights in the binary mask.
-
-    Access to optimizer:
-        masking.optimizer
-
-    Access to momentum/Adam update:
-        masking.get_momentum_for_weight(weight)
-
-    Accessible global statistics:
-
-    Layer statistics:
-        Non-zero count of layer:
-            masking.stats.nonzeros_dict[name]
-        Zero count of layer:
-            masking.stats.zeros_dict[name]
-        Redistribution proportion:
-            masking.stats.variance_dict[name]
-        Number of items removed through pruning:
-            masking.stats.removed_dict[name]
-
-    Network statistics:
-        Total number of nonzero parameter in the network:
-            masking.stats.total_nonzero = 0
-        Total number of zero-valued parameter in the network:
-            masking.stats.total_zero = 0
-        Total number of parameters removed in pruning:
-            masking.stats.total_removed = 0
+    :param masking: Masking instance
+    :param name: layer name
+    :param new_mask: output boolean tensor
+    :param total_regrowth: amount to re-grow
+    :param weight: layer weight
+    :return:
     """
     momentum = masking.get_momentum_for_weight(weight)
     if momentum.dtype == torch.float16:
@@ -107,10 +60,10 @@ def abs_grad_growth(
     weight: "Tensor",
 ):
     """
-    Grows weights in places where the abs(grad) is largest.
-    (among present zero'ed weights)
+    Grows weights in places where the abs(grad) is largest
+    (among present zero'ed weights).
 
-    Operates in-place manner, with new_mask modified.
+    Operates in-place, with new_mask modified.
 
     :param masking: Masking instance
     :param name: layer name
@@ -146,7 +99,9 @@ def random_growth(
     weight: "Tensor",
 ):
     """
-    Random growth
+    Random growth.
+
+    Operates in-place, with new_mask modified.
 
     :param masking: Masking instance
     :param name: layer name
@@ -181,7 +136,9 @@ def no_growth(
     weight: "Tensor",
 ):
     """
-    No growth
+    No growth.
+
+    Operates in-place, with new_mask modified.
 
     :param masking: Masking instance
     :param name: layer name
@@ -202,7 +159,9 @@ def struct_abs_grad_growth(
     criterion: Callable = torch.mean,
 ):
     """
-    Performs absolute gradient growth channel-wise
+    Performs absolute gradient growth channel-wise.
+
+    Operates in-place, with new_mask modified.
 
     :param masking: Masking instance
     :param name: layer name

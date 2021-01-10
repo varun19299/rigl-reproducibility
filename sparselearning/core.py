@@ -1,3 +1,20 @@
+"""
+Wraps PyTorch model parameters with a boolean mask
+to simulate unstructured sparsity.
+
+Example usage:
+    optimizer = torchoptim.SGD(model.parameters(),lr=args.lr)
+    decay = CosineDecay(args.prune_rate, len(train_loader)*(args.epochs))
+    mask = Masking(optimizer, prune_rate_decay=decay)
+    model = MyModel()
+    mask.add_module(model)
+
+    # Wrapped optimizer step
+    mask.step
+
+    # Mask update step
+    mask.update_connections()
+"""
 import logging
 import math
 from dataclasses import dataclass, field
@@ -23,10 +40,16 @@ if TYPE_CHECKING:
 
 @dataclass
 class LayerStats(object):
+    """
+    Layer-wise statistics
+    """
+
     # maps layer names to variances
     variance_dict: "Dict[str, float]" = field(default_factory=dict)
+
     # maps layer names to no of zeroed weights
     zeros_dict: "Dict[str, int]" = field(default_factory=dict)
+
     # maps layer names to no of non-zero weights
     nonzeros_dict: "Dict[str, int]" = field(default_factory=dict)
 
@@ -34,7 +57,7 @@ class LayerStats(object):
     # (w.r.t to base initialization)
     removed_dict: "Dict[str, int]" = field(default_factory=dict)
 
-    # Same stats across network
+    # Global (model-level) statistics
     total_variance: float = 0
     total_zero: int = 0
     total_nonzero: int = 0
@@ -87,7 +110,8 @@ class LayerStats(object):
 
 @dataclass
 class Masking(object):
-    """Wraps PyTorch model parameters with a sparse mask.
+    """
+    Wraps PyTorch model parameters with a sparse mask.
 
     Creates a mask for each parameter tensor contained in the model. When
     `apply_mask()` is called, it applies the sparsity pattern to the parameters.
@@ -116,8 +140,12 @@ class Masking(object):
     density: float = 0.1  # Sparsity = 1 - density
     sparse_init: str = "random"  # see sparselearning/funcs/init_scheme.py
 
+    # If sparse (not dense),
+    # grads are masked
+    # at each train iter.
     dense_gradients: bool = False
 
+    # Topology modification modes
     prune_mode: str = "magnitude"
     growth_mode: str = "momentum"
     redistribution_mode: str = "momentum"
@@ -145,6 +173,7 @@ class Masking(object):
         self.adjustments = []
 
         self.name2prune_rate = {}
+        # layer-wise statistics
         self.stats = LayerStats()
 
         # FLOPs
@@ -190,6 +219,10 @@ class Masking(object):
     def add_module(self, module, lottery_mask_path: "Path" = None):
         """
         Store dict of parameters to mask
+
+        :param module: to mask
+        :param lottery_mask_path: initialize from an existing model's mask.
+        :return:
         """
         self.module = module
         logging.info(f"Dense FLOPs {self.dense_FLOPs:,}")
@@ -253,11 +286,24 @@ class Masking(object):
                 weight.grad = weight.grad * self.mask_dict[name]
 
     @property
-    def avg_inference_FLOPs(self):
+    def avg_inference_FLOPs(self) -> float:
+        """
+        :return: running average of inference FLOPs
+        """
         self._inference_FLOPs_collector.add_value(self.inference_FLOPs)
         return self._inference_FLOPs_collector.smooth
 
-    def calc_growth_redistribution(self):
+    def calc_redistributed_densities(self) -> "Dict[str, float]":
+        """
+        Computes layer-wise density
+        given a redistribution scheme.
+
+        Ensures that layer-wise densities
+        are valid (i.e. 0 <= density <= 1).
+        """
+        # TODO: try clarifying logic used
+        # original source:
+        # https://github.com/TimDettmers/sparse_learning/blob/f99c2f2ee1e89a786e942c73c054c11912866488/sparselearning/core.py#L454
         residual = 9999
         mean_residual = 0
         name2regrowth = {}
@@ -308,7 +354,7 @@ class Masking(object):
         return name2regrowth
 
     @property
-    def dense_FLOPs(self):
+    def dense_FLOPs(self) -> float:
         """
         Calculates dense inference FLOPs of the model
         """
@@ -319,7 +365,7 @@ class Masking(object):
             return self._dense_FLOPs
 
     @property
-    def inference_FLOPs(self):
+    def inference_FLOPs(self) -> float:
         """
         Calculates dense inference FLOPs of the model
         """
@@ -327,6 +373,14 @@ class Masking(object):
 
     @torch.no_grad()
     def init(self, lottery_mask_path: "Path"):
+        """
+        Sparsity initialization
+
+        :param lottery_mask_path: Mask path,
+            if using Lottery Ticket Hypothesis
+            (Frankle & Carbin 2018).
+        :return:
+        """
         # Performs weight initialization
         self.sparsify(lottery_mask_path=lottery_mask_path)
         self.to_module_device_()
@@ -356,6 +410,10 @@ class Masking(object):
         )
 
     def gather_statistics(self):
+        """
+        Gather layer-wise & global stats.
+        Typically performed before each mask update.
+        """
         variance_dict = {}
         nonzeros_dict = {}
         zeros_dict = {}
@@ -548,6 +606,9 @@ class Masking(object):
 
     @torch.no_grad()
     def reset_momentum(self):
+        """
+        Mask momentum buffers
+        """
         for name, weight in self.module.named_parameters():
             # Skip modules we aren't masking
             if name not in self.mask_dict:
@@ -567,6 +628,10 @@ class Masking(object):
                 param_state["momentum_buffer"] *= mask
 
     def sparsify(self, **kwargs):
+        """
+        Call sparsity init func
+        (see sparselearning/funcs/init_scheme.py)
+        """
         init_registry[self.sparse_init](self, **kwargs)
 
     def state_dict(self) -> "Dict":
@@ -582,7 +647,8 @@ class Masking(object):
 
     def step(self):
         """
-        Performs a masking step
+        Performs an optimizer step
+        (i.e, no update to mask topology).
         """
         self.optimizer.step()
         self.apply_mask()
@@ -645,7 +711,7 @@ class Masking(object):
             )
         else:
             if self.redistribution_mode not in ["nonzero", "none"]:
-                name2regrowth = self.calc_growth_redistribution()
+                name2regrowth = self.calc_redistributed_densities()
 
             for name, weight in self.module.named_parameters():
                 # Skip modules we aren't masking
@@ -698,6 +764,10 @@ class Masking(object):
         self.gather_statistics()
 
     def update_connections(self):
+        """
+        Performs a mask update
+        (i.e, update to mask topology).
+        """
         self.truncate_weights()
         if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
             # debug logged
