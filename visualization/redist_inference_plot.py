@@ -1,31 +1,13 @@
-# ---
-# jupyter:
-#   jupytext:
-#     formats: ipynb,py:hydrogen
-#     text_representation:
-#       extension: .py
-#       format_name: hydrogen
-#       format_version: '1.3'
-#       jupytext_version: 1.7.1
-#   kernelspec:
-#     display_name: Python [conda env:sparse-learning] *
-#     language: python
-#     name: conda-env-sparse-learning-py
-# ---
-
 import os
 
-from brokenaxes import brokenaxes
+import hydra
 import matplotlib.pyplot as plt
 import numpy as np
-
-# %%
 import wandb
+from omegaconf import DictConfig
 
-# %%
 line_alpha = 0.75
 
-# %%
 # Matplotlib font sizes
 TINY_SIZE = 8
 SMALL_SIZE = 12
@@ -40,12 +22,12 @@ plt.rc("ytick", labelsize=SMALL_SIZE)  # fontsize of the tick labels
 plt.rc("legend", fontsize=MEDIUM_SIZE)  # legend fontsize
 plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
-plt.rc("axes", grid=False)
+plt.rc("axes", grid=True)
 plt.rc("lines", linewidth=3)
-# plt.rc("savefig", facecolor="white")
+
+MAX_SAMPLES = 1000000
 
 
-# %%
 def export_legend(legend, filename="legend.png"):
     fig = legend.figure
     fig.canvas.draw()
@@ -53,95 +35,98 @@ def export_legend(legend, filename="legend.png"):
     fig.savefig(filename, dpi="figure", bbox_inches=bbox)
 
 
-# %%
-def get_steps_and_col(df, col):
+def get_steps_and_col(df, col, max_steps=None):
     steps = np.array(df["_step"])
     vals = np.array(df[col])
     ii = np.where(~np.isnan(np.array(vals)))
-    return steps[ii], vals[ii]
+    steps = steps[ii]
+    vals = vals[ii]
+    if max_steps:
+        jj = np.where(steps < max_steps)
+        steps = steps[jj]
+        vals = vals[jj]
+    return steps, vals
 
 
-# %%
-MAX_SAMPLES = 1000000
+@hydra.main(config_name="config", config_path="../conf")
+def main(cfg: DictConfig):
+    # Authenticate API
+    with open(cfg.wandb.api_key) as f:
+        os.environ["WANDB_API_KEY"] = f.read()
 
-with open("wandb_api.key") as f:
-    os.environ["WANDB_API_KEY"] = f.read()
+    api = wandb.Api()
 
-api = wandb.Api()
-
-# %%
-riglsg, riglsm = list(
-    api.runs(
-        "ml-reprod-2020/cifar100",
-        filters={
-            "state": "finished",
-            "config.seed": 3,
-            "config.masking.density": 0.2,
-            "config.masking.sparse_init": "random",
-            "config.masking.name": "RigL",
-        },
+    riglsg, riglsm = list(
+        api.runs(
+            f"{cfg.wandb.entity}/{cfg.wandb.project}",
+            filters={
+                "state": "finished",
+                "config.seed": 3,
+                "config.masking.density": 0.2,
+                "config.masking.sparse_init": "random",
+                "config.masking.name": "RigL",
+            },
+        )
     )
-)
 
-# %%
-random_name = "Random"
-erk_name = "ERK"
-sg_name = "Sparse Grad"
-sm_name = "Sparse Mmt"
+    random_name = "Random"
+    erk_name = "ERK"
+    sg_name = "Sparse Grad"
+    sm_name = "Sparse Mmt"
 
-# %%
-rigl_random_flops = 0.2
-rigl_erk_flops = 0.38
+    rigl_random_flops = 0.2
+    rigl_erk_flops = 0.38
 
-# %%
-flop_col = "Avg Inference FLOPs"
-sg_history = riglsg.history(samples=MAX_SAMPLES)
-sm_history = riglsm.history(samples=MAX_SAMPLES)
+    flop_col = "Avg Inference FLOPs"
+    sg_history = riglsg.history(samples=MAX_SAMPLES)
+    sm_history = riglsm.history(samples=MAX_SAMPLES)
 
-# %%
-default_mpl_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    default_mpl_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 
-names = [random_name, erk_name, sg_name, sm_name]
+    names = [random_name, erk_name, sg_name, sm_name]
 
-COLORS = {}
-for i, k in enumerate(names):
-    COLORS[k] = default_mpl_cycle[i]
+    COLORS = {}
+    for i, k in enumerate(names):
+        COLORS[k] = default_mpl_cycle[i]
 
-# %%
-name = f"cifar100_inference_flops"
-plt.figure(figsize=(5, 5))
+    plt.figure(figsize=(5, 5))
 
-bax = brokenaxes(xlims=((-1000, 20100), (70000, 90100)), wspace=0.35)
+    plt.axhline(
+        rigl_random_flops,
+        label=random_name,
+        alpha=line_alpha,
+        color=COLORS[random_name],
+    )
+    plt.axhline(
+        rigl_erk_flops, label=erk_name, alpha=line_alpha, color=COLORS[erk_name]
+    )
+    plt.plot(
+        *get_steps_and_col(sg_history, flop_col, max_steps=3.5e4),
+        label=sg_name,
+        alpha=line_alpha,
+        color=COLORS[sg_name],
+    )
+    plt.plot(
+        *get_steps_and_col(sm_history, flop_col, max_steps=3.5e4),
+        label=sm_name,
+        alpha=line_alpha,
+        color=COLORS[sm_name],
+    )
+
+    plt.legend(loc="upper right")
+
+    plt.grid()
+    plt.xlabel("Train Step")
+    plt.ylabel("Forward Flops")
+    plt.tight_layout()
+
+    plt.savefig(
+        f"{hydra.utils.get_original_cwd()}/outputs/plots/{cfg.wandb.project}_redist_inference_flops.pdf",
+        dpi=150,
+    )
+
+    plt.show()
 
 
-bax.axhline(
-    rigl_random_flops, label=random_name, alpha=line_alpha, color=COLORS[random_name]
-)
-bax.axhline(rigl_erk_flops, label=erk_name, alpha=line_alpha, color=COLORS[erk_name])
-bax.plot(
-    *get_steps_and_col(sg_history, flop_col),
-    label=sg_name,
-    alpha=line_alpha,
-    color=COLORS[sg_name],
-)
-bax.plot(
-    *get_steps_and_col(sm_history, flop_col),
-    label=sm_name,
-    alpha=line_alpha,
-    color=COLORS[sm_name],
-)
-
-bax.set_xlabel("Step", labelpad=-10)
-bax.set_ylabel("Inference Flops", labelpad=40)
-
-# legend = plt.legend(bbox_to_anchor=(1, 1), loc="upper left", frameon=False)
-bax.legend(loc="upper right")
-# export_legend(legend, f"figs/pdfs/{name}_legend.pdf")
-
-plt.tight_layout()
-plt.savefig(f"outputs/plots/{name}.pdf", dpi=150)
-
-
-plt.show()
-
-# %%
+if __name__ == "__main__":
+    main()

@@ -18,8 +18,12 @@ vis.tuning.lr:
 vis.erk_vs_random_FLOPs:
 	${PYTHON} visualization/erk_vs_random_FLOPs.py
 
+## vis.redist_inference_FLOPs: plot RigL-Random, SG, SM, ERK inference FLOPs vs train steps, on CIFAR100, 80% sparsity.
+vis.redist_inference_FLOPs:
+	${PYTHON} visualization/redist_inference_plot.py wandb.project=cifar100 dataset=CIFAR100
+
 VIS_DEPS := vis.main_result.cifar10 vis.main_result.cifar100
 VIS_DEPS += vis.tuning.alpha_deltaT vis.tuning.lr
-VIS_DEPS += vis.erk_vs_random_FLOPs
+VIS_DEPS += vis.erk_vs_random_FLOPs vis.redist_inference_FLOPs
 ## vis: All visualizations
 vis: $(VIS_DEPS)

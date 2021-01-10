@@ -4,6 +4,7 @@
 
 ### Install 
 
+* `python3.8`
 * `pytorch`: 1.7.0+ (GPU support preferable).
 
 Then,
