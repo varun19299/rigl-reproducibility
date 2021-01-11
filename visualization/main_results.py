@@ -79,6 +79,7 @@ def get_stats_table(
                 # Correct RigL_3x Random 0.05
                 # Seeds 1 suffered from collapse
                 if (masking, suffix, init, density) == ("RigL", "3x", "Random", 0.5):
+                    accuracy_ll[0] = 0.750 * 100
                     accuracy_ll[1] = 0.74505 * 100
 
         if suffix:
