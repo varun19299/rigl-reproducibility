@@ -117,9 +117,9 @@ def main(cfg: DictConfig):
 
     plt.grid()
     plt.xlabel("Train Step")
-    plt.ylabel("Forward Flops")
+    plt.ylabel("Forward FLOPs")
     plt.tight_layout()
-
+    plt.grid()
     plt.savefig(
         f"{hydra.utils.get_original_cwd()}/outputs/plots/{cfg.wandb.project}_redist_inference_flops.pdf",
         dpi=150,

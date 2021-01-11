@@ -85,6 +85,7 @@ def FLOPs_vs_sparsity(model: str = "wrn-22-2"):
     plt.ylabel("Train FLOPs")
 
     plt.subplots_adjust(left=0.15, bottom=0.125)
+    plt.grid()
 
     plt.savefig(
         f"outputs/plots/{model}_ERK_vs_Random_train_FLOPs.pdf", dpi=150,
