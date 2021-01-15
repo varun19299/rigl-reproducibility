@@ -6,7 +6,6 @@ To ease # imports for typing.
 """
 
 __all__ = [
-    "TYPE_CHECKING",
     "Any",
     "Array",
     "DataLoader",
@@ -18,7 +17,6 @@ __all__ = [
     "nn.Module",
     "optim",
     "Path",
-    "SparseSpeedupBench",
     "SummaryWriter",
     "Tensor",
     "tqdm",
@@ -26,7 +24,6 @@ __all__ = [
     "Union",
 ]
 
-from models.benchmark import SparseSpeedupBench
 from numpy import ndarray as Array
 from pathlib import Path
 from sparselearning.core import Masking

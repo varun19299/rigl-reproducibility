@@ -1,9 +1,9 @@
 """
 Run as:
 
-python sparselearning/visualization/main_results.py wandb.project=cifar10 dataset=CIFAR10
+python visualization/main_results.py wandb.project=cifar10 dataset=CIFAR10
 
-python sparselearning/visualization/main_results.py wandb.project=cifar100 dataset=CIFAR100
+python visualization/main_results.py wandb.project=cifar100 dataset=CIFAR100
 """
 import itertools
 import logging

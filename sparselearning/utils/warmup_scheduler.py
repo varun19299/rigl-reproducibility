@@ -30,10 +30,11 @@ class WarmUpLR(_LRScheduler):
 
 if __name__ == "__main__":
     from torch import optim
-    from models.alexnet import AlexNet
+    from models import registry as model_registry
     from matplotlib import pyplot as plt
 
-    model = AlexNet()
+    model_class, args = model_registry["wrn-22-2"]
+    model = model_class(*args)
 
     optimizer = optim.SGD(model.parameters(), lr=1)
 

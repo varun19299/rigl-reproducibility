@@ -1,6 +1,9 @@
-"""resnet in pytorch
-[1] Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun.
-    Deep Residual Learning for Image Recognition
+"""Modified ResNet in pytorch
+
+Uses 3x3 conv in first layer instead of 7x7
+See our supplementary for exact details.
+
+Original paper: Deep Residual Learning for Image Recognition
     https://arxiv.org/abs/1512.03385v1
 """
 
@@ -9,8 +12,6 @@ from typing import TYPE_CHECKING
 import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-
-from models.benchmark import SparseSpeedupBench
 
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
@@ -122,12 +123,27 @@ class BottleNeck(nn.Module):
 
 
 class ResNet(nn.Module):
+    """
+    Modified ResNet in pytorch
+
+    Uses 3x3 conv in first layer instead of 7x7
+    See our supplementary for exact details.
+
+    Original paper: Deep Residual Learning for Image Recognition
+        https://arxiv.org/abs/1512.03385v1
+
+    :param block: Block type, Basic or Bottleneck
+    :param num_block: Block no's.
+    :param num_classes: No of output labels.
+    :param small_dense_density: Equivalent parameter density of Small-Dense model
+    :param zero_init_residual: Whether to init batchnorm gamma to 0
+        (empirically achieves better performance, Improved residual training).
+    """
     def __init__(
         self,
         block: "Union[BasicBlock, BottleNeck]",
         num_block: "List[int]",
         num_classes: int = 100,
-        bench_model: bool = False,
         small_dense_density: float = 1.0,
         zero_init_residual: bool = True,
     ):
@@ -135,8 +151,6 @@ class ResNet(nn.Module):
 
         small_dense_density = np.sqrt(small_dense_density)
 
-        # TODO: Implement benchmark class or drop it throughout
-        self.bench = SparseSpeedupBench() if bench_model else None
         self.in_channels = int(64 * small_dense_density)
 
         self.conv1 = nn.Sequential(
@@ -178,7 +192,7 @@ class ResNet(nn.Module):
         if zero_init_residual:
             for m in self.modules():
                 if isinstance(m, BottleNeck) or isinstance(m, BasicBlock):
-                    nn.init.constant_(m.residual_function[-1].weight, 0)  # type: ignore[arg-type]
+                    nn.init.constant_(m.residual_function[-1].weight, 0)
 
     def _make_layer(self, block, out_channels, num_blocks, stride):
         """make resnet layers(by layer i didnt mean this 'layer' was the

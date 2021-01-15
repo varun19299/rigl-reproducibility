@@ -9,7 +9,6 @@ import torch
 from tqdm import tqdm
 import wandb
 from omegaconf import DictConfig, OmegaConf
-from torch.cuda.amp import autocast, GradScaler
 
 from data import get_dataloaders
 from loss import LabelSmoothingCrossEntropy
@@ -38,7 +37,6 @@ def train(
     global_step: int,
     epoch: int,
     device: torch.device,
-    mixed_precision_scalar: "GradScaler" = None,
     label_smoothing: float = 0.0,
     log_interval: int = 100,
     use_wandb: bool = False,
@@ -58,21 +56,13 @@ def train(
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
 
-        if mixed_precision_scalar:
-            with autocast():
-                output = model(data)
-                loss = smooth_CE(output, target)
+        output = model(data)
+        loss = smooth_CE(output, target)
+        loss.backward()
+        # L2 Regularization
 
-            mixed_precision_scalar.scale(loss).backward()
-
-        else:
-            output = model(data)
-            loss = smooth_CE(output, target)
-            loss.backward()
-            # L2 Regularization
-
-            # Exp avg collection
-            _loss_collector.add_value(loss.item())
+        # Exp avg collection
+        _loss_collector.add_value(loss.item())
 
         # Mask the gradient step
         stepper = mask if mask else optimizer
@@ -85,11 +75,7 @@ def train(
             mask.update_connections()
             _mask_update_counter += 1
         else:
-            if mixed_precision_scalar:
-                mixed_precision_scalar.step(stepper)
-                mixed_precision_scalar.update()
-            else:
-                stepper.step()
+            stepper.step()
 
         # Lr scheduler
         lr_scheduler.step()
@@ -213,7 +199,7 @@ def single_seed_run(cfg: DictConfig) -> float:
     ), f"Select from {','.join(model_registry.keys())}"
     model_class, model_args = model_registry[cfg.model]
     _small_density = cfg.masking.density if cfg.masking.name == "Small_Dense" else 1.0
-    model = model_class(*model_args, cfg.benchmark, _small_density).to(device)
+    model = model_class(*model_args, _small_density).to(device)
 
     # wandb
     if cfg.wandb.use:
@@ -243,9 +229,6 @@ def single_seed_run(cfg: DictConfig) -> float:
 
     # Setup optimizers, lr schedulers
     optimizer, (lr_scheduler, warmup_scheduler) = get_optimizer(model, **cfg.optimizer)
-
-    # Mixed Precision
-    mixed_precision_scalar = GradScaler() if cfg.mixed_precision else None
 
     # Setup mask
     mask = None
@@ -323,7 +306,6 @@ def single_seed_run(cfg: DictConfig) -> float:
             step,
             epoch + 1,
             device,
-            mixed_precision_scalar,
             label_smoothing=cfg.optimizer.label_smoothing,
             log_interval=cfg.log_interval,
             use_wandb=cfg.wandb.use,

@@ -1,13 +1,9 @@
 import math
-from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-if TYPE_CHECKING:
-    from sparselearning.utils.typing_alias import *
 
 
 class WideResNet(nn.Module):
@@ -23,16 +19,17 @@ class WideResNet(nn.Module):
         widen_factor: int = 2,
         num_classes: int = 10,
         dropRate: float = 0.3,
-        bench_model: bool = False,
         small_dense_density: float = 1.0,
     ):
         """
-        depth, widen_factor as described by the paper.
-        droprate: float = dropout rate to apply
-        bench_model: bool = benchmark model speedup (due to sparsity).
+
+        :param depth: No of layers
+        :param widen_factor: Factor to increase channel width by
+        :param num_classes: No of output labels
+        :param dropRate: Dropout Probability
+        :param small_dense_density: Equivalent parameter density of Small-Dense model
         """
         super(WideResNet, self).__init__()
-        self.bench = None if not bench_model else SparseSpeedupBench()
 
         small_dense_multiplier = np.sqrt(small_dense_density)
         nChannels = [16, 16 * widen_factor, 32 * widen_factor, 64 * widen_factor]
@@ -44,18 +41,32 @@ class WideResNet(nn.Module):
         self.conv1 = nn.Conv2d(
             3, nChannels[0], kernel_size=3, stride=1, padding=1, bias=False
         )
-        self.bench = SparseSpeedupBench() if bench_model else None
         # 1st block
         self.block1 = NetworkBlock(
-            n, nChannels[0], nChannels[1], block, 1, dropRate, bench=self.bench,
+            n,
+            nChannels[0],
+            nChannels[1],
+            block,
+            1,
+            dropRate,
         )
         # 2nd block
         self.block2 = NetworkBlock(
-            n, nChannels[1], nChannels[2], block, 2, dropRate, bench=self.bench,
+            n,
+            nChannels[1],
+            nChannels[2],
+            block,
+            2,
+            dropRate,
         )
         # 3rd block
         self.block3 = NetworkBlock(
-            n, nChannels[2], nChannels[3], block, 2, dropRate, bench=self.bench,
+            n,
+            nChannels[2],
+            nChannels[3],
+            block,
+            2,
+            dropRate,
         )
         # global average pooling and classifier
         self.bn1 = nn.BatchNorm2d(nChannels[3])
@@ -76,11 +87,7 @@ class WideResNet(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        if self.bench:
-            out = self.bench.forward(self.conv1, x, "conv1")
-        else:
-            out = self.conv1(x)
-
+        out = self.conv1(x)
         out = self.block1(out)
         out = self.block2(out)
         out = self.block3(out)
@@ -93,10 +100,11 @@ class WideResNet(nn.Module):
 
 
 class BasicBlock(nn.Module):
-    """Wide Residual Network basic block
+    """
+    Wide Residual Network basic block
 
-    For more info, see the paper: Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
-    https://arxiv.org/abs/1605.07146
+        For more info, see the paper: Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
+        https://arxiv.org/abs/1605.07146
     """
 
     def __init__(
@@ -105,7 +113,6 @@ class BasicBlock(nn.Module):
         out_planes: int,
         stride: int,
         dropRate: float = 0.0,
-        bench: "SparseSpeedupBench" = None,
     ):
         super(BasicBlock, self).__init__()
         self.bn1 = nn.BatchNorm2d(in_planes)
@@ -134,42 +141,33 @@ class BasicBlock(nn.Module):
         )
         self.feats = []
         self.densities = []
-        self.bench = bench
         self.in_planes = in_planes
 
     def forward(self, x):
-        conv_layers = []
         if not self.equalInOut:
             x = self.relu1(self.bn1(x))
         else:
             out = self.relu1(self.bn1(x))
 
-        if self.bench:
-            out0 = self.bench.forward(
-                self.conv1,
-                (out if self.equalInOut else x),
-                str(self.in_planes) + ".conv1",
-            )
-        else:
-            out0 = self.conv1(out if self.equalInOut else x)
+        out0 = self.conv1(out if self.equalInOut else x)
 
         out = self.relu2(self.bn2(out0))
 
         if self.droprate > 0:
             out = F.dropout(out, p=self.droprate, training=self.training)
-        if self.bench:
-            out = self.bench.forward(self.conv2, out, str(self.in_planes) + ".conv2")
-        else:
-            out = self.conv2(out)
+
+        out = self.conv2(out)
 
         return torch.add(x if self.equalInOut else self.convShortcut(x), out)
 
 
 class NetworkBlock(nn.Module):
-    """Wide Residual Network network block which holds basic blocks.
+    """
+    Wide Residual Network network block which holds basic blocks.
 
-    For more info, see the paper: Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
-    https://arxiv.org/abs/1605.07146
+    For more info, see the paper:
+        Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
+        https://arxiv.org/abs/1605.07146
     """
 
     def __init__(
@@ -177,15 +175,13 @@ class NetworkBlock(nn.Module):
         nb_layers: int,
         in_planes: int,
         out_planes: int,
-        block,
+        block: BasicBlock,
         stride: int,
         dropRate: float = 0.0,
-        bench: "SparseSpeedupBench" = None,
     ):
         super(NetworkBlock, self).__init__()
         self.feats = []
         self.densities = []
-        self.bench = bench
         self.layer = self._make_layer(
             block, in_planes, out_planes, nb_layers, stride, dropRate
         )
@@ -199,7 +195,6 @@ class NetworkBlock(nn.Module):
                     out_planes,
                     i == 0 and stride or 1,
                     dropRate,
-                    bench=self.bench,
                 )
             )
         return nn.Sequential(*layers)
@@ -213,5 +208,5 @@ class NetworkBlock(nn.Module):
 if __name__ == "__main__":
     from torchsummary import summary
 
-    model = WideResNet(depth=22, widen_factor=2, small_dense_density=0.5)
+    model = WideResNet(depth=22, widen_factor=2, small_dense_density=1.0)
     summary(model, (3, 32, 32))
