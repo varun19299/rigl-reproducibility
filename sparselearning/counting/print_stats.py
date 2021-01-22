@@ -16,6 +16,14 @@ if TYPE_CHECKING:
 
 
 def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
+    """
+    Print FLOP statistics for (Dense, Pruning, RigL, SET, SNFS) models
+
+    :param model_name: Model to use (wrn-22-2 or resnet-50)
+    :type model_name: str
+    :param input_size: Shape of input tensor, single input only
+    :type input_size: Tuple[int]
+    """
     _model_FLOPs = partial(
         model_inference_FLOPs, model_name=model_name, input_size=input_size
     )

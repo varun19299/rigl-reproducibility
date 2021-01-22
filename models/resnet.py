@@ -1,4 +1,5 @@
-"""Modified ResNet in pytorch
+"""
+Modified ResNet in pytorch
 
 Uses 3x3 conv in first layer instead of 7x7
 See our supplementary for exact details.
@@ -18,7 +19,15 @@ if TYPE_CHECKING:
 
 
 class BasicBlock(nn.Module):
-    """Basic Block for resnet 18 and resnet 34
+    """
+    Basic Block for ResNet-18 and ResNet-34
+
+    :param in_channels: input channels
+    :type in_channels: int
+    :param out_channels: output channels
+    :type out_channels: int
+    :param stride: the stride of the first block of this layer
+    :type stride: int
     """
 
     # BasicBlock and BottleNeck block
@@ -74,7 +83,15 @@ class BasicBlock(nn.Module):
 
 
 class BottleNeck(nn.Module):
-    """Residual block for resnet over 50 layers
+    """
+    Residual block for ResNet-50+ layers
+
+    :param in_channels: input channels
+    :type in_channels: int
+    :param out_channels: output channels
+    :type out_channels: int
+    :param stride: the stride of the first block of this layer
+    :type stride: int
     """
 
     expansion = 4
@@ -133,12 +150,19 @@ class ResNet(nn.Module):
         https://arxiv.org/abs/1512.03385v1
 
     :param block: Block type, Basic or Bottleneck
+    :type block: Union[BasicBlock, BottleNeck]
     :param num_block: Block no's.
+    :type num_block: List[int]
     :param num_classes: No of output labels.
+    :type num_classes: int
     :param small_dense_density: Equivalent parameter density of Small-Dense model
-    :param zero_init_residual: Whether to init batchnorm gamma to 0
-        (empirically achieves better performance, Improved residual training).
+    :type small_dense_density: float
+    :param zero_init_residual: Whether to init batchnorm gamma to 0.
+        Empirically achieves better performance, Improved residual training.
+        Default 0.
+    :type zero_init_residual: bool
     """
+
     def __init__(
         self,
         block: "Union[BasicBlock, BottleNeck]",
@@ -194,19 +218,29 @@ class ResNet(nn.Module):
                 if isinstance(m, BottleNeck) or isinstance(m, BasicBlock):
                     nn.init.constant_(m.residual_function[-1].weight, 0)
 
-    def _make_layer(self, block, out_channels, num_blocks, stride):
-        """make resnet layers(by layer i didnt mean this 'layer' was the
-        same as a neuron netowork layer, ex. conv layer), one layer may
-        contain more than one residual block
-        Args:
-            block: block type, basic block or bottle neck block
-            out_channels: output depth channel number of this layer
-            num_blocks: how many blocks per layer
-            stride: the stride of the first block of this layer
-        Return:
-            return a resnet layer
+    def _make_layer(
+        self,
+        block: "Union[BasicBlock, BottleNeck]",
+        out_channels: int,
+        num_blocks: int,
+        stride: int,
+    ) -> nn.Sequential:
         """
+        Make resnet layers(by layer i didnt mean this 'layer' was the
+        same as a neuron netowork layer, ex. conv layer), one layer may
+        contain more than one residual block.
 
+        :param block: Block type, Basic or Bottleneck
+        :type block: Union[BasicBlock, BottleNeck]
+        :param out_channels: output depth channel number of this layer
+        :type out_channels: int
+        :param num_blocks: how many blocks per layer
+        :type num_blocks: int
+        :param stride: the stride of the first block of this layer
+        :type stride: int
+        :return: return a resnet layer
+        :rtype: nn.Sequential
+        """
         # we have num_block blocks per layer, the first block
         # could be 1 or 2, other blocks would always be 1
         strides = [stride] + [1] * (num_blocks - 1)
@@ -231,31 +265,36 @@ class ResNet(nn.Module):
 
 
 def resnet18():
-    """ return a ResNet 18 object
+    """
+    return a ResNet-18 model
     """
     return ResNet(BasicBlock, [2, 2, 2, 2])
 
 
 def resnet34():
-    """ return a ResNet 34 object
+    """
+    return a ResNet-34 model
     """
     return ResNet(BasicBlock, [3, 4, 6, 3])
 
 
 def resnet50():
-    """ return a ResNet 50 object
+    """
+    return a ResNet-50 model
     """
     return ResNet(BottleNeck, [3, 4, 6, 3])
 
 
 def resnet101():
-    """ return a ResNet 101 object
+    """
+    return a ResNet-101 model
     """
     return ResNet(BottleNeck, [3, 4, 23, 3])
 
 
 def resnet152():
-    """ return a ResNet 152 object
+    """
+    return a ResNet-152 model
     """
     return ResNet(BottleNeck, [3, 8, 36, 3])
 

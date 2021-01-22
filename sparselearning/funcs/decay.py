@@ -1,3 +1,6 @@
+"""
+Implements decay functions (cosine, linear, iterative pruning).
+"""
 from dataclasses import dataclass
 
 import torch
@@ -6,6 +9,9 @@ import torch.optim as optim
 
 @dataclass
 class Decay(object):
+    """
+    Template decay class
+    """
     def __init__(self):
         self.mode = "current"
 
@@ -17,11 +23,19 @@ class Decay(object):
 
 
 class CosineDecay(Decay):
-    """Decays a pruning rate according to a cosine schedule
-
-    This class is just a wrapper around PyTorch's CosineAnnealingLR.
     """
+    Decays a pruning rate according to a cosine schedule.
+    Just a wrapper around PyTorch's CosineAnnealingLR.
 
+    :param prune_rate: \alpha described in RigL's paper, initial prune rate (default 0.3)
+    :type prune_rate: float
+    :param T_max: Max mask-update steps (default 1000)
+    :type T_max: int
+    :param eta_min: final prune rate (default 0.0)
+    :type eta_min: float
+    :param last_epoch: epoch to reset annealing. If -1, doesn't reset (default -1).
+    :type last_epoch: int
+    """
     def __init__(
         self,
         prune_rate: float = 0.3,
@@ -57,9 +71,17 @@ class CosineDecay(Decay):
 
 
 class LinearDecay(Decay):
-    """Anneals the pruning rate linearly with each step."""
+    """
+    Anneals the pruning rate linearly with each step.
 
-    def __init__(self, prune_rate: float, T_max: int):
+    :param prune_rate: Initial prune rate (default 0.3)
+    :type prune_rate: float
+    :param T_max: Max mask-update steps (default 1000)
+    :type T_max: int
+    """
+
+    def __init__(self, prune_rate: float=0.3, T_max: int=1000):
+
         super().__init__()
 
         self._step = 0
@@ -90,8 +112,7 @@ class LinearDecay(Decay):
 @dataclass
 class MagnitudePruneDecay(Decay):
     """
-    Anneals according to Zhu et al., "To prune or not to prune"
-
+    Anneals according to Zhu and Gupta 2018, "To prune or not to prune".
     We implement cumulative sparsity and take a finite difference to get sparsity(t).
 
     Amount to prune = sparsity.
@@ -137,7 +158,7 @@ class MagnitudePruneDecay(Decay):
         return self.current_prune_rate
 
 
-def decay_test():
+def _decay_test():
     from matplotlib import pyplot as plt
 
     decay = MagnitudePruneDecay(
@@ -166,4 +187,4 @@ registry = {
 }
 
 if __name__ == "__main__":
-    decay_test()
+    _decay_test()

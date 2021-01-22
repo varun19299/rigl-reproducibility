@@ -30,10 +30,31 @@ def get_stats_table(
     correct_SET: bool = False,
 ) -> pd.DataFrame:
     """
-    List all possible choices for
-    masking, init, density, dataset
+    Get stats saved on W&B.
 
-    We'll try matching the exhaustive caretesian product
+    List all possible choices for (masking, init, density, dataset).
+
+    We'll try matching the exhaustive caretesian product of
+    (masking_ll x init_ll x suffix_ll x density_ll etc).
+
+    :param runs: Experiment run
+    :type runs: wandb.api.runs
+    :param masking_ll: List of sparse training techniques
+    :type masking_ll: List[str]
+    :param init_ll: List of sparsity initialization schemes
+    :type init_ll: List[str]
+    :param suffix_ll: List of method suffixes.
+    :type suffix_ll: List[str]
+    :param density_ll: List of density values (1 - sparsity)
+    :type density_ll: List[float]
+    :param dataset_ll: List of datasets
+    :type dataset_ll: List[str]
+    :param reorder: sort methods alphabetically
+    :type reorder: bool
+    :param correct_SET: manually correct SET results, which collapsed.
+    :type correct_SET: bool
+    :return: Dataframe containing test accuracies of methods
+    :rtype: pd.DataFrame
     """
     columns = ["Method", "Init", "Density", "Acc seed 0", "Acc seed 1", "Acc seed 2"]
     df = pd.DataFrame(columns=columns)

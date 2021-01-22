@@ -4,9 +4,18 @@ if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
 
 
-def get_pre_activations_dict(net: "nn.Module", input_tensor: "Tensor"):
+def get_pre_activations_dict(net: "nn.Module", input_tensor: "Tensor")-> "Dict[str, Tensor]":
     """
-    Find (pre)activation dict for every possible module in net
+    Find pre-activation dict for every possible module in network
+
+    :param net: Pytorch model
+    :type net: nn.Module
+    :param input_tensor: input tensor, supports only single input
+    :type input_tensor: Tensor
+    :return: dictionary mapping layers to pre-activations
+    :rtype: Dict[str, Tensor]
+    """
+    """
     """
     # TODO: this function invokes the warning
     # torch/nn/modules/container.py:434: UserWarning: Setting attributes on ParameterList is not supported.

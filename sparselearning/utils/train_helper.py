@@ -13,7 +13,15 @@ if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
 
 
-def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, Tuple[lr_scheduler]]":
+def get_optimizer(model: "nn.Module", **kwargs) -> "Tuple[optim, Tuple[lr_scheduler]]":
+    """
+    Get model optimizer
+
+    :param model: Pytorch model
+    :type model: nn.Module
+    :return: Optimizer, LR Scheduler(s)
+    :rtype: Tuple[optim, Tuple[lr_scheduler]]
+    """
     name = kwargs["name"]
     lr = kwargs["lr"]
     weight_decay = kwargs["weight_decay"]
@@ -25,7 +33,7 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, Tuple[lr_schedu
         # biases and batchnorms
         if weight_decay:
             logging.info("Excluding bias and batchnorm layers from weight decay.")
-            parameters = add_weight_decay(model, weight_decay)
+            parameters = _add_weight_decay(model, weight_decay)
             weight_decay = 0
         else:
             parameters = model.parameters()
@@ -51,9 +59,18 @@ def get_optimizer(model: "nn.Module", **kwargs) -> "Union[optim, Tuple[lr_schedu
     return optimizer, (lr_scheduler, warmup_scheduler)
 
 
-def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
+def _add_weight_decay(model, weight_decay=1e-5, skip_list=())-> "Tuple[Dict[str, float],Dict[str, float]]":
     """
     Excludes batchnorm and bias from weight decay
+
+    :param model: Pytorch model
+    :type model: nn.Module
+    :param weight_decay: L2 Weight decay to use
+    :type weight_decay: float
+    :param skip_list: names of layers to skip
+    :type skip_list: Tuple[str]
+    :return: Two dictionaries, with layers to apply weight decay to.
+    :rtype: Tuple[Dict[str, float],Dict[str, float]]
     """
     decay = []
     no_decay = []
@@ -65,10 +82,10 @@ def add_weight_decay(model, weight_decay=1e-5, skip_list=()):
             no_decay.append(param)
         else:
             decay.append(param)
-    return [
+    return (
         {"params": no_decay, "weight_decay": 0.0},
         {"params": decay, "weight_decay": weight_decay},
-    ]
+    )
 
 
 def save_weights(
@@ -81,6 +98,26 @@ def save_weights(
     ckpt_dir: str,
     is_min: bool = True,
 ):
+    """
+    Save progress.
+
+    :param model: Pytorch model
+    :type model: nn.Module
+    :param optimizer: model optimizer
+    :type optimizer: torch.optim.Optimizer
+    :param mask: Masking instance
+    :type mask: sparselearning.core.Masking
+    :param val_loss: Current validation loss
+    :type val_loss: float
+    :param step: Current step
+    :type step: int
+    :param epoch: Current epoch
+    :type epoch: int
+    :param ckpt_dir: Checkpoint directory
+    :type ckpt_dir: Path
+    :param is_min: Whether current model achieves least val loss
+    :type is_min: bool
+    """
     logging.info(f"Epoch {epoch} saving weights")
 
     state_dict = {
@@ -109,18 +146,37 @@ def load_weights(
     mask: "Masking",
     ckpt_dir: str,
     resume: bool = True,
-) -> "Union[nn.Module, optim, Masking, int, int, float]":
-    ckpt_dir = Path(ckpt_dir)
-    ckpt_dir.mkdir(parents=True, exist_ok=True)
+) -> "Tuple[nn.Module, optim, Masking, int, int, float]":
+    """
+    Load model, optimizers, mask from a checkpoint file (.pth).
 
-    pth_files = list(ckpt_dir.glob("epoch_*.pth"))
-
+    :param model: Pytorch model
+    :type model: nn.Module
+    :param optimizer: model optimizer
+    :type optimizer: torch.optim.Optimizer
+    :param mask: Masking instance
+    :type mask: sparselearning.core.Masking
+    :param ckpt_dir: Checkpoint directory
+    :type ckpt_dir: Path
+    :param resume: resume or not, if not do nothing
+    :type resume: bool
+    :return: model, optimizer, mask, step, epoch, best_val_loss
+    :rtype: Tuple[nn.Module, optim, Masking, int, int, float]
+    """
     # Defaults
-    epoch = 0
     step = 0
+    epoch = 0
     best_val_loss = 1e6
 
-    if not resume or not pth_files:
+    if not resume:
+        logging.info(f"Not resuming, training from scratch.")
+        return model, optimizer, mask, step, epoch, best_val_loss
+
+    ckpt_dir = Path(ckpt_dir)
+    ckpt_dir.mkdir(parents=True, exist_ok=True)
+    pth_files = list(ckpt_dir.glob("epoch_*.pth"))
+
+    if not pth_files:
         logging.info(f"No checkpoint found at {ckpt_dir.resolve()}.")
         return model, optimizer, mask, step, epoch, best_val_loss
 

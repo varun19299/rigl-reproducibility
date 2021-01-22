@@ -2,14 +2,24 @@ import pytest
 import torch
 from einops import repeat
 from torch import optim
+from typing import TYPE_CHECKING
 
 from models import registry as model_registry
 from sparselearning.core import Masking
 from sparselearning.funcs.decay import CosineDecay
 
+if TYPE_CHECKING:
+    from sparselearning.utils.typing_alias import *
 
-def is_channel_sparse(mask):
-    """Checks if the conv mask is channel-wise sparse."""
+def is_channel_sparse(mask: "Masking")-> bool:
+    """
+    Checks if the conv mask is channel-wise sparse.
+
+    :param mask: Masking instance
+    :type mask: Masking
+    :return: True if channel-wise sparse
+    :rtype: bool
+    """
     c_in, c_out, h, w = mask.shape
 
     blocked = repeat(mask[:, :, 0, 0], "c_in c_out -> c_in c_out h w", h=h, w=w)
@@ -24,8 +34,13 @@ def is_channel_sparse(mask):
         "struct-random",
     ],
 )
-def test_struct_init(init_scheme):
+def test_struct_init(init_scheme: str):
+    """
+    Test structured sparsity for various init schemes
 
+    :param init_scheme: Random/ER/ERK
+    :type init_scheme: str
+    """
     model_class, args = model_registry["resnet50"]
     model = model_class(*args)
     decay = CosineDecay()
@@ -53,6 +68,15 @@ def test_struct_init(init_scheme):
     "growth_mode", ["struct-absolute-gradient-min", "struct-absolute-gradient-mean"]
 )
 def test_struct_prune_growth(prune_mode, growth_mode):
+    """
+    Test structured sparsity across prune, growth modes.
+    See sparselearning.funcs.prune,growth
+
+    :param prune_mode: prune mode
+    :type prune_mode: str
+    :param growth_mode: growth mode
+    :type growth_mode: str
+    """
     model_class, args = model_registry["resnet50"]
     model = model_class(*args)
     decay = CosineDecay()

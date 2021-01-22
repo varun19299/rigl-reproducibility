@@ -1,13 +1,17 @@
 from pathlib import Path
 import torch
 from torch.nn import functional as F
+from typing import TYPE_CHECKING
 
 from models.wide_resnet import WideResNet
 from sparselearning.core import Masking
 from sparselearning.funcs.decay import CosineDecay
 
+if TYPE_CHECKING:
+    from sparselearning.utils.typing_alias import *
 
-def save(model, optimizer, mask, step):
+
+def _save(model: "nn.Module", optimizer: "optim", mask: "Masking", step: int):
     state_dict = {
         "step": step,
         "model": model.state_dict(),
@@ -19,7 +23,7 @@ def save(model, optimizer, mask, step):
     torch.save(state_dict, save_path)
 
 
-def load(model, optimizer, mask, step):
+def _load(model: "nn.Module", optimizer: "optim", mask: "Masking", step: int):
     save_path = Path(f"/tmp/tests/test_save_{step}.pth")
     state_dict = torch.load(save_path, map_location="cpu")
 
@@ -49,8 +53,8 @@ def test_save_load():
 
     step = 0
 
-    save(model, optimizer, mask, step)
-    new_model, new_optimizer, new_mask, new_step = load(model, optimizer, mask, step)
+    _save(model, optimizer, mask, step)
+    new_model, new_optimizer, new_mask, new_step = _load(model, optimizer, mask, step)
 
     assert new_step == step
     assert new_model == model
@@ -71,8 +75,8 @@ def test_save_load():
         else:
             mask.step()
 
-    save(model, optimizer, mask, step)
-    new_model, new_optimizer, new_mask, new_step = load(model, optimizer, mask, step)
+    _save(model, optimizer, mask, step)
+    new_model, new_optimizer, new_mask, new_step = _load(model, optimizer, mask, step)
 
     assert new_step == step
     assert new_model == model

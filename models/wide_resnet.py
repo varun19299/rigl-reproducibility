@@ -7,10 +7,22 @@ import torch.nn.functional as F
 
 
 class WideResNet(nn.Module):
-    """Wide Residual Network with varying depth and width.
+    """
+    Wide Residual Network with varying depth and width.
 
     For more info, see the paper: Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
     https://arxiv.org/abs/1605.07146
+
+    :param depth: No of layers
+    :type depth: int
+    :param widen_factor: Factor to increase channel width by
+    :type widen_factor: int
+    :param num_classes: No of output labels
+    :type num_classes: int
+    :param dropRate: Dropout Probability
+    :type dropRate: float
+    :param small_dense_density: Equivalent parameter density of Small-Dense model
+    :type small_dense_density: float
     """
 
     def __init__(
@@ -21,14 +33,6 @@ class WideResNet(nn.Module):
         dropRate: float = 0.3,
         small_dense_density: float = 1.0,
     ):
-        """
-
-        :param depth: No of layers
-        :param widen_factor: Factor to increase channel width by
-        :param num_classes: No of output labels
-        :param dropRate: Dropout Probability
-        :param small_dense_density: Equivalent parameter density of Small-Dense model
-        """
         super(WideResNet, self).__init__()
 
         small_dense_multiplier = np.sqrt(small_dense_density)
@@ -103,8 +107,17 @@ class BasicBlock(nn.Module):
     """
     Wide Residual Network basic block
 
-        For more info, see the paper: Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
-        https://arxiv.org/abs/1605.07146
+    For more info, see the paper: Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
+    https://arxiv.org/abs/1605.07146
+
+    :param in_planes: input channels
+    :type in_planes: int
+    :param out_planes: output channels
+    :type out_planes: int
+    :param stride: the stride of the first block of this layer
+    :type stride: int
+    :param dropRate: Dropout Probability
+    :type dropRate: float
     """
 
     def __init__(
@@ -168,6 +181,19 @@ class NetworkBlock(nn.Module):
     For more info, see the paper:
         Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
         https://arxiv.org/abs/1605.07146
+
+    :param nb_layers: Number of blocks
+    :type nb_layers: int
+    :param in_planes: input channels
+    :type in_planes: int
+    :param out_planes: output channels
+    :type out_planes: int
+    :param block: Block type, BasicBlock only
+    :type block: BasicBlock
+    :param stride: the stride of the first block of this layer
+    :type stride: int
+    :param dropRate: Dropout Probability
+    :type dropRate: float
     """
 
     def __init__(
@@ -179,6 +205,7 @@ class NetworkBlock(nn.Module):
         stride: int,
         dropRate: float = 0.0,
     ):
+
         super(NetworkBlock, self).__init__()
         self.feats = []
         self.densities = []

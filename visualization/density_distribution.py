@@ -35,7 +35,15 @@ ALPHA = 0.9
 
 
 @dispatch(nn.Module)
-def get_layer_wise_density(model: "nn.Module") -> Union[List[str], List[float]]:
+def get_layer_wise_density(model: "nn.Module") -> "Tuple[List[str], List[float]]":
+    """
+    Layer-wise density list
+
+    :param model: Pytorch model
+    :type model: nn.Module
+    :return: layer names, density
+    :rtype: Tuple[List[str], List[float]]
+    """
     density_ll = []
     name_ll = []
     for name, module in model.named_modules():
@@ -52,7 +60,15 @@ def get_layer_wise_density(model: "nn.Module") -> Union[List[str], List[float]]:
 
 
 @dispatch(str)
-def get_layer_wise_density(model_path: str) -> Union[List[str], List[float]]:
+def get_layer_wise_density(model_path: str) -> "Tuple[List[str], List[float]]":
+    """
+    Layer-wise density list
+
+    :param model_path: Path to model's ckpt
+    :type model_path: str
+    :return: layer names, density
+    :rtype: Tuple[List[str], List[float]]
+    """
     model_class, args = model_registry["wrn-22-2"]
     model = model_class(*args)
 
@@ -92,7 +108,6 @@ if __name__ == "__main__":
     plt.xticks(np.arange(1, len(density_ll) + 1), name_ll, rotation=25, ha="right")
 
     plt.legend(legend_ll)
-    # plt.xlabel("Layer")
     plt.ylabel("Density", labelpad=10)
     plt.subplots_adjust(bottom=0.15)
     plt.savefig("outputs/plots/density_dist_rand_erk_redist.pdf", dpi=150)

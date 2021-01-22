@@ -29,6 +29,11 @@ registry = {"wrn-22-2": wrn_22_2_FLOPs, "resnet50": resnet50_FLOPs}
 
 
 def FLOPs_vs_sparsity(model: str = "wrn-22-2"):
+    """
+    FLOPs vs sparsity for Random, ERK initializations
+    :param model: model name (wrn-22-2, resnet50) to use.
+    :type model: str
+    """
     assert model in ["wrn-22-2", "resnet50"], f"Model {model} not found"
 
     dense_FLOPs = registry[model](density=1.0)
@@ -95,6 +100,9 @@ def FLOPs_vs_sparsity(model: str = "wrn-22-2"):
 
 
 def accuracy_vs_FLOPs():
+    """
+    Plot test accuracy vs FLOPs for ERK, Random init
+    """
     wrn_22_2_dense_FLOPs = wrn_22_2_FLOPs(density=1.0)
     wrn_22_2_dense_train_FLOPs = (
         3 * wrn_22_2_dense_FLOPs
@@ -108,7 +116,7 @@ def accuracy_vs_FLOPs():
     columns = ["Model", "Init", "FLOPs", "Test Acc Mean", "Test Acc Std"]
     df = pd.DataFrame(columns=columns)
 
-    # TODO: can we fetch this directly form W&B
+    # TODO: can we fetch this directly from W&B?
     df.loc[0] = [
         "wrn-22-2",
         "Random",

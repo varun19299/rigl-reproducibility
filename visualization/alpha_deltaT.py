@@ -36,10 +36,17 @@ plt.rc("figure", titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 def get_stats(runs, reorder: bool = True,) -> pd.DataFrame:
     """
-    List all possible choices for
-    masking, init, density, dataset
+    Get stats saved on W&B.
 
-    We'll try matching the exhaustive caretesian product
+    List all possible choices for (masking, init, density, dataset).
+    We'll try matching the exhaustive caretesian product.
+
+    :param runs: Experiment run
+    :type runs: wandb.api.runs
+    :param reorder: sort methods alphabetically
+    :type reorder: bool
+    :return: Dataframe containing test accuracies of methods
+    :rtype: pd.DataFrame
     """
     columns = [
         "Method",
@@ -107,8 +114,20 @@ def alpha_deltaT_plot(
     df: pd.DataFrame,
     dataset: str = "CIFAR10",
     init_ll: "List[str]" = ["ERK", "Random"],
-    density_ll=[0.1, 0.2, 0.5],
+    density_ll: "List[float]"=[0.1, 0.2, 0.5],
 ):
+    """
+    Plot contour plot depicting alpha-deltaT trial space
+
+    :param df: Dataframe containing main results
+    :type df: pd.DataFrame
+    :param dataset: dataset to plot
+    :type dataset: str
+    :param init_ll: List of initialization schemes to plot
+    :type init_ll: List[str]
+    :param density_ll: List of densities to plot
+    :type density_ll: List[float]
+    """
     for e, (init, density) in enumerate(itertools.product(init_ll, density_ll)):
         sub_df = df.loc[(df["Init"] == init) & (df["Density"] == density)]
         row = sub_df.loc[sub_df["Test Acc"].astype(float).idxmax()]

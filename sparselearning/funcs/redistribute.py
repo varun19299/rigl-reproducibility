@@ -16,17 +16,22 @@ Signature:
 import torch
 
 
-def momentum_redistribution(masking, name, weight, mask):
+def momentum_redistribution(masking, name, weight, mask)-> float:
     """
     Calculates momentum redistribution statistics.
 
-    :param masking:
+    :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param name: layer name
+    :type name: str
     :param weight: layer weight
+    :type weight: torch.Tensor
     :param mask: layer mask
+    :type mask: torch.Tensor
     :return: Layer Statistic---unnormalized layer statistics
-        for the layer. Normalizing across layers gives
-        the density distribution.
+            for the layer. Normalizing across layers gives
+            the density distribution.
+    :rtype: float
     """
     momentum = masking.get_momentum_for_weight(weight)
 
@@ -35,15 +40,21 @@ def momentum_redistribution(masking, name, weight, mask):
 
 
 def grad_redistribution(masking, name, weight, mask):
-    """Calculates gradient redistribution statistics.
+    """
+    Calculates gradient redistribution statistics.
 
-    :param masking:
+    :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param name: layer name
+    :type name: str
     :param weight: layer weight
+    :type weight: torch.Tensor
     :param mask: layer mask
+    :type mask: torch.Tensor
     :return: Layer Statistic---unnormalized layer statistics
-        for the layer. Normalizing across layers gives
-        the density distribution.
+            for the layer. Normalizing across layers gives
+            the density distribution.
+    :rtype: float
     """
     grad = weight.grad
     mean_grad = torch.abs(grad[mask.bool()]).mean().item()
@@ -58,13 +69,18 @@ def nonzero_redistribution(masking, name, weight, mask):
     In practice, we prefer to skip redistribution if
     non-zero is chosen.
 
-    :param masking:
+    :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param name: layer name
+    :type name: str
     :param weight: layer weight
+    :type weight: torch.Tensor
     :param mask: layer mask
+    :type mask: torch.Tensor
     :return: Layer Statistic---unnormalized layer statistics
-        for the layer. Normalizing across layers gives
-        the density distribution.
+            for the layer. Normalizing across layers gives
+            the density distribution.
+    :rtype: float
     """
     nonzero = (weight != 0.0).sum().item()
     return nonzero

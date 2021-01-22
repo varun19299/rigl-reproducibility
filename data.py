@@ -49,7 +49,9 @@ def _get_CIFAR10_dataset(root: "Path") -> "Tuple[Dataset,Dataset]":
     Returns CIFAR10 Dataset
 
     :param root: path to download to / load from
+    :type root: Path
     :return: train+val, test dataset
+    :rtype: Tuple[Dataset,Dataset]
     """
     normalize = transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 
@@ -80,7 +82,9 @@ def _get_CIFAR100_dataset(root: "Path") -> "Tuple[Dataset,Dataset]":
     Returns CIFAR100 Dataset
 
     :param root: path to download to / load from
+    :type root: Path
     :return: train+val, test dataset
+    :rtype: Tuple[Dataset,Dataset]
     """
     normalize = transforms.Normalize((0.5071, 0.4865, 0.4409), (0.2673, 0.2564, 0.2762))
 
@@ -111,7 +115,9 @@ def _get_Mini_Imagenet_dataset(root: "Path") -> "Tuple[Dataset,Dataset]":
     (https://github.com/yaoyao-liu/mini-imagenet-tools)
 
     :param root: path to download to / load from
+    :type root: Path
     :return: train+val, test dataset
+    :rtype: Tuple[Dataset,Dataset]
     """
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
@@ -142,7 +148,9 @@ def _get_MNIST_dataset(root: "Path") -> "Tuple[Dataset,Dataset]":
     Returns MNIST Dataset
 
     :param root: path to download to / load from
+    :type root: Path
     :return: train+val, test dataset
+    :rtype: Tuple[Dataset,Dataset]
     """
     normalize = transforms.Normalize((0.1307,), (0.3081,))
     transform = transforms.Compose([transforms.ToTensor(), normalize])
@@ -165,16 +173,23 @@ def get_dataloaders(
     """
     Creates augmented train, validation, and test data loaders.
 
-    :param name:
-    :param root:
+    :param name: dataset name
+    :type name: str
+    :param root: Path to download to / load from
+    :type root: Path
     :param batch_size: mini batch for train/val split
+    :type batch_size: int
     :param test_batch_size: mini batch for test split
+    :type test_batch_size: int
     :param validation_split: 0-> no val
+    :type validation_split: float
     :param max_threads: Max threads to use for dataloaders
+    :type max_threads: int
     :param fixed_shuffle: whether to shuffle once and save shuffled indices.
-    Useful when using ImageFolderDataset and want reproducible shuffling.
-
+    Useful when using ImageFolderDataset and want reproducible shuffling
+    :type fixed_shuffle: bool
     :return: train, val, test loaders
+    :rtype: Tuple[DataLoader, DataLoader, DataLoader]
     """
 
     assert name in registry.keys()

@@ -13,7 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""This module defines an API for counting parameters and operations.
+"""
+Code taken from: https://github.com/google-research/google-research/blob/master/micronet_challenge/counting.py
+
+This module defines an API for counting parameters and operations.
 
 
 ## Defining the Operation Count API

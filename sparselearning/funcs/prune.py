@@ -28,10 +28,15 @@ def magnitude_prune(
     Prunes the weights with smallest magnitude.
 
     :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param mask: layer mask
+    :type mask: torch.Tensor
     :param weight: layer weight
+    :type weight: torch.Tensor
     :param name: layer name
+    :type name: str
     :return: pruned mask
+    :rtype: torch.Tensor
     """
     num_remove = math.ceil(
         masking.name2prune_rate[name] * masking.stats.nonzeros_dict[name]
@@ -51,7 +56,9 @@ def global_magnitude_prune(masking: "Masking") -> int:
     Global Magnitude (L1) pruning. Modifies in-place.
 
     :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :return: number of weights removed
+    :rtype: int
     """
     tokill = math.ceil(masking.prune_rate * masking.baseline_nonzero)
     if tokill <= 0:
@@ -109,14 +116,19 @@ def struct_magnitude_prune(
     with reduced smallest magnitude.
 
     :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param mask: layer mask
+    :type mask: torch.Tensor
     :param weight: layer weight
+    :type weight: torch.Tensor
     :param name: layer name
+    :type name: str
     :param criterion: determines reduction function.
-    (reduces a kernel to a single statisitc,
-    eg: mean/max/min).
-
+        (reduces a kernel to a single statisitc,
+        eg: mean/max/min).
+    :type criterion: Callable
     :return: pruned mask
+    :rtype: torch.Tensor
     """
     c_in, c_out, h, w = weight.shape
 

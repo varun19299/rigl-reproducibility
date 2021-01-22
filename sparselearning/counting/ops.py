@@ -13,7 +13,20 @@ if TYPE_CHECKING:
 @torch.no_grad()
 def get_inference_FLOPs(
     masking: "Masking", input_tensor: "Tensor", param_size: int = 32
-):
+) -> int:
+    """
+    Returns total FLOPs consumed for a forward pass (inference FLOPs).
+    Assumes support for sparse convolutions, sparse dense layers.
+
+    :param masking: Masking instance, a wrapper on boolean masks
+    :type masking: Masking
+    :param input_tensor: Input to model, single input supported
+    :type input_tensor: torch.Tensor
+    :param param_size: bits used for floating point operations (default 32)
+    :type param_size: int
+    :return: total FLOPs consumed for a forward pass
+    :rtype: int
+    """
     total_FLOPs = 0
 
     activation_dict = get_pre_activations_dict(masking.module, input_tensor)

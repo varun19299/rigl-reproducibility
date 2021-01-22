@@ -10,11 +10,10 @@ enabling greater flexibility in designing
 custom growth modes.
 
 Signature:
-<func>(masking, name, new_mask, total_regrowth, weight)
+<func>(masking, name, total_regrowth, weight)
 """
 from einops import rearrange
 from functools import partial
-import math
 from typing import TYPE_CHECKING, Callable
 
 import torch
@@ -26,21 +25,25 @@ if TYPE_CHECKING:
 def momentum_growth(
     masking: "Masking",
     name: str,
-    new_mask: "Tensor",
     total_regrowth: int,
     weight: "Tensor",
-):
-    """Grows weights in places where the momentum is largest.
-    
-    Operates in-place, with new_mask modified.
+) -> "Tensor":
+    """
+    Grows weights in places where the momentum is largest.
 
     :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param name: layer name
-    :param new_mask: output boolean tensor
+    :type name: str
     :param total_regrowth: amount to re-grow
+    :type total_regrowth: int
     :param weight: layer weight
-    :return:
+    :type weight: torch.Tensor
+    :return: New boolean mask
+    :rtype: torch.Tensor
     """
+    new_mask = masking.mask_dict[name].data.bool()
+
     momentum = masking.get_momentum_for_weight(weight)
     if momentum.dtype == torch.float16:
         momentum = momentum * (new_mask == 0).half()
@@ -55,23 +58,26 @@ def momentum_growth(
 def abs_grad_growth(
     masking: "Masking",
     name: str,
-    new_mask: "Tensor",
     total_regrowth: int,
     weight: "Tensor",
-):
+) -> "Tensor":
     """
     Grows weights in places where the abs(grad) is largest
     (among present zero'ed weights).
 
-    Operates in-place, with new_mask modified.
-
     :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param name: layer name
-    :param new_mask: output boolean tensor
+    :type name: str
     :param total_regrowth: amount to re-grow
+    :type total_regrowth: int
     :param weight: layer weight
-    :return:
+    :type weight: torch.Tensor
+    :return: New boolean mask
+    :rtype: torch.Tensor
     """
+    new_mask = masking.mask_dict[name].data.bool()
+
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -94,22 +100,25 @@ def abs_grad_growth(
 def random_growth(
     masking: "Masking",
     name: str,
-    new_mask: "Tensor",
     total_regrowth: int,
     weight: "Tensor",
-):
+) -> "Tensor":
     """
     Random growth.
 
-    Operates in-place, with new_mask modified.
-
     :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param name: layer name
-    :param new_mask: output boolean tensor
+    :type name: str
     :param total_regrowth: amount to re-grow
+    :type total_regrowth: int
     :param weight: layer weight
-    :return:
+    :type weight: torch.Tensor
+    :return: New boolean mask
+    :rtype: torch.Tensor
     """
+    new_mask = masking.mask_dict[name].data.bool()
+
     # If dense, skip
     n = (new_mask == 0).sum().item()
     if n == 0:
@@ -131,29 +140,31 @@ def random_growth(
 def no_growth(
     masking: "Masking",
     name: str,
-    new_mask: "Tensor",
     total_regrowth: int,
     weight: "Tensor",
-):
+) -> "Tensor":
     """
     No growth.
 
-    Operates in-place, with new_mask modified.
-
     :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param name: layer name
-    :param new_mask: output boolean tensor
+    :type name: str
     :param total_regrowth: amount to re-grow
+    :type total_regrowth: int
     :param weight: layer weight
-    :return:
+    :type weight: torch.Tensor
+    :return: New boolean mask
+    :rtype: torch.Tensor
     """
+    new_mask = masking.mask_dict[name].data.bool()
+
     return new_mask
 
 
 def struct_abs_grad_growth(
     masking: "Masking",
     name: str,
-    new_mask: "Tensor",
     total_regrowth: int,
     weight: "Tensor",
     criterion: Callable = torch.mean,
@@ -161,16 +172,20 @@ def struct_abs_grad_growth(
     """
     Performs absolute gradient growth channel-wise.
 
-    Operates in-place, with new_mask modified.
-
     :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
     :param name: layer name
-    :param new_mask: output boolean tensor
+    :type name: str
     :param total_regrowth: amount to re-grow
+    :type total_regrowth: int
     :param weight: layer weight
+    :type weight: torch.Tensor
     :param criterion: callable to perform reduction
-    :return:
+    :type criterion: Callable
+    :return: New boolean mask
+    :rtype: torch.Tensor
     """
+    new_mask = masking.mask_dict[name].data.bool()
 
     # If dense, skip
     n = (new_mask == 0).sum().item()

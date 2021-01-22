@@ -1,3 +1,6 @@
+"""
+Utility for layer wise density plots.
+"""
 from matplotlib import pyplot as plt
 import numpy as np
 import wandb
@@ -8,38 +11,52 @@ from matplotlib.figure import Figure
 if TYPE_CHECKING:
     from sparselearning.utils.typing_alias import *
 
-
-def plot(masking: "Masking", plt) -> plt:
-    """
-    Plot layer wise density histogram
-    """
-
+def _get_density_ll(masking: "Masking")->"List[float]":
     non_zero_ll = np.array(list(masking.stats.nonzeros_dict.values()))
     zero_ll = np.array(list(masking.stats.zeros_dict.values()))
     density_ll = non_zero_ll / (non_zero_ll + zero_ll)
 
+    return density_ll
+
+def plot(masking: "Masking", mplot: plt) -> plt:
+    """
+    Plot layer wise density bar plot.
+
+    :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
+    :param mplot: matplotlib object
+    :type mplot: pyplot
+    :return: matplotlib plot
+    :rtype: pyplot
+    """
+
+    density_ll = _get_density_ll(masking)
     bin_ll = np.arange(len(density_ll)) + 1
     width = 0.8
 
-    plt.clf()
-    plt.bar(bin_ll, density_ll, width, color="b")
+    mplot.clf()
+    mplot.bar(bin_ll, density_ll, width, color="b")
 
     # Gets too crowded when including layer names
     # layer_name_ll = list(masking.masks.keys())
     # plt.xticks(bin_ll, layer_name_ll)
 
-    plt.ylabel("Density")
-    plt.xlabel("Layer Number")
+    mplot.ylabel("Density")
+    mplot.xlabel("Layer Number")
 
-    return plt
+    return mplot
 
 
-def wandb_bar(masking: "Masking"):
-    non_zero_ll = np.array(list(masking.stats.nonzeros_dict.values()))
-    zero_ll = np.array(list(masking.stats.zeros_dict.values()))
+def wandb_bar(masking: "Masking")->wandb.plot.bar:
+    """
+    Plot layer wise density as W&B bar plot.
 
-    density_ll = non_zero_ll / (non_zero_ll + zero_ll)
-    # label_ll = np.arange(len(density_ll)) + 1
+    :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
+    :return: W&B bar plot
+    :rtype: wandb.plot.bar
+    """
+    density_ll = _get_density_ll(masking)
     label_ll = list(masking.stats.nonzeros_dict.keys())
 
     data = [[label, density] for (label, density) in zip(label_ll, density_ll)]
@@ -48,14 +65,19 @@ def wandb_bar(masking: "Masking"):
 
 
 def plot_as_image(masking: "Masking") -> "Array":
+    """
+    Plot layer wise density as bar plot figure.
+
+    :param masking: Masking instance
+    :type masking: sparselearning.core.Masking
+    :return: Numpy array representing figure (H, W, 3)
+    :rtype: np.ndarray
+    """
     fig = Figure()
     canvas = FigureCanvas(fig)
     ax = fig.gca()
 
-    non_zero_ll = np.array(list(masking.stats.nonzeros_dict.values()))
-    zero_ll = np.array(list(masking.stats.zeros_dict.values()))
-    density_ll = non_zero_ll / (non_zero_ll + zero_ll)
-
+    density_ll = _get_density_ll(masking)
     bin_ll = np.arange(len(density_ll)) + 1
     width = 0.8
 

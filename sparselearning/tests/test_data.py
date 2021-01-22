@@ -16,6 +16,9 @@ from data import get_dataloaders, DatasetSplitter, registry
 
 
 def test_splitter():
+    """
+    Test data splitting using DatasetSplitter
+    """
     train_x = torch.rand(10, 3, 32, 32)
     train_y = torch.rand(10, 10)
     dataset = TensorDataset(train_x, train_y)
@@ -27,10 +30,19 @@ def test_splitter():
 
 @pytest.mark.parametrize("dataset", ["CIFAR10", "CIFAR100", "MNIST"])
 def test_registry(dataset):
+    """
+    Test get_dataset functions
+
+    :param dataset: Dataset to use
+    :type dataset: str
+    """
     full_dataset, test_dataset = registry[dataset](root=Path(f"datasets/{dataset}"))
 
 
-def loader_loop(loader):
+def _loader_loop(loader):
+    """
+    Test dataloader
+    """
     for x, y in tqdm(loader):
         assert len(x.shape) == 4  # NCHWW
         assert len(y.shape) == 1  # class ID
@@ -38,6 +50,12 @@ def loader_loop(loader):
 
 @pytest.mark.parametrize("dataset", ["CIFAR10", "CIFAR100", "MNIST"])
 def test_get_loaders(dataset):
+    """
+    Test dataloader
+
+    :param dataset: Dataset to use
+    :type dataset: str
+    """
     logging.info(f"Loading dataloaders for {dataset}")
     loaders = get_dataloaders(
         dataset,
@@ -49,4 +67,4 @@ def test_get_loaders(dataset):
     )
     logging.info(f"Looping through dataset {dataset}")
     for loader in loaders:
-        loader_loop(loader)
+        _loader_loop(loader)

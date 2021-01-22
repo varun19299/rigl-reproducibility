@@ -7,19 +7,24 @@ if TYPE_CHECKING:
 
 
 class WarmUpLR(_LRScheduler):
-    """warmup_training learning rate scheduler
-    Args:
-        optimizer: optimzier(e.g. SGD)
-        total_iters: totoal_iters of warmup phase
+    """
+    Warmup-training learning rate scheduler
+
+    :param optimizer: model optimizer (e.g. SGD)
+    :type optimizer: torch.optim.Optimizer
+    :param total_iters: warm up phase iterations
+    :type total_iters: int
+    :param last_epoch: Epoch to reset at (default -1, don't reset)
+    :type last_epoch: int
     """
 
     def __init__(self, optimizer, total_iters: int, last_epoch: int = -1):
-
         self.total_iters = total_iters
         super().__init__(optimizer, last_epoch)
 
     def get_lr(self):
-        """we will use the first m batches, and set the learning
+        """
+        We will use the first m batches, and set the learning
         rate to base_lr * m / total_iters
         """
         return [

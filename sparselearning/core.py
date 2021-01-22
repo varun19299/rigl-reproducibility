@@ -289,19 +289,23 @@ class Masking(object):
     def avg_inference_FLOPs(self) -> float:
         """
         :return: running average of inference FLOPs
+        :rtype: float
         """
         self._inference_FLOPs_collector.add_value(self.inference_FLOPs)
         return self._inference_FLOPs_collector.smooth
 
-    def calc_redistributed_densities(self) -> "Dict[str, float]":
+    def calc_redistributed_densities(self) -> "":
         """
         Computes layer-wise density
         given a redistribution scheme.
 
         Ensures that layer-wise densities
         are valid (i.e. 0 <= density <= 1).
+
+        :return: Layer-wise valid densities.
+        :rtype: Dict[str, float]
         """
-        # TODO: try clarifying logic used
+        # TODO: try clarifying the logic used
         # original source:
         # https://github.com/TimDettmers/sparse_learning/blob/f99c2f2ee1e89a786e942c73c054c11912866488/sparselearning/core.py#L454
         residual = 9999
@@ -354,9 +358,12 @@ class Masking(object):
         return name2regrowth
 
     @property
-    def dense_FLOPs(self) -> float:
+    def dense_FLOPs(self) -> int:
         """
         Calculates dense inference FLOPs of the model
+
+        :return: dense FLOPs
+        :rtype: int
         """
         if not self._dense_FLOPs:
             self._dense_FLOPs = get_inference_FLOPs(self, torch.rand(*self._input_size))
@@ -368,6 +375,9 @@ class Masking(object):
     def inference_FLOPs(self) -> float:
         """
         Calculates dense inference FLOPs of the model
+
+        :return: inference FLOPs
+        :rtype: float
         """
         return get_inference_FLOPs(self, torch.rand(*self._input_size))
 
@@ -379,7 +389,7 @@ class Masking(object):
         :param lottery_mask_path: Mask path,
             if using Lottery Ticket Hypothesis
             (Frankle & Carbin 2018).
-        :return:
+        :type lottery_mask_path: Path
         """
         # Performs weight initialization
         self.sparsify(lottery_mask_path=lottery_mask_path)
@@ -455,16 +465,17 @@ class Masking(object):
         return grow_registry[self.growth_mode]
 
     @property
-    def global_growth(self):
-        return "global" in self.growth_mode
-
-    @property
     def global_prune(self):
         return "global" in self.prune_mode
 
-    def get_momentum_for_weight(self, weight):
+    def get_momentum_for_weight(self, weight:str)->"Tensor":
         """
         Return momentum from optimizer (SGD or Adam)
+
+        :param weight: weight name
+        :type weight: str
+        :return: Momentum buffer for layer
+        :rtype: torch.Tensor
         """
         momentum = []
         # Adam
@@ -537,7 +548,10 @@ class Masking(object):
 
     def remove_weight(self, name):
         """
-        Remove weight by complete name
+        Remove layer by complete name
+
+        :param name: layer name
+        :type name: str
         """
         if name in self.mask_dict:
             logging.debug(
@@ -555,6 +569,9 @@ class Masking(object):
     def remove_weight_partial_name(self, partial_name: str):
         """
         Remove module by partial name (eg: conv).
+
+        :param partial_name: partial layer name
+        :type partial_name: str
         """
         _removed = 0
         for name in list(self.mask_dict.keys()):
@@ -569,7 +586,10 @@ class Masking(object):
 
     def remove_type(self, nn_type):
         """
-        Remove module by type (eg: nn.Linear, nn.Conv2d, etc.)
+        Remove layer by type (eg: nn.Linear, nn.Conv2d, etc.)
+
+        :param nn_type: type of layer
+        :type nn_type: nn.Module
         """
         for name, module in self.module.named_modules():
             if isinstance(module, nn_type):
@@ -705,10 +725,6 @@ class Masking(object):
         if self.growth_mode == "none":
             total_nonzero_new = self.stats.total_nonzero - self.stats.total_removed
 
-        elif self.global_growth:
-            total_nonzero_new = self.growth_func(
-                self, self.stats.total_removed + self.adjusted_growth
-            )
         else:
             if self.redistribution_mode not in ["nonzero", "none"]:
                 name2regrowth = self.calc_redistributed_densities()
@@ -718,16 +734,13 @@ class Masking(object):
                 if name not in self.mask_dict:
                     continue
 
-                new_mask = self.mask_dict[name].data.bool()
-
                 # growth
                 if self.redistribution_mode not in ["nonzero", "none"]:
                     num_growth = name2regrowth[name]
                 else:
-                    feedback = self.adjustments[-1] if self.adjustments else 0
-                    num_growth = self.stats.removed_dict[name]  # + feedback
+                    num_growth = self.stats.removed_dict[name]
 
-                new_mask = self.growth_func(self, name, new_mask, num_growth, weight)
+                new_mask = self.growth_func(self, name, num_growth, weight)
                 new_nonzero = new_mask.sum().item()
 
                 # exchanging masks

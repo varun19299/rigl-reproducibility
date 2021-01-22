@@ -28,14 +28,14 @@ plt.rc("lines", linewidth=3)
 MAX_SAMPLES = 1000000
 
 
-def export_legend(legend, filename="legend.png"):
+def _export_legend(legend, filename="legend.png"):
     fig = legend.figure
     fig.canvas.draw()
     bbox = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
     fig.savefig(filename, dpi="figure", bbox_inches=bbox)
 
 
-def get_steps_and_col(df, col, max_steps=None):
+def _get_steps_and_col(df, col, max_steps=None):
     steps = np.array(df["_step"])
     vals = np.array(df[col])
     ii = np.where(~np.isnan(np.array(vals)))
@@ -101,13 +101,13 @@ def main(cfg: DictConfig):
         rigl_erk_flops, label=erk_name, alpha=line_alpha, color=COLORS[erk_name]
     )
     plt.plot(
-        *get_steps_and_col(sg_history, flop_col, max_steps=3.5e4),
+        *_get_steps_and_col(sg_history, flop_col, max_steps=3.5e4),
         label=sg_name,
         alpha=line_alpha,
         color=COLORS[sg_name],
     )
     plt.plot(
-        *get_steps_and_col(sm_history, flop_col, max_steps=3.5e4),
+        *_get_steps_and_col(sm_history, flop_col, max_steps=3.5e4),
         label=sm_name,
         alpha=line_alpha,
         color=COLORS[sm_name],

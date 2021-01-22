@@ -49,10 +49,35 @@ def get_stats(
     reorder: bool = True,
 ) -> pd.DataFrame:
     """
-    List all possible choices for
-    masking, init, density, dataset
+    Get stats saved on W&B.
 
-    We'll try matching the exhaustive caretesian product
+    List all possible choices for (masking, init, density, dataset).
+
+    We'll try matching the exhaustive caretesian product of
+    (masking_ll x init_ll x suffix_ll x density_ll etc).
+
+    :param runs: Experiment run
+    :type runs: wandb.api.runs
+    :param masking_ll: List of sparse training techniques
+    :type masking_ll: List[str]
+    :param init_ll: List of sparsity initialization schemes
+    :type init_ll: List[str]
+    :param suffix_ll: List of method suffixes.
+    :type suffix_ll: List[str]
+    :param density_ll: List of density values (1 - sparsity)
+    :type density_ll: List[float]
+    :param lr_ll: List of learning rates
+    :type lr_ll: List[float]
+    :param alpha_ll: List of alphas (initial pruning rate)
+    :type alpha_ll: List[float]
+    :param deltaT_ll: List of deltaT's to plot
+    :type deltaT_ll: List[float]
+    :param dataset_ll: List of datasets
+    :type dataset_ll: List[str]
+    :param reorder: sort methods alphabetically
+    :type reorder: bool
+    :return: Dataframe containing test accuracies of methods
+    :rtype: pd.DataFrame
     """
     columns = [
         "Method",
@@ -137,6 +162,24 @@ def lr_tuning_plot(
     alpha_ll: "List[float]" = [0.3],
     deltaT_ll: "List[float]" = [100],
 ):
+    """
+    Plot LR tuning trials
+
+    :param df: Dataframe containing main results
+    :type df: pd.DataFrame
+    :param dataset: dataset to plot
+    :type dataset: str
+    :param init_ll: List of initialization schemes to plot
+    :type init_ll: List[str]
+    :param density_ll: List of densities to plot
+    :type density_ll: List[float]
+    :param lr_ll: List of learning rates
+    :type lr_ll: List[float]
+    :param alpha_ll: List of alphas (initial pruning rate)
+    :type alpha_ll: List[float]
+    :param deltaT_ll: List of deltaT's to plot
+    :type deltaT_ll: List[float]
+    """
     for (init, density) in itertools.product(init_ll, density_ll):
         sub_df = df.loc[(df["Init"] == init) & (df["Density"] == density)]
         legend = []
