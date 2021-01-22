@@ -1,0 +1,702 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>sparselearning.funcs &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sparselearning.tests" href="sparselearning.tests.html" />
+    <link rel="prev" title="sparselearning.counting" href="sparselearning.counting.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_code.html">Example Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_results.html">Main Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_structure.html">Code Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="sparselearning.html">sparselearning package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sparselearning.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.counting.html">sparselearning.counting</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sparselearning.funcs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.funcs.decay">sparselearning.funcs.decay</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.funcs.grow">sparselearning.funcs.grow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.funcs.init_scheme">sparselearning.funcs.init_scheme</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.funcs.prune">sparselearning.funcs.prune</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.funcs.redistribute">sparselearning.funcs.redistribute</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.tests.html">sparselearning.tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.utils.html">sparselearning.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.html#module-sparselearning.core">sparselearning.core</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization/visualization.html">visualization package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/models.html">models package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="sparselearning.html">sparselearning package</a> &raquo;</li>
+        
+      <li>sparselearning.funcs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/sparselearning/sparselearning.funcs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sparselearning-funcs">
+<h1>sparselearning.funcs<a class="headerlink" href="#sparselearning-funcs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-sparselearning.funcs.decay">
+<span id="sparselearning-funcs-decay"></span><h2>sparselearning.funcs.decay<a class="headerlink" href="#module-sparselearning.funcs.decay" title="Permalink to this headline">¶</a></h2>
+<p>Implements decay functions (cosine, linear, iterative pruning).</p>
+<dl class="py class">
+<dt id="sparselearning.funcs.decay.CosineDecay">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.funcs.decay.</code><code class="sig-name descname">CosineDecay</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prune_rate</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">T_max</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">eta_min</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">last_epoch</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.CosineDecay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sparselearning.funcs.decay.Decay" title="sparselearning.funcs.decay.Decay"><code class="xref py py-class docutils literal notranslate"><span class="pre">sparselearning.funcs.decay.Decay</span></code></a></p>
+<p>Decays a pruning rate according to a cosine schedule.
+Just a wrapper around PyTorch’s CosineAnnealingLR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prune_rate</strong> (<em>float</em>) – lpha described in RigL’s paper, initial prune rate (default 0.3)</p></li>
+<li><p><strong>T_max</strong> (<em>int</em>) – Max mask-update steps (default 1000)</p></li>
+<li><p><strong>eta_min</strong> (<em>float</em>) – final prune rate (default 0.0)</p></li>
+<li><p><strong>last_epoch</strong> (<em>int</em>) – epoch to reset annealing. If -1, doesn’t reset (default -1).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.CosineDecay.get_dr">
+<code class="sig-name descname">get_dr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.CosineDecay.get_dr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.CosineDecay.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.CosineDecay.step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.funcs.decay.Decay">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.funcs.decay.</code><code class="sig-name descname">Decay</code><a class="headerlink" href="#sparselearning.funcs.decay.Decay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Template decay class</p>
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.Decay.get_dr">
+<code class="sig-name descname">get_dr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.Decay.get_dr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.Decay.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.Decay.step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.funcs.decay.LinearDecay">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.funcs.decay.</code><code class="sig-name descname">LinearDecay</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">prune_rate</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">T_max</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1000</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.LinearDecay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sparselearning.funcs.decay.Decay" title="sparselearning.funcs.decay.Decay"><code class="xref py py-class docutils literal notranslate"><span class="pre">sparselearning.funcs.decay.Decay</span></code></a></p>
+<p>Anneals the pruning rate linearly with each step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prune_rate</strong> (<em>float</em>) – Initial prune rate (default 0.3)</p></li>
+<li><p><strong>T_max</strong> (<em>int</em>) – Max mask-update steps (default 1000)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.LinearDecay.get_dr">
+<code class="sig-name descname">get_dr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.LinearDecay.get_dr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.LinearDecay.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.LinearDecay.step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.funcs.decay.</code><code class="sig-name descname">MagnitudePruneDecay</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">initial_sparsity</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">final_sparsity</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">T_max</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">30000</span></em>, <em class="sig-param"><span class="n">T_start</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">350</span></em>, <em class="sig-param"><span class="n">interval</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">100</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#sparselearning.funcs.decay.Decay" title="sparselearning.funcs.decay.Decay"><code class="xref py py-class docutils literal notranslate"><span class="pre">sparselearning.funcs.decay.Decay</span></code></a></p>
+<p>Anneals according to Zhu and Gupta 2018, “To prune or not to prune”.
+We implement cumulative sparsity and take a finite difference to get sparsity(t).</p>
+<p>Amount to prune = sparsity.</p>
+<dl class="py attribute">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay.T_max">
+<code class="sig-name descname">T_max</code><em class="property">: int</em><em class="property"> = 30000</em><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay.T_max" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay.T_start">
+<code class="sig-name descname">T_start</code><em class="property">: int</em><em class="property"> = 350</em><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay.T_start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay.cumulative_sparsity">
+<code class="sig-name descname">cumulative_sparsity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay.cumulative_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay.final_sparsity">
+<code class="sig-name descname">final_sparsity</code><em class="property">: float</em><em class="property"> = 0.3</em><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay.final_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay.get_dr">
+<code class="sig-name descname">get_dr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay.get_dr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay.initial_sparsity">
+<code class="sig-name descname">initial_sparsity</code><em class="property">: float</em><em class="property"> = 0.0</em><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay.initial_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay.interval">
+<code class="sig-name descname">interval</code><em class="property">: int</em><em class="property"> = 100</em><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay.interval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.funcs.decay.MagnitudePruneDecay.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">step</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">current_sparsity</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.decay.MagnitudePruneDecay.step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.funcs.grow">
+<span id="sparselearning-funcs-grow"></span><h2>sparselearning.funcs.grow<a class="headerlink" href="#module-sparselearning.funcs.grow" title="Permalink to this headline">¶</a></h2>
+<p>Implements Growth function.</p>
+<p>Modifies binary mask to enable gradient flow.
+New weights by default 0 and it can
+be changed in the function.</p>
+<p>Functions have access to the masking object
+enabling greater flexibility in designing
+custom growth modes.</p>
+<p>Signature:
+&lt;func&gt;(masking, name, total_regrowth, weight)</p>
+<dl class="py function">
+<dt id="sparselearning.funcs.grow.abs_grad_growth">
+<code class="sig-prename descclassname">sparselearning.funcs.grow.</code><code class="sig-name descname">abs_grad_growth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">total_regrowth</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">weight</span><span class="p">:</span> <span class="n">Tensor</span></em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#sparselearning.funcs.grow.abs_grad_growth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grows weights in places where the abs(grad) is largest
+(among present zero’ed weights).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>total_regrowth</strong> (<em>int</em>) – amount to re-grow</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New boolean mask</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.grow.momentum_growth">
+<code class="sig-prename descclassname">sparselearning.funcs.grow.</code><code class="sig-name descname">momentum_growth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">total_regrowth</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">weight</span><span class="p">:</span> <span class="n">Tensor</span></em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#sparselearning.funcs.grow.momentum_growth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grows weights in places where the momentum is largest.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>total_regrowth</strong> (<em>int</em>) – amount to re-grow</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New boolean mask</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.grow.no_growth">
+<code class="sig-prename descclassname">sparselearning.funcs.grow.</code><code class="sig-name descname">no_growth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">total_regrowth</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">weight</span><span class="p">:</span> <span class="n">Tensor</span></em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#sparselearning.funcs.grow.no_growth" title="Permalink to this definition">¶</a></dt>
+<dd><p>No growth.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>total_regrowth</strong> (<em>int</em>) – amount to re-grow</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New boolean mask</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.grow.random_growth">
+<code class="sig-prename descclassname">sparselearning.funcs.grow.</code><code class="sig-name descname">random_growth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">total_regrowth</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">weight</span><span class="p">:</span> <span class="n">Tensor</span></em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#sparselearning.funcs.grow.random_growth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random growth.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>total_regrowth</strong> (<em>int</em>) – amount to re-grow</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New boolean mask</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.grow.struct_abs_grad_growth">
+<code class="sig-prename descclassname">sparselearning.funcs.grow.</code><code class="sig-name descname">struct_abs_grad_growth</code><span class="sig-paren">(</span><em class="sig-param">masking: Masking</em>, <em class="sig-param">name: str</em>, <em class="sig-param">total_regrowth: int</em>, <em class="sig-param">weight: Tensor</em>, <em class="sig-param">criterion: Callable = &lt;built-in method mean of type object&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.grow.struct_abs_grad_growth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs absolute gradient growth channel-wise.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>total_regrowth</strong> (<em>int</em>) – amount to re-grow</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+<li><p><strong>criterion</strong> (<em>Callable</em>) – callable to perform reduction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New boolean mask</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.funcs.init_scheme">
+<span id="sparselearning-funcs-init-scheme"></span><h2>sparselearning.funcs.init_scheme<a class="headerlink" href="#module-sparselearning.funcs.init_scheme" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sparselearning.funcs.init_scheme.erdos_renyi_init">
+<code class="sig-prename descclassname">sparselearning.funcs.init_scheme.</code><code class="sig-name descname">erdos_renyi_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">is_kernel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.init_scheme.erdos_renyi_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.init_scheme.get_erdos_renyi_dist">
+<code class="sig-prename descclassname">sparselearning.funcs.init_scheme.</code><code class="sig-name descname">get_erdos_renyi_dist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">is_kernel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>float<span class="p">]</span><a class="headerlink" href="#sparselearning.funcs.init_scheme.get_erdos_renyi_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get layer-wise densities distributed according to
+ER or ERK (erdos-renyi or erdos-renyi-kernel).</p>
+<p>Ensures resulting densities do not cross 1
+for any layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> – Masking instance</p></li>
+<li><p><strong>is_kernel</strong> – use ERK (True), ER (False)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Layer-wise density dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.init_scheme.lottery_ticket_init">
+<code class="sig-prename descclassname">sparselearning.funcs.init_scheme.</code><code class="sig-name descname">lottery_ticket_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">lottery_mask_path</span><span class="p">:</span> <span class="n">Path</span></em>, <em class="sig-param"><span class="n">shuffle</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.init_scheme.lottery_ticket_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shuffle: use layer wise densities, but not exact mask</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.init_scheme.random_init">
+<code class="sig-prename descclassname">sparselearning.funcs.init_scheme.</code><code class="sig-name descname">random_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.init_scheme.random_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.init_scheme.resume_init">
+<code class="sig-prename descclassname">sparselearning.funcs.init_scheme.</code><code class="sig-name descname">resume_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.init_scheme.resume_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.init_scheme.struct_erdos_renyi_init">
+<code class="sig-prename descclassname">sparselearning.funcs.init_scheme.</code><code class="sig-name descname">struct_erdos_renyi_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">is_kernel</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.init_scheme.struct_erdos_renyi_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.init_scheme.struct_random_init">
+<code class="sig-prename descclassname">sparselearning.funcs.init_scheme.</code><code class="sig-name descname">struct_random_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.init_scheme.struct_random_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.funcs.prune">
+<span id="sparselearning-funcs-prune"></span><h2>sparselearning.funcs.prune<a class="headerlink" href="#module-sparselearning.funcs.prune" title="Permalink to this headline">¶</a></h2>
+<p>Implements Pruning function.</p>
+<p>Modifies binary mask to prevent gradient flow.</p>
+<p>Functions have access to the masking object
+enabling greater flexibility in designing
+custom prune modes.</p>
+<p>Signature:
+&lt;func&gt;(masking, mask, weight, name)</p>
+<dl class="py function">
+<dt id="sparselearning.funcs.prune.global_magnitude_prune">
+<code class="sig-prename descclassname">sparselearning.funcs.prune.</code><code class="sig-name descname">global_magnitude_prune</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sparselearning.funcs.prune.global_magnitude_prune" title="Permalink to this definition">¶</a></dt>
+<dd><p>Global Magnitude (L1) pruning. Modifies in-place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>number of weights removed</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.prune.magnitude_prune">
+<code class="sig-prename descclassname">sparselearning.funcs.prune.</code><code class="sig-name descname">magnitude_prune</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">mask</span><span class="p">:</span> <span class="n">Tensor</span></em>, <em class="sig-param"><span class="n">weight</span><span class="p">:</span> <span class="n">Tensor</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#sparselearning.funcs.prune.magnitude_prune" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prunes the weights with smallest magnitude.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>mask</strong> (<em>torch.Tensor</em>) – layer mask</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pruned mask</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.prune.struct_magnitude_prune">
+<code class="sig-prename descclassname">sparselearning.funcs.prune.</code><code class="sig-name descname">struct_magnitude_prune</code><span class="sig-paren">(</span><em class="sig-param">masking: Masking</em>, <em class="sig-param">mask: Tensor</em>, <em class="sig-param">weight: Tensor</em>, <em class="sig-param">name: str</em>, <em class="sig-param">criterion: Callable = &lt;built-in method mean of type object&gt;</em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#sparselearning.funcs.prune.struct_magnitude_prune" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prunes the weights channel-wise,
+with reduced smallest magnitude.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>mask</strong> (<em>torch.Tensor</em>) – layer mask</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>criterion</strong> (<em>Callable</em>) – determines reduction function.
+(reduces a kernel to a single statisitc,
+eg: mean/max/min).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>pruned mask</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.funcs.redistribute">
+<span id="sparselearning-funcs-redistribute"></span><h2>sparselearning.funcs.redistribute<a class="headerlink" href="#module-sparselearning.funcs.redistribute" title="Permalink to this headline">¶</a></h2>
+<p>Implements Redistribution function.</p>
+<p>Modifies layer-wise sparsity during mask update.</p>
+<p>Functions have access to the masking object
+enabling greater flexibility in designing
+custom redistribution modes.</p>
+<p>Masking class implements the output redistribution
+in a valid manner, ensuring no weight exceeds its capacity.</p>
+<p>Signature:
+&lt;func&gt;(masking, name, weight, mask)</p>
+<dl class="py function">
+<dt id="sparselearning.funcs.redistribute.grad_redistribution">
+<code class="sig-prename descclassname">sparselearning.funcs.redistribute.</code><code class="sig-name descname">grad_redistribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">weight</span></em>, <em class="sig-param"><span class="n">mask</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.redistribute.grad_redistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates gradient redistribution statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+<li><p><strong>mask</strong> (<em>torch.Tensor</em>) – layer mask</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Layer Statistic—unnormalized layer statistics
+for the layer. Normalizing across layers gives
+the density distribution.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.redistribute.momentum_redistribution">
+<code class="sig-prename descclassname">sparselearning.funcs.redistribute.</code><code class="sig-name descname">momentum_redistribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">weight</span></em>, <em class="sig-param"><span class="n">mask</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#sparselearning.funcs.redistribute.momentum_redistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates momentum redistribution statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+<li><p><strong>mask</strong> (<em>torch.Tensor</em>) – layer mask</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Layer Statistic—unnormalized layer statistics
+for the layer. Normalizing across layers gives
+the density distribution.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.funcs.redistribute.nonzero_redistribution">
+<code class="sig-prename descclassname">sparselearning.funcs.redistribute.</code><code class="sig-name descname">nonzero_redistribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">weight</span></em>, <em class="sig-param"><span class="n">mask</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.funcs.redistribute.nonzero_redistribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates non-zero redistribution statistics.
+Ideally, this just preserves the older distribution,
+upto numerical error.
+In practice, we prefer to skip redistribution if
+non-zero is chosen.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – layer name</p></li>
+<li><p><strong>weight</strong> (<em>torch.Tensor</em>) – layer weight</p></li>
+<li><p><strong>mask</strong> (<em>torch.Tensor</em>) – layer mask</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Layer Statistic—unnormalized layer statistics
+for the layer. Normalizing across layers gives
+the density distribution.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="sparselearning.tests.html" class="btn btn-neutral float-right" title="sparselearning.tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="sparselearning.counting.html" class="btn btn-neutral float-left" title="sparselearning.counting" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

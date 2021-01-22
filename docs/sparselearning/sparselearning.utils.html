@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>sparselearning.utils &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="visualization package" href="../visualization/visualization.html" />
+    <link rel="prev" title="sparselearning.tests" href="sparselearning.tests.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_code.html">Example Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_results.html">Main Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_structure.html">Code Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="sparselearning.html">sparselearning package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sparselearning.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.counting.html">sparselearning.counting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.funcs.html">sparselearning.funcs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.tests.html">sparselearning.tests</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sparselearning.utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.utils.accuracy_helper">sparselearning.utils.accuracy_helper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.utils.layer_wise_density">sparselearning.utils.layer_wise_density</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.utils.model_serialization">sparselearning.utils.model_serialization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.utils.ops">sparselearning.utils.ops</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.utils.smoothen_value">sparselearning.utils.smoothen_value</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.utils.tqdm_logging">sparselearning.utils.tqdm_logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.utils.train_helper">sparselearning.utils.train_helper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.utils.warmup_scheduler">sparselearning.utils.warmup_scheduler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.html#module-sparselearning.core">sparselearning.core</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization/visualization.html">visualization package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/models.html">models package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="sparselearning.html">sparselearning package</a> &raquo;</li>
+        
+      <li>sparselearning.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/sparselearning/sparselearning.utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sparselearning-utils">
+<h1>sparselearning.utils<a class="headerlink" href="#sparselearning-utils" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-sparselearning.utils.accuracy_helper">
+<span id="sparselearning-utils-accuracy-helper"></span><h2>sparselearning.utils.accuracy_helper<a class="headerlink" href="#module-sparselearning.utils.accuracy_helper" title="Permalink to this headline">¶</a></h2>
+<p>Implements Top-k accuracy</p>
+<dl class="py function">
+<dt id="sparselearning.utils.accuracy_helper.get_topk_accuracy">
+<code class="sig-prename descclassname">sparselearning.utils.accuracy_helper.</code><code class="sig-name descname">get_topk_accuracy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">output</span><span class="p">:</span> <span class="n">Tensor</span></em>, <em class="sig-param"><span class="n">target</span><span class="p">:</span> <span class="n">Tensor</span></em>, <em class="sig-param"><span class="n">topk</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="default_value">(1)</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>float<span class="p">]</span><a class="headerlink" href="#sparselearning.utils.accuracy_helper.get_topk_accuracy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the accuracy over the k top predictions for the specified values of k.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output</strong> (<em>torch.Tensor</em>) – predicted labels</p></li>
+<li><p><strong>target</strong> (<em>torch.Tensor</em>) – groundtruth labels</p></li>
+<li><p><strong>topk</strong> (<em>Tuple</em><em>[</em><em>int</em><em>]</em>) – k for which top-k should be evaluted</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Top-k accuracies for each value of k supplied</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.utils.layer_wise_density">
+<span id="sparselearning-utils-layer-wise-density"></span><h2>sparselearning.utils.layer_wise_density<a class="headerlink" href="#module-sparselearning.utils.layer_wise_density" title="Permalink to this headline">¶</a></h2>
+<p>Utility for layer wise density plots.</p>
+<dl class="py function">
+<dt id="sparselearning.utils.layer_wise_density.plot">
+<code class="sig-prename descclassname">sparselearning.utils.layer_wise_density.</code><code class="sig-name descname">plot</code><span class="sig-paren">(</span><em class="sig-param">masking: Masking</em>, <em class="sig-param">mplot: &lt;module 'matplotlib.pyplot' from '/Users/varun/miniconda3/envs/torch38/lib/python3.8/site-packages/matplotlib/pyplot.py'&gt;</em><span class="sig-paren">)</span> &#x2192; &lt;module ‘matplotlib.pyplot’ from ‘/Users/varun/miniconda3/envs/torch38/lib/python3.8/site-packages/matplotlib/pyplot.py’&gt;<a class="headerlink" href="#sparselearning.utils.layer_wise_density.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot layer wise density bar plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>mplot</strong> (<em>pyplot</em>) – matplotlib object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>matplotlib plot</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pyplot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.utils.layer_wise_density.plot_as_image">
+<code class="sig-prename descclassname">sparselearning.utils.layer_wise_density.</code><code class="sig-name descname">plot_as_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em><span class="sig-paren">)</span> &#x2192; Array<a class="headerlink" href="#sparselearning.utils.layer_wise_density.plot_as_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot layer wise density as bar plot figure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Numpy array representing figure (H, W, 3)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>np.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.utils.layer_wise_density.wandb_bar">
+<code class="sig-prename descclassname">sparselearning.utils.layer_wise_density.</code><code class="sig-name descname">wandb_bar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em><span class="sig-paren">)</span> &#x2192; wandb.plot.bar.bar<a class="headerlink" href="#sparselearning.utils.layer_wise_density.wandb_bar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot layer wise density as W&amp;B bar plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>W&amp;B bar plot</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>wandb.plot.bar</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.utils.model_serialization">
+<span id="sparselearning-utils-model-serialization"></span><h2>sparselearning.utils.model_serialization<a class="headerlink" href="#module-sparselearning.utils.model_serialization" title="Permalink to this headline">¶</a></h2>
+<p>Code taken from</p>
+<p>maskrcnn-benchmark</p>
+<p><a class="reference external" href="https://github.com/facebookresearch/maskrcnn-benchmark/blob/master/maskrcnn_benchmark/utils/model_serialization.py">https://github.com/facebookresearch/maskrcnn-benchmark/blob/master/maskrcnn_benchmark/utils/model_serialization.py</a></p>
+<dl class="py function">
+<dt id="sparselearning.utils.model_serialization.align_and_update_state_dicts">
+<code class="sig-prename descclassname">sparselearning.utils.model_serialization.</code><code class="sig-name descname">align_and_update_state_dicts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_state_dict</span></em>, <em class="sig-param"><span class="n">loaded_state_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.model_serialization.align_and_update_state_dicts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Strategy: suppose that the models that we will create will have prefixes appended
+to each of its keys, for example due to an extra level of nesting that the original
+pre-trained weights from ImageNet won’t contain. For example, model.state_dict()
+might return backbone[0].body.res2.conv1.weight, while the pre-trained model contains
+res2.conv1.weight. We thus want to match both parameters together.
+For that, we look for each model weight, look among all loaded keys if there is one
+that is a suffix of the current weight name, and use it if that’s the case.
+If multiple matches exist, take the one with longest size
+of the corresponding name. For example, for the same model as before, the pretrained
+weight file can contain both res2.conv1.weight, as well as conv1.weight. In this case,
+we want to match backbone[0].body.conv1.weight to conv1.weight, and
+backbone[0].body.res2.conv1.weight to res2.conv1.weight.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.utils.model_serialization.load_state_dict">
+<code class="sig-prename descclassname">sparselearning.utils.model_serialization.</code><code class="sig-name descname">load_state_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">loaded_state_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.model_serialization.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.utils.model_serialization.strip_prefix_if_present">
+<code class="sig-prename descclassname">sparselearning.utils.model_serialization.</code><code class="sig-name descname">strip_prefix_if_present</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state_dict</span></em>, <em class="sig-param"><span class="n">prefix</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.model_serialization.strip_prefix_if_present" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.utils.ops">
+<span id="sparselearning-utils-ops"></span><h2>sparselearning.utils.ops<a class="headerlink" href="#module-sparselearning.utils.ops" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sparselearning.utils.ops.random_perm">
+<code class="sig-prename descclassname">sparselearning.utils.ops.</code><code class="sig-name descname">random_perm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span><span class="p">:</span> <span class="n">torch.Tensor</span></em><span class="sig-paren">)</span> &#x2192; torch.Tensor<a class="headerlink" href="#sparselearning.utils.ops.random_perm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random shuffle a tensor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>a</strong> (<em>torch.Tensor</em>) – input Tensor</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>shuffled Tensor</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.utils.smoothen_value">
+<span id="sparselearning-utils-smoothen-value"></span><h2>sparselearning.utils.smoothen_value<a class="headerlink" href="#module-sparselearning.utils.smoothen_value" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="sparselearning.utils.smoothen_value.AverageValue">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.utils.smoothen_value.</code><code class="sig-name descname">AverageValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.smoothen_value.AverageValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Create a simple running average for a value (loss, etc).</p>
+<dl class="py method">
+<dt id="sparselearning.utils.smoothen_value.AverageValue.add_value">
+<code class="sig-name descname">add_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.smoothen_value.AverageValue.add_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add <cite>val</cite> to calculate updated smoothed value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>val</strong> (<em>float</em>) – value to add</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.utils.smoothen_value.AverageValue.n">
+<code class="sig-name descname">n</code><em class="property">: int</em><em class="property"> = 0</em><a class="headerlink" href="#sparselearning.utils.smoothen_value.AverageValue.n" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.utils.smoothen_value.SmoothenValue">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.utils.smoothen_value.</code><code class="sig-name descname">SmoothenValue</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">beta</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.9</span></em>, <em class="sig-param"><span class="n">n</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.smoothen_value.SmoothenValue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Create a exponentially smooth moving average for a value (loss, etc) using <cite>beta</cite>.</p>
+<dl class="py method">
+<dt id="sparselearning.utils.smoothen_value.SmoothenValue.add_value">
+<code class="sig-name descname">add_value</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">val</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#sparselearning.utils.smoothen_value.SmoothenValue.add_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add <cite>val</cite> to calculate updated smoothed value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>val</strong> (<em>float</em>) – value to add</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.utils.smoothen_value.SmoothenValue.beta">
+<code class="sig-name descname">beta</code><em class="property">: float</em><em class="property"> = 0.9</em><a class="headerlink" href="#sparselearning.utils.smoothen_value.SmoothenValue.beta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.utils.smoothen_value.SmoothenValue.n">
+<code class="sig-name descname">n</code><em class="property">: int</em><em class="property"> = 0</em><a class="headerlink" href="#sparselearning.utils.smoothen_value.SmoothenValue.n" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.utils.tqdm_logging">
+<span id="sparselearning-utils-tqdm-logging"></span><h2>sparselearning.utils.tqdm_logging<a class="headerlink" href="#module-sparselearning.utils.tqdm_logging" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="sparselearning.utils.tqdm_logging.TqdmLoggingHandler">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.utils.tqdm_logging.</code><code class="sig-name descname">TqdmLoggingHandler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stream</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.tqdm_logging.TqdmLoggingHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">logging.StreamHandler</span></code></p>
+<p>Handler to pass tqdm outputs to the output file</p>
+<dl class="py method">
+<dt id="sparselearning.utils.tqdm_logging.TqdmLoggingHandler.emit">
+<code class="sig-name descname">emit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.tqdm_logging.TqdmLoggingHandler.emit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emit a record.</p>
+<p>If a formatter is specified, it is used to format the record.
+The record is then written to the stream with a trailing newline.  If
+exception information is present, it is formatted using
+traceback.print_exception and appended to the stream.  If the stream
+has an ‘encoding’ attribute, it is used to determine how to do the
+output to the stream.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.utils.train_helper">
+<span id="sparselearning-utils-train-helper"></span><h2>sparselearning.utils.train_helper<a class="headerlink" href="#module-sparselearning.utils.train_helper" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sparselearning.utils.train_helper.get_optimizer">
+<code class="sig-prename descclassname">sparselearning.utils.train_helper.</code><code class="sig-name descname">get_optimizer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">nn.Module</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>optim<span class="p">, </span>Tuple<span class="p">[</span>lr_scheduler<span class="p">]</span><span class="p">]</span><a class="headerlink" href="#sparselearning.utils.train_helper.get_optimizer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get model optimizer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<em>nn.Module</em>) – Pytorch model</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Optimizer, LR Scheduler(s)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[optim, Tuple[lr_scheduler]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.utils.train_helper.load_weights">
+<code class="sig-prename descclassname">sparselearning.utils.train_helper.</code><code class="sig-name descname">load_weights</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">nn.Module</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="p">:</span> <span class="n">optim</span></em>, <em class="sig-param"><span class="n">mask</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">ckpt_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">resume</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; Tuple<span class="p">[</span>nn.Module<span class="p">, </span>optim<span class="p">, </span>Masking<span class="p">, </span>int<span class="p">, </span>int<span class="p">, </span>float<span class="p">]</span><a class="headerlink" href="#sparselearning.utils.train_helper.load_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load model, optimizers, mask from a checkpoint file (.pth).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>nn.Module</em>) – Pytorch model</p></li>
+<li><p><strong>optimizer</strong> (<em>torch.optim.Optimizer</em>) – model optimizer</p></li>
+<li><p><strong>mask</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>ckpt_dir</strong> (<em>Path</em>) – Checkpoint directory</p></li>
+<li><p><strong>resume</strong> (<em>bool</em>) – resume or not, if not do nothing</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>model, optimizer, mask, step, epoch, best_val_loss</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Tuple[nn.Module, optim, <a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking">Masking</a>, int, int, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.utils.train_helper.save_weights">
+<code class="sig-prename descclassname">sparselearning.utils.train_helper.</code><code class="sig-name descname">save_weights</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">nn.Module</span></em>, <em class="sig-param"><span class="n">optimizer</span><span class="p">:</span> <span class="n">optim</span></em>, <em class="sig-param"><span class="n">mask</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">val_loss</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">step</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">epoch</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">ckpt_dir</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">is_min</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.train_helper.save_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save progress.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>nn.Module</em>) – Pytorch model</p></li>
+<li><p><strong>optimizer</strong> (<em>torch.optim.Optimizer</em>) – model optimizer</p></li>
+<li><p><strong>mask</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>sparselearning.core.Masking</em></a>) – Masking instance</p></li>
+<li><p><strong>val_loss</strong> (<em>float</em>) – Current validation loss</p></li>
+<li><p><strong>step</strong> (<em>int</em>) – Current step</p></li>
+<li><p><strong>epoch</strong> (<em>int</em>) – Current epoch</p></li>
+<li><p><strong>ckpt_dir</strong> (<em>Path</em>) – Checkpoint directory</p></li>
+<li><p><strong>is_min</strong> (<em>bool</em>) – Whether current model achieves least val loss</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.utils.warmup_scheduler">
+<span id="sparselearning-utils-warmup-scheduler"></span><h2>sparselearning.utils.warmup_scheduler<a class="headerlink" href="#module-sparselearning.utils.warmup_scheduler" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="sparselearning.utils.warmup_scheduler.WarmUpLR">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.utils.warmup_scheduler.</code><code class="sig-name descname">WarmUpLR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">optimizer</span></em>, <em class="sig-param"><span class="n">total_iters</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">last_epoch</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.warmup_scheduler.WarmUpLR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.optim.lr_scheduler._LRScheduler</span></code></p>
+<p>Warmup-training learning rate scheduler</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>optimizer</strong> (<em>torch.optim.Optimizer</em>) – model optimizer (e.g. SGD)</p></li>
+<li><p><strong>total_iters</strong> (<em>int</em>) – warm up phase iterations</p></li>
+<li><p><strong>last_epoch</strong> (<em>int</em>) – Epoch to reset at (default -1, don’t reset)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sparselearning.utils.warmup_scheduler.WarmUpLR.get_lr">
+<code class="sig-name descname">get_lr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.utils.warmup_scheduler.WarmUpLR.get_lr" title="Permalink to this definition">¶</a></dt>
+<dd><p>We will use the first m batches, and set the learning
+rate to base_lr * m / total_iters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../visualization/visualization.html" class="btn btn-neutral float-right" title="visualization package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="sparselearning.tests.html" class="btn btn-neutral float-left" title="sparselearning.tests" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
