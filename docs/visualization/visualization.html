@@ -1,0 +1,441 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>visualization package &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="models package" href="../models/models.html" />
+    <link rel="prev" title="sparselearning.utils" href="../sparselearning/sparselearning.utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_code.html">Example Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_results.html">Main Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_structure.html">Code Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../sparselearning/sparselearning.html">sparselearning package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">visualization package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-visualization.alpha_deltaT">visualization.alpha_deltaT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-visualization.density_distribution">visualization.density_distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-visualization.erk_vs_random_FLOPs">visualization.erk_vs_random_FLOPs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-visualization.lr_tuning">visualization.lr_tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-visualization.main_plots">visualization.main_plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-visualization.main_results">visualization.main_results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-visualization.redist_inference_plot">visualization.redist_inference_plot</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../models/models.html">models package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>visualization package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/visualization/visualization.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="visualization-package">
+<h1>visualization package<a class="headerlink" href="#visualization-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-visualization.alpha_deltaT">
+<span id="visualization-alpha-deltat"></span><h2>visualization.alpha_deltaT<a class="headerlink" href="#module-visualization.alpha_deltaT" title="Permalink to this headline">¶</a></h2>
+<p>Run as:</p>
+<p>python visualization/alpha_deltaT.py wandb.project=”cifar10 optuna multiseed” dataset=CIFAR10</p>
+<dl class="py function">
+<dt id="visualization.alpha_deltaT.alpha_deltaT_plot">
+<code class="sig-prename descclassname">visualization.alpha_deltaT.</code><code class="sig-name descname">alpha_deltaT_plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dataset</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'CIFAR10'</span></em>, <em class="sig-param"><span class="n">init_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['ERK', 'Random']</span></em>, <em class="sig-param"><span class="n">density_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[0.1, 0.2, 0.5]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.alpha_deltaT.alpha_deltaT_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot contour plot depicting alpha-deltaT trial space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – Dataframe containing main results</p></li>
+<li><p><strong>dataset</strong> (<em>str</em>) – dataset to plot</p></li>
+<li><p><strong>init_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of initialization schemes to plot</p></li>
+<li><p><strong>density_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of densities to plot</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="visualization.alpha_deltaT.get_stats">
+<code class="sig-prename descclassname">visualization.alpha_deltaT.</code><code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">runs</span></em>, <em class="sig-param"><span class="n">reorder</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#visualization.alpha_deltaT.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get stats saved on W&amp;B.</p>
+<p>List all possible choices for (masking, init, density, dataset).
+We’ll try matching the exhaustive caretesian product.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>runs</strong> (<em>wandb.api.runs</em>) – Experiment run</p></li>
+<li><p><strong>reorder</strong> (<em>bool</em>) – sort methods alphabetically</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe containing test accuracies of methods</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="visualization.alpha_deltaT.main">
+<code class="sig-prename descclassname">visualization.alpha_deltaT.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfg</span><span class="p">:</span> <span class="n">omegaconf.dictconfig.DictConfig</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.alpha_deltaT.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-visualization.density_distribution">
+<span id="visualization-density-distribution"></span><h2>visualization.density_distribution<a class="headerlink" href="#module-visualization.density_distribution" title="Permalink to this headline">¶</a></h2>
+<p>python sparselearning/visualization/lr_tuning.py wandb.project=”cifar10 grid lr” dataset=CIFAR10</p>
+</div>
+<div class="section" id="module-visualization.erk_vs_random_FLOPs">
+<span id="visualization-erk-vs-random-flops"></span><h2>visualization.erk_vs_random_FLOPs<a class="headerlink" href="#module-visualization.erk_vs_random_FLOPs" title="Permalink to this headline">¶</a></h2>
+<p>Run as:
+python visualization/erk_vs_random_FLOPs.py</p>
+<dl class="py function">
+<dt id="visualization.erk_vs_random_FLOPs.FLOPs_vs_sparsity">
+<code class="sig-prename descclassname">visualization.erk_vs_random_FLOPs.</code><code class="sig-name descname">FLOPs_vs_sparsity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'wrn-22-2'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.erk_vs_random_FLOPs.FLOPs_vs_sparsity" title="Permalink to this definition">¶</a></dt>
+<dd><p>FLOPs vs sparsity for Random, ERK initializations
+:param model: model name (wrn-22-2, resnet50) to use.
+:type model: str</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="visualization.erk_vs_random_FLOPs.accuracy_vs_FLOPs">
+<code class="sig-prename descclassname">visualization.erk_vs_random_FLOPs.</code><code class="sig-name descname">accuracy_vs_FLOPs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#visualization.erk_vs_random_FLOPs.accuracy_vs_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot test accuracy vs FLOPs for ERK, Random init</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-visualization.lr_tuning">
+<span id="visualization-lr-tuning"></span><h2>visualization.lr_tuning<a class="headerlink" href="#module-visualization.lr_tuning" title="Permalink to this headline">¶</a></h2>
+<p>Run as:</p>
+<p>python visualization/lr_tuning.py wandb.project=”cifar10 grid lr” dataset=CIFAR10</p>
+<dl class="py function">
+<dt id="visualization.lr_tuning.get_stats">
+<code class="sig-prename descclassname">visualization.lr_tuning.</code><code class="sig-name descname">get_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">runs</span></em>, <em class="sig-param"><span class="n">masking_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['RigL']</span></em>, <em class="sig-param"><span class="n">init_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['Random']</span></em>, <em class="sig-param"><span class="n">suffix_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['grid_lr']</span></em>, <em class="sig-param"><span class="n">density_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[0.1]</span></em>, <em class="sig-param"><span class="n">lr_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[0.1]</span></em>, <em class="sig-param"><span class="n">alpha_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[0.3]</span></em>, <em class="sig-param"><span class="n">deltaT_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[100]</span></em>, <em class="sig-param"><span class="n">dataset_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['CIFAR10']</span></em>, <em class="sig-param"><span class="n">reorder</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#visualization.lr_tuning.get_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get stats saved on W&amp;B.</p>
+<p>List all possible choices for (masking, init, density, dataset).</p>
+<p>We’ll try matching the exhaustive caretesian product of
+(masking_ll x init_ll x suffix_ll x density_ll etc).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>runs</strong> (<em>wandb.api.runs</em>) – Experiment run</p></li>
+<li><p><strong>masking_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of sparse training techniques</p></li>
+<li><p><strong>init_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of sparsity initialization schemes</p></li>
+<li><p><strong>suffix_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of method suffixes.</p></li>
+<li><p><strong>density_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of density values (1 - sparsity)</p></li>
+<li><p><strong>lr_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of learning rates</p></li>
+<li><p><strong>alpha_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of alphas (initial pruning rate)</p></li>
+<li><p><strong>deltaT_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of deltaT’s to plot</p></li>
+<li><p><strong>dataset_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of datasets</p></li>
+<li><p><strong>reorder</strong> (<em>bool</em>) – sort methods alphabetically</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe containing test accuracies of methods</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="visualization.lr_tuning.lr_tuning_plot">
+<code class="sig-prename descclassname">visualization.lr_tuning.</code><code class="sig-name descname">lr_tuning_plot</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span><span class="p">:</span> <span class="n">pandas.core.frame.DataFrame</span></em>, <em class="sig-param"><span class="n">dataset</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'CIFAR10'</span></em>, <em class="sig-param"><span class="n">init_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['ERK', 'Random']</span></em>, <em class="sig-param"><span class="n">density_ll</span><span class="o">=</span><span class="default_value">[0.1, 0.2, 0.5]</span></em>, <em class="sig-param"><span class="n">lr_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[0.1]</span></em>, <em class="sig-param"><span class="n">alpha_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[0.3]</span></em>, <em class="sig-param"><span class="n">deltaT_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[100]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.lr_tuning.lr_tuning_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot LR tuning trials</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pd.DataFrame</em>) – Dataframe containing main results</p></li>
+<li><p><strong>dataset</strong> (<em>str</em>) – dataset to plot</p></li>
+<li><p><strong>init_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of initialization schemes to plot</p></li>
+<li><p><strong>density_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of densities to plot</p></li>
+<li><p><strong>lr_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of learning rates</p></li>
+<li><p><strong>alpha_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of alphas (initial pruning rate)</p></li>
+<li><p><strong>deltaT_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of deltaT’s to plot</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="visualization.lr_tuning.main">
+<code class="sig-prename descclassname">visualization.lr_tuning.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfg</span><span class="p">:</span> <span class="n">omegaconf.dictconfig.DictConfig</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.lr_tuning.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-visualization.main_plots">
+<span id="visualization-main-plots"></span><h2>visualization.main_plots<a class="headerlink" href="#module-visualization.main_plots" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="visualization.main_plots.cifar100plots">
+<code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">cifar100plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.cifar100plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="visualization.main_plots.cifar10plots">
+<code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">cifar10plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.cifar10plots" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="visualization.main_plots.create_plot_from_spec">
+<code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">create_plot_from_spec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">plot_spec</span></em>, <em class="sig-param"><span class="n">ylimits</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.create_plot_from_spec" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="visualization.main_plots.main">
+<code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfg</span><span class="p">:</span> <span class="n">omegaconf.dictconfig.DictConfig</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="visualization.main_plots.plot_col_vs_density">
+<code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">plot_col_vs_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_key</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">init</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">plot_kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.plot_col_vs_density" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a column for a single method + init combination.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="visualization.main_plots.plot_method">
+<code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">plot_method</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">init</span></em>, <em class="sig-param"><span class="n">color</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.plot_method" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-visualization.main_results">
+<span id="visualization-main-results"></span><h2>visualization.main_results<a class="headerlink" href="#module-visualization.main_results" title="Permalink to this headline">¶</a></h2>
+<p>Run as:</p>
+<p>python visualization/main_results.py wandb.project=cifar10 dataset=CIFAR10</p>
+<p>python visualization/main_results.py wandb.project=cifar100 dataset=CIFAR100</p>
+<dl class="py function">
+<dt id="visualization.main_results.get_stats_table">
+<code class="sig-prename descclassname">visualization.main_results.</code><code class="sig-name descname">get_stats_table</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">runs</span></em>, <em class="sig-param"><span class="n">masking_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['RigL']</span></em>, <em class="sig-param"><span class="n">init_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['Random']</span></em>, <em class="sig-param"><span class="n">suffix_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['']</span></em>, <em class="sig-param"><span class="n">density_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[0.1]</span></em>, <em class="sig-param"><span class="n">dataset_ll</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">['CIFAR10']</span></em>, <em class="sig-param"><span class="n">reorder</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">correct_SET</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; pandas.core.frame.DataFrame<a class="headerlink" href="#visualization.main_results.get_stats_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get stats saved on W&amp;B.</p>
+<p>List all possible choices for (masking, init, density, dataset).</p>
+<p>We’ll try matching the exhaustive caretesian product of
+(masking_ll x init_ll x suffix_ll x density_ll etc).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>runs</strong> (<em>wandb.api.runs</em>) – Experiment run</p></li>
+<li><p><strong>masking_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of sparse training techniques</p></li>
+<li><p><strong>init_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of sparsity initialization schemes</p></li>
+<li><p><strong>suffix_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of method suffixes.</p></li>
+<li><p><strong>density_ll</strong> (<em>List</em><em>[</em><em>float</em><em>]</em>) – List of density values (1 - sparsity)</p></li>
+<li><p><strong>dataset_ll</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – List of datasets</p></li>
+<li><p><strong>reorder</strong> (<em>bool</em>) – sort methods alphabetically</p></li>
+<li><p><strong>correct_SET</strong> (<em>bool</em>) – manually correct SET results, which collapsed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dataframe containing test accuracies of methods</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pd.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="visualization.main_results.main">
+<code class="sig-prename descclassname">visualization.main_results.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfg</span><span class="p">:</span> <span class="n">omegaconf.dictconfig.DictConfig</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_results.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-visualization.redist_inference_plot">
+<span id="visualization-redist-inference-plot"></span><h2>visualization.redist_inference_plot<a class="headerlink" href="#module-visualization.redist_inference_plot" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="visualization.redist_inference_plot.main">
+<code class="sig-prename descclassname">visualization.redist_inference_plot.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cfg</span><span class="p">:</span> <span class="n">omegaconf.dictconfig.DictConfig</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.redist_inference_plot.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../models/models.html" class="btn btn-neutral float-right" title="models package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../sparselearning/sparselearning.utils.html" class="btn btn-neutral float-left" title="sparselearning.utils" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

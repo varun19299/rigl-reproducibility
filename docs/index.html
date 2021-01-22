@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Welcome to SparseLearning’s documentation! &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="#" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_code.html">Example Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_results.html">Main Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sparselearning/sparselearning.html">sparselearning package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization/visualization.html">visualization package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/models.html">models package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Welcome to SparseLearning’s documentation!</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="welcome-to-sparselearning-s-documentation">
+<h1>Welcome to SparseLearning’s documentation!<a class="headerlink" href="#welcome-to-sparselearning-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>This repository hosts source code for our reproducibility report on
+<a class="reference external" href="https://arxiv.org/abs/1911.11134/">Rigging the Lottery: Making all Tickets Winners</a>, published at ICML 2020.</p>
+<a class="reference internal image-reference" href="_images/dyn_sparse_train.png"><img alt="RigL Main Figure" src="_images/dyn_sparse_train.png" style="width: 400px;" /></a>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#install">Install</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#w-b-api-key">W&amp;B API key</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#unit-tests">Unit Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="example_code.html">Example Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="example_code.html#train-wideresnet-22-2-with-rigl-on-cifar10">Train WideResNet-22-2 with RigL on CIFAR10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_code.html#train-resnet-50-with-snfs-on-cifar100">Train ResNet-50 with SNFS on CIFAR100</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_code.html#evaluate-wideresnet-22-2-with-rigl-on-cifar10">Evaluate WideResNet-22-2 with RigL on CIFAR10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_code.html#evaluate-resnet-50-with-snfs-on-cifar100">Evaluate ResNet-50 with SNFS on CIFAR100</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="main_results.html">Main Results</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="main_results.html#pre-trained-models">Pre-trained Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_results.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main_results.html#table-of-results">Table of Results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="code_structure.html#print-current-config">Print current config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_structure.html#understanding-the-config-setup">Understanding the config setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_structure.html#overrriding-options-group-configs">Overrriding options / group configs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_structure.html#exhaustive-config-options">Exhaustive config options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="code_structure.html#using-specific-configs">Using specific configs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sparselearning/sparselearning.html">sparselearning package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning/sparselearning.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning/sparselearning.html#module-sparselearning.core">sparselearning.core</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="visualization/visualization.html">visualization package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="visualization/visualization.html#module-visualization.alpha_deltaT">visualization.alpha_deltaT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization/visualization.html#module-visualization.density_distribution">visualization.density_distribution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization/visualization.html#module-visualization.erk_vs_random_FLOPs">visualization.erk_vs_random_FLOPs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization/visualization.html#module-visualization.lr_tuning">visualization.lr_tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization/visualization.html#module-visualization.main_plots">visualization.main_plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization/visualization.html#module-visualization.main_results">visualization.main_results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization/visualization.html#module-visualization.redist_inference_plot">visualization.redist_inference_plot</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models/models.html">models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models/models.html#module-models.resnet">models.resnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models/models.html#module-models.wide_resnet">models.wide_resnet</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

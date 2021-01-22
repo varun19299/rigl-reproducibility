@@ -23,3 +23,6 @@ Icon*
  
 .ipynb_checkpoints
 figs
+
+docs_src/build
+

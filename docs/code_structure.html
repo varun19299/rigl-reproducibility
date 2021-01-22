@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Code Structure &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="references.html" />
+    <link rel="prev" title="Main Results" href="main_results.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_code.html">Example Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="main_results.html">Main Results</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#print-current-config">Print current config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#understanding-the-config-setup">Understanding the config setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#overrriding-options-group-configs">Overrriding options / group configs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exhaustive-config-options">Exhaustive config options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-specific-configs">Using specific configs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sparselearning/sparselearning.html">sparselearning package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization/visualization.html">visualization package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/models.html">models package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Code Structure</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/code_structure.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="code-structure">
+<h1>Code Structure<a class="headerlink" href="#code-structure" title="Permalink to this headline">¶</a></h1>
+<p>This section may be useful if you desire to extend this code base or understand its structure.
+<code class="docutils literal notranslate"><span class="pre">main.py</span></code> is the python file used for training-evaluating, and the <code class="docutils literal notranslate"><span class="pre">make</span></code> commands serve as a wrapper for it.</p>
+<div class="section" id="print-current-config">
+<h2>Print current config<a class="headerlink" href="#print-current-config" title="Permalink to this headline">¶</a></h2>
+<p>We use <a class="reference external" href="https://hydra.cc/docs/intro/">hydra</a> to handle configs.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python main.py --cfg job
+</pre></div>
+</div>
+<p>See <code class="docutils literal notranslate"><span class="pre">conf/configs</span></code> for a detailed list of default configs, and under each folder of <code class="docutils literal notranslate"><span class="pre">conf</span></code> for possible options.</p>
+</div>
+<div class="section" id="understanding-the-config-setup">
+<h2>Understanding the config setup<a class="headerlink" href="#understanding-the-config-setup" title="Permalink to this headline">¶</a></h2>
+<p>We split configs into various config groups for brevity.</p>
+<p>Config groups (example):</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>masking</p></li>
+<li><p>optimizer</p></li>
+<li><p>dataset</p></li>
+</ul>
+</div></blockquote>
+<p>etc.</p>
+<p>Hydra allows us to override these either group-wise or globally as described below.</p>
+</div>
+<div class="section" id="overrriding-options-group-configs">
+<h2>Overrriding options / group configs<a class="headerlink" href="#overrriding-options-group-configs" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python main.py <span class="nv">masking</span><span class="o">=</span>RigL wandb.use<span class="o">=</span>True
+</pre></div>
+</div>
+<p>Refer to hydra’s documentation for more details.</p>
+</div>
+<div class="section" id="exhaustive-config-options">
+<h2>Exhaustive config options<a class="headerlink" href="#exhaustive-config-options" title="Permalink to this headline">¶</a></h2>
+<p>See <code class="docutils literal notranslate"><span class="pre">conf/config.yaml</span></code> and the defaults it uses (eg: <code class="docutils literal notranslate"><span class="pre">dataset:</span> <span class="pre">CIFAR10</span></code>, <code class="docutils literal notranslate"><span class="pre">optimizer:</span> <span class="pre">SGD</span></code>, etc.).</p>
+</div>
+<div class="section" id="using-specific-configs">
+<h2>Using specific configs<a class="headerlink" href="#using-specific-configs" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes, we want to store the specific config of a run with tuned options across mutliple groups (masking, optimizer etc.)</p>
+<p>To do so:</p>
+<ul class="simple">
+<li><p>store your config under <code class="docutils literal notranslate"><span class="pre">specific/</span></code>.</p></li>
+<li><p>each YAML file must start with a <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">&#64;package</span> <span class="pre">_global_</span></code> directive. See <code class="docutils literal notranslate"><span class="pre">specific/</span></code> for existing examples.</p></li>
+<li><p>override only what has changed, i.e., donot keep redundant arguments, which the base config (<code class="docutils literal notranslate"><span class="pre">config.yaml</span></code>) already covers.</p></li>
+</ul>
+<p>Syntax:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python main.py +specific<span class="o">=</span>cifar_wrn_22_2_rigl
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="main_results.html" class="btn btn-neutral float-left" title="Main Results" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

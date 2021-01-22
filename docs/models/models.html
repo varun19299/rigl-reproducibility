@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>models package &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="visualization package" href="../visualization/visualization.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_code.html">Example Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_results.html">Main Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_structure.html">Code Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../sparselearning/sparselearning.html">sparselearning package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization/visualization.html">visualization package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-models.resnet">models.resnet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-models.wide_resnet">models.wide_resnet</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>models package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/models/models.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="models-package">
+<h1>models package<a class="headerlink" href="#models-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-models.resnet">
+<span id="models-resnet"></span><h2>models.resnet<a class="headerlink" href="#module-models.resnet" title="Permalink to this headline">¶</a></h2>
+<p>Modified ResNet in pytorch</p>
+<p>Uses 3x3 conv in first layer instead of 7x7
+See our supplementary for exact details.</p>
+<dl class="simple">
+<dt>Original paper: Deep Residual Learning for Image Recognition</dt><dd><p><a class="reference external" href="https://arxiv.org/abs/1512.03385v1">https://arxiv.org/abs/1512.03385v1</a></p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="models.resnet.BasicBlock">
+<em class="property">class </em><code class="sig-prename descclassname">models.resnet.</code><code class="sig-name descname">BasicBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_channels</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">out_channels</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">stride</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.BasicBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Basic Block for ResNet-18 and ResNet-34</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<em>int</em>) – input channels</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – output channels</p></li>
+<li><p><strong>stride</strong> (<em>int</em>) – the stride of the first block of this layer</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="models.resnet.BasicBlock.expansion">
+<code class="sig-name descname">expansion</code><em class="property"> = 1</em><a class="headerlink" href="#models.resnet.BasicBlock.expansion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="models.resnet.BasicBlock.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.BasicBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="models.resnet.BasicBlock.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.resnet.BasicBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.resnet.BottleNeck">
+<em class="property">class </em><code class="sig-prename descclassname">models.resnet.</code><code class="sig-name descname">BottleNeck</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_channels</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">out_channels</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">stride</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.BottleNeck" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Residual block for ResNet-50+ layers</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<em>int</em>) – input channels</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – output channels</p></li>
+<li><p><strong>stride</strong> (<em>int</em>) – the stride of the first block of this layer</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="models.resnet.BottleNeck.expansion">
+<code class="sig-name descname">expansion</code><em class="property"> = 4</em><a class="headerlink" href="#models.resnet.BottleNeck.expansion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="models.resnet.BottleNeck.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.BottleNeck.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="models.resnet.BottleNeck.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.resnet.BottleNeck.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.resnet.ResNet">
+<em class="property">class </em><code class="sig-prename descclassname">models.resnet.</code><code class="sig-name descname">ResNet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">block</span><span class="p">:</span> <span class="n">Union<span class="p">[</span><a class="reference internal" href="#models.resnet.BasicBlock" title="models.resnet.BasicBlock">BasicBlock</a><span class="p">, </span><a class="reference internal" href="#models.resnet.BottleNeck" title="models.resnet.BottleNeck">BottleNeck</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">num_block</span><span class="p">:</span> <span class="n">List<span class="p">[</span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">num_classes</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">100</span></em>, <em class="sig-param"><span class="n">small_dense_density</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">zero_init_residual</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.ResNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Modified ResNet in pytorch</p>
+<p>Uses 3x3 conv in first layer instead of 7x7
+See our supplementary for exact details.</p>
+<dl class="simple">
+<dt>Original paper: Deep Residual Learning for Image Recognition</dt><dd><p><a class="reference external" href="https://arxiv.org/abs/1512.03385v1">https://arxiv.org/abs/1512.03385v1</a></p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block</strong> (<em>Union</em><em>[</em><a class="reference internal" href="#models.resnet.BasicBlock" title="models.resnet.BasicBlock"><em>BasicBlock</em></a><em>, </em><a class="reference internal" href="#models.resnet.BottleNeck" title="models.resnet.BottleNeck"><em>BottleNeck</em></a><em>]</em>) – Block type, Basic or Bottleneck</p></li>
+<li><p><strong>num_block</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – Block no’s.</p></li>
+<li><p><strong>num_classes</strong> (<em>int</em>) – No of output labels.</p></li>
+<li><p><strong>small_dense_density</strong> (<em>float</em>) – Equivalent parameter density of Small-Dense model</p></li>
+<li><p><strong>zero_init_residual</strong> (<em>bool</em>) – Whether to init batchnorm gamma to 0.
+Empirically achieves better performance, Improved residual training.
+Default 0.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="models.resnet.ResNet.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.ResNet.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="models.resnet.ResNet.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.resnet.ResNet.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="models.resnet.resnet101">
+<code class="sig-prename descclassname">models.resnet.</code><code class="sig-name descname">resnet101</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.resnet101" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a ResNet-101 model</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="models.resnet.resnet152">
+<code class="sig-prename descclassname">models.resnet.</code><code class="sig-name descname">resnet152</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.resnet152" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a ResNet-152 model</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="models.resnet.resnet18">
+<code class="sig-prename descclassname">models.resnet.</code><code class="sig-name descname">resnet18</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.resnet18" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a ResNet-18 model</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="models.resnet.resnet34">
+<code class="sig-prename descclassname">models.resnet.</code><code class="sig-name descname">resnet34</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.resnet34" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a ResNet-34 model</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="models.resnet.resnet50">
+<code class="sig-prename descclassname">models.resnet.</code><code class="sig-name descname">resnet50</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#models.resnet.resnet50" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a ResNet-50 model</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-models.wide_resnet">
+<span id="models-wide-resnet"></span><h2>models.wide_resnet<a class="headerlink" href="#module-models.wide_resnet" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="models.wide_resnet.BasicBlock">
+<em class="property">class </em><code class="sig-prename descclassname">models.wide_resnet.</code><code class="sig-name descname">BasicBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">in_planes</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">out_planes</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">stride</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">dropRate</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.wide_resnet.BasicBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Wide Residual Network basic block</p>
+<p>For more info, see the paper: Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
+<a class="reference external" href="https://arxiv.org/abs/1605.07146">https://arxiv.org/abs/1605.07146</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_planes</strong> (<em>int</em>) – input channels</p></li>
+<li><p><strong>out_planes</strong> (<em>int</em>) – output channels</p></li>
+<li><p><strong>stride</strong> (<em>int</em>) – the stride of the first block of this layer</p></li>
+<li><p><strong>dropRate</strong> (<em>float</em>) – Dropout Probability</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="models.wide_resnet.BasicBlock.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.wide_resnet.BasicBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="models.wide_resnet.BasicBlock.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.wide_resnet.BasicBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.wide_resnet.NetworkBlock">
+<em class="property">class </em><code class="sig-prename descclassname">models.wide_resnet.</code><code class="sig-name descname">NetworkBlock</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nb_layers</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">in_planes</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">out_planes</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">block</span><span class="p">:</span> <span class="n"><a class="reference internal" href="#models.wide_resnet.BasicBlock" title="models.wide_resnet.BasicBlock">models.wide_resnet.BasicBlock</a></span></em>, <em class="sig-param"><span class="n">stride</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">dropRate</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.wide_resnet.NetworkBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Wide Residual Network network block which holds basic blocks.</p>
+<dl class="simple">
+<dt>For more info, see the paper:</dt><dd><p>Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
+<a class="reference external" href="https://arxiv.org/abs/1605.07146">https://arxiv.org/abs/1605.07146</a></p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nb_layers</strong> (<em>int</em>) – Number of blocks</p></li>
+<li><p><strong>in_planes</strong> (<em>int</em>) – input channels</p></li>
+<li><p><strong>out_planes</strong> (<em>int</em>) – output channels</p></li>
+<li><p><strong>block</strong> (<a class="reference internal" href="#models.wide_resnet.BasicBlock" title="models.wide_resnet.BasicBlock"><em>BasicBlock</em></a>) – Block type, BasicBlock only</p></li>
+<li><p><strong>stride</strong> (<em>int</em>) – the stride of the first block of this layer</p></li>
+<li><p><strong>dropRate</strong> (<em>float</em>) – Dropout Probability</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="models.wide_resnet.NetworkBlock.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.wide_resnet.NetworkBlock.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="models.wide_resnet.NetworkBlock.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.wide_resnet.NetworkBlock.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="models.wide_resnet.WideResNet">
+<em class="property">class </em><code class="sig-prename descclassname">models.wide_resnet.</code><code class="sig-name descname">WideResNet</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">depth</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">22</span></em>, <em class="sig-param"><span class="n">widen_factor</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">2</span></em>, <em class="sig-param"><span class="n">num_classes</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">10</span></em>, <em class="sig-param"><span class="n">dropRate</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.3</span></em>, <em class="sig-param"><span class="n">small_dense_density</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.wide_resnet.WideResNet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Wide Residual Network with varying depth and width.</p>
+<p>For more info, see the paper: Wide Residual Networks by Sergey Zagoruyko, Nikos Komodakis
+<a class="reference external" href="https://arxiv.org/abs/1605.07146">https://arxiv.org/abs/1605.07146</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>depth</strong> (<em>int</em>) – No of layers</p></li>
+<li><p><strong>widen_factor</strong> (<em>int</em>) – Factor to increase channel width by</p></li>
+<li><p><strong>num_classes</strong> (<em>int</em>) – No of output labels</p></li>
+<li><p><strong>dropRate</strong> (<em>float</em>) – Dropout Probability</p></li>
+<li><p><strong>small_dense_density</strong> (<em>float</em>) – Equivalent parameter density of Small-Dense model</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="models.wide_resnet.WideResNet.forward">
+<code class="sig-name descname">forward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="headerlink" href="#models.wide_resnet.WideResNet.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="models.wide_resnet.WideResNet.training">
+<code class="sig-name descname">training</code><em class="property">: bool</em><a class="headerlink" href="#models.wide_resnet.WideResNet.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../visualization/visualization.html" class="btn btn-neutral float-left" title="visualization package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

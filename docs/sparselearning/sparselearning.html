@@ -1,0 +1,696 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>sparselearning package &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sparselearning.counting" href="sparselearning.counting.html" />
+    <link rel="prev" title="References" href="../references.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_code.html">Example Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_results.html">Main Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_structure.html">Code Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">sparselearning package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.counting.html">sparselearning.counting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.funcs.html">sparselearning.funcs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.tests.html">sparselearning.tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.utils.html">sparselearning.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-sparselearning.core">sparselearning.core</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization/visualization.html">visualization package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/models.html">models package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>sparselearning package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/sparselearning/sparselearning.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sparselearning-package">
+<h1>sparselearning package<a class="headerlink" href="#sparselearning-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sparselearning.counting.html">sparselearning.counting</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.counting.html#module-sparselearning.counting.helper">sparselearning.counting.helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.counting.html#module-sparselearning.counting.inference_train_FLOPs">sparselearning.counting.inference_train_FLOPs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.counting.html#module-sparselearning.counting.micronet_challenge">sparselearning.counting.micronet_challenge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.counting.html#module-sparselearning.counting.ops">sparselearning.counting.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.counting.html#module-sparselearning.counting.print_stats">sparselearning.counting.print_stats</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sparselearning.funcs.html">sparselearning.funcs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.funcs.html#module-sparselearning.funcs.decay">sparselearning.funcs.decay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.funcs.html#module-sparselearning.funcs.grow">sparselearning.funcs.grow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.funcs.html#module-sparselearning.funcs.init_scheme">sparselearning.funcs.init_scheme</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.funcs.html#module-sparselearning.funcs.prune">sparselearning.funcs.prune</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.funcs.html#module-sparselearning.funcs.redistribute">sparselearning.funcs.redistribute</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sparselearning.tests.html">sparselearning.tests</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.tests.html#module-sparselearning.tests.test_data">sparselearning.tests.test_data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.tests.html#module-sparselearning.tests.test_mask_loading_saving">sparselearning.tests.test_mask_loading_saving</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.tests.html#module-sparselearning.tests.test_struct_sparse">sparselearning.tests.test_struct_sparse</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sparselearning.utils.html">sparselearning.utils</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.utils.html#module-sparselearning.utils.accuracy_helper">sparselearning.utils.accuracy_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.utils.html#module-sparselearning.utils.layer_wise_density">sparselearning.utils.layer_wise_density</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.utils.html#module-sparselearning.utils.model_serialization">sparselearning.utils.model_serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.utils.html#module-sparselearning.utils.ops">sparselearning.utils.ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.utils.html#module-sparselearning.utils.smoothen_value">sparselearning.utils.smoothen_value</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.utils.html#module-sparselearning.utils.tqdm_logging">sparselearning.utils.tqdm_logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.utils.html#module-sparselearning.utils.train_helper">sparselearning.utils.train_helper</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.utils.html#module-sparselearning.utils.warmup_scheduler">sparselearning.utils.warmup_scheduler</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-sparselearning.core">
+<span id="sparselearning-core"></span><h2>sparselearning.core<a class="headerlink" href="#module-sparselearning.core" title="Permalink to this headline">¶</a></h2>
+<p>Wraps PyTorch model parameters with a boolean mask
+to simulate unstructured sparsity.</p>
+<dl>
+<dt>Example usage:</dt><dd><p>optimizer = torchoptim.SGD(model.parameters(),lr=args.lr)
+decay = CosineDecay(args.prune_rate, len(train_loader)*(args.epochs))
+mask = Masking(optimizer, prune_rate_decay=decay)
+model = MyModel()
+mask.add_module(model)</p>
+<p># Wrapped optimizer step
+mask.step</p>
+<p># Mask update step
+mask.update_connections()</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="sparselearning.core.LayerStats">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.core.</code><code class="sig-name descname">LayerStats</code><span class="sig-paren">(</span><em class="sig-param">variance_dict: Dict[str</em>, <em class="sig-param">float] = &lt;factory&gt;</em>, <em class="sig-param">zeros_dict: Dict[str</em>, <em class="sig-param">int] = &lt;factory&gt;</em>, <em class="sig-param">nonzeros_dict: Dict[str</em>, <em class="sig-param">int] = &lt;factory&gt;</em>, <em class="sig-param">removed_dict: Dict[str</em>, <em class="sig-param">int] = &lt;factory&gt;</em>, <em class="sig-param">total_variance: float = 0</em>, <em class="sig-param">total_zero: int = 0</em>, <em class="sig-param">total_nonzero: int = 0</em>, <em class="sig-param">total_removed: int = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.LayerStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Layer-wise statistics</p>
+<dl class="py method">
+<dt id="sparselearning.core.LayerStats.load_state_dict">
+<code class="sig-name descname">load_state_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">initial_data</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.LayerStats.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.LayerStats.nonzeros_dict">
+<code class="sig-name descname">nonzeros_dict</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></em><a class="headerlink" href="#sparselearning.core.LayerStats.nonzeros_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.LayerStats.removed_dict">
+<code class="sig-name descname">removed_dict</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></em><a class="headerlink" href="#sparselearning.core.LayerStats.removed_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.LayerStats.state_dict">
+<code class="sig-name descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.LayerStats.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.LayerStats.total_density">
+<em class="property">property </em><code class="sig-name descname">total_density</code><a class="headerlink" href="#sparselearning.core.LayerStats.total_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.LayerStats.total_nonzero">
+<code class="sig-name descname">total_nonzero</code><em class="property">: int</em><em class="property"> = 0</em><a class="headerlink" href="#sparselearning.core.LayerStats.total_nonzero" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.LayerStats.total_removed">
+<code class="sig-name descname">total_removed</code><em class="property">: int</em><em class="property"> = 0</em><a class="headerlink" href="#sparselearning.core.LayerStats.total_removed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.LayerStats.total_variance">
+<code class="sig-name descname">total_variance</code><em class="property">: float</em><em class="property"> = 0</em><a class="headerlink" href="#sparselearning.core.LayerStats.total_variance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.LayerStats.total_zero">
+<code class="sig-name descname">total_zero</code><em class="property">: int</em><em class="property"> = 0</em><a class="headerlink" href="#sparselearning.core.LayerStats.total_zero" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.LayerStats.variance_dict">
+<code class="sig-name descname">variance_dict</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>float<span class="p">]</span></em><a class="headerlink" href="#sparselearning.core.LayerStats.variance_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.LayerStats.zeros_dict">
+<code class="sig-name descname">zeros_dict</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>int<span class="p">]</span></em><a class="headerlink" href="#sparselearning.core.LayerStats.zeros_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.core.Masking">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.core.</code><code class="sig-name descname">Masking</code><span class="sig-paren">(</span><em class="sig-param">optimizer: optim</em>, <em class="sig-param">prune_rate_decay: Decay</em>, <em class="sig-param">density: float = 0.1</em>, <em class="sig-param">sparse_init: str = 'random'</em>, <em class="sig-param">dense_gradients: bool = False</em>, <em class="sig-param">prune_mode: str = 'magnitude'</em>, <em class="sig-param">growth_mode: str = 'momentum'</em>, <em class="sig-param">redistribution_mode: str = 'momentum'</em>, <em class="sig-param">prune_threshold: float = 0.001</em>, <em class="sig-param">growth_threshold: float = 0.001</em>, <em class="sig-param">growth_increment: float = 0.2</em>, <em class="sig-param">increment: float = 0.2</em>, <em class="sig-param">tolerance: float = 1e-06</em>, <em class="sig-param">mask_dict: Dict[str</em>, <em class="sig-param">Tensor] = &lt;factory&gt;</em>, <em class="sig-param">module: nn.Module = None</em>, <em class="sig-param">mask_step: int = 0</em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wraps PyTorch model parameters with a sparse mask.</p>
+<p>Creates a mask for each parameter tensor contained in the model. When
+<cite>apply_mask()</cite> is called, it applies the sparsity pattern to the parameters.</p>
+<dl class="simple">
+<dt>Basic usage:</dt><dd><p>optimizer = torchoptim.SGD(model.parameters(),lr=args.lr)
+decay = CosineDecay(args.prune_rate, len(train_loader)*(args.epochs))
+mask = Masking(optimizer, prune_rate_decay=decay)
+model = MyModel()
+mask.add_module(model)</p>
+</dd>
+</dl>
+<p>Removing layers: Layers can be removed individually, by type, or by partial
+match of their name.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><cite>mask.remove_weight(name)</cite> requires an exact name of</p></li>
+</ul>
+</div></blockquote>
+<dl class="simple">
+<dt>a parameter.</dt><dd><ul class="simple">
+<li><p><cite>mask.remove_weight_partial_name(partial_name=name)</cite> removes all
+parameters that contain the partial name. For example ‘conv’ would remove all
+layers with ‘conv’ in their name.</p></li>
+<li><p><cite>mask.remove_type(type)</cite> removes all layers of a certain type. For example,
+mask.remove_type(torch.nn.BatchNorm2d) removes all 2D batch norm layers.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="sparselearning.core.Masking.add_module">
+<code class="sig-name descname">add_module</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">module</span></em>, <em class="sig-param"><span class="n">lottery_mask_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.add_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store dict of parameters to mask</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – to mask</p></li>
+<li><p><strong>lottery_mask_path</strong> – initialize from an existing model’s mask.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.adjust_prune_rate">
+<code class="sig-name descname">adjust_prune_rate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.adjust_prune_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modify prune rate for layers with low sparsity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.apply_mask">
+<code class="sig-name descname">apply_mask</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.apply_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies boolean mask to modules</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.apply_mask_gradients">
+<code class="sig-name descname">apply_mask_gradients</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.apply_mask_gradients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies boolean mask to modules’s gradients</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.avg_inference_FLOPs">
+<em class="property">property </em><code class="sig-name descname">avg_inference_FLOPs</code><a class="headerlink" href="#sparselearning.core.Masking.avg_inference_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>running average of inference FLOPs</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.calc_redistributed_densities">
+<code class="sig-name descname">calc_redistributed_densities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.calc_redistributed_densities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes layer-wise density
+given a redistribution scheme.</p>
+<p>Ensures that layer-wise densities
+are valid (i.e. 0 &lt;= density &lt;= 1).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Layer-wise valid densities.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[str, float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.dense_FLOPs">
+<em class="property">property </em><code class="sig-name descname">dense_FLOPs</code><a class="headerlink" href="#sparselearning.core.Masking.dense_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates dense inference FLOPs of the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>dense FLOPs</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.dense_gradients">
+<code class="sig-name descname">dense_gradients</code><em class="property"> = False</em><a class="headerlink" href="#sparselearning.core.Masking.dense_gradients" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.density">
+<code class="sig-name descname">density</code><em class="property"> = 0.1</em><a class="headerlink" href="#sparselearning.core.Masking.density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.gather_statistics">
+<code class="sig-name descname">gather_statistics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.gather_statistics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gather layer-wise &amp; global stats.
+Typically performed before each mask update.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.get_momentum_for_weight">
+<code class="sig-name descname">get_momentum_for_weight</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">weight</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Tensor<a class="headerlink" href="#sparselearning.core.Masking.get_momentum_for_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return momentum from optimizer (SGD or Adam)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>weight</strong> (<em>str</em>) – weight name</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Momentum buffer for layer</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>torch.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.global_prune">
+<em class="property">property </em><code class="sig-name descname">global_prune</code><a class="headerlink" href="#sparselearning.core.Masking.global_prune" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.growth_func">
+<em class="property">property </em><code class="sig-name descname">growth_func</code><a class="headerlink" href="#sparselearning.core.Masking.growth_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.growth_increment">
+<code class="sig-name descname">growth_increment</code><em class="property"> = 0.2</em><a class="headerlink" href="#sparselearning.core.Masking.growth_increment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.growth_mode">
+<code class="sig-name descname">growth_mode</code><em class="property"> = 'momentum'</em><a class="headerlink" href="#sparselearning.core.Masking.growth_mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.growth_threshold">
+<code class="sig-name descname">growth_threshold</code><em class="property"> = 0.001</em><a class="headerlink" href="#sparselearning.core.Masking.growth_threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.increment">
+<code class="sig-name descname">increment</code><em class="property"> = 0.2</em><a class="headerlink" href="#sparselearning.core.Masking.increment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.inference_FLOPs">
+<em class="property">property </em><code class="sig-name descname">inference_FLOPs</code><a class="headerlink" href="#sparselearning.core.Masking.inference_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates dense inference FLOPs of the model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>inference FLOPs</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.init">
+<code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lottery_mask_path</span><span class="p">:</span> <span class="n">Path</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sparsity initialization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lottery_mask_path</strong> (<em>Path</em>) – Mask path,
+if using Lottery Ticket Hypothesis
+(Frankle &amp; Carbin 2018).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.load_state_dict">
+<code class="sig-name descname">load_state_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">initial_data</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.load_state_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.mask_step">
+<code class="sig-name descname">mask_step</code><em class="property"> = 0</em><a class="headerlink" href="#sparselearning.core.Masking.mask_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.module">
+<code class="sig-name descname">module</code><em class="property"> = None</em><a class="headerlink" href="#sparselearning.core.Masking.module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.print_nonzero_counts">
+<code class="sig-name descname">print_nonzero_counts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.print_nonzero_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.prune_func">
+<em class="property">property </em><code class="sig-name descname">prune_func</code><a class="headerlink" href="#sparselearning.core.Masking.prune_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls prune func from the  registry.</p>
+<p>We use &#64;property, so that it is always
+synced with prune_mode</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.prune_mode">
+<code class="sig-name descname">prune_mode</code><em class="property"> = 'magnitude'</em><a class="headerlink" href="#sparselearning.core.Masking.prune_mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.prune_rate">
+<em class="property">property </em><code class="sig-name descname">prune_rate</code><a class="headerlink" href="#sparselearning.core.Masking.prune_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get prune rate from the decay object</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.prune_threshold">
+<code class="sig-name descname">prune_threshold</code><em class="property"> = 0.001</em><a class="headerlink" href="#sparselearning.core.Masking.prune_threshold" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.redistribution_func">
+<em class="property">property </em><code class="sig-name descname">redistribution_func</code><a class="headerlink" href="#sparselearning.core.Masking.redistribution_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls redistribution func from the  registry.</p>
+<p>We use &#64;property, so that it is always
+synced with redistribution_mode</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.redistribution_mode">
+<code class="sig-name descname">redistribution_mode</code><em class="property"> = 'momentum'</em><a class="headerlink" href="#sparselearning.core.Masking.redistribution_mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.remove_type">
+<code class="sig-name descname">remove_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nn_type</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.remove_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove layer by type (eg: nn.Linear, nn.Conv2d, etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>nn_type</strong> (<em>nn.Module</em>) – type of layer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.remove_weight">
+<code class="sig-name descname">remove_weight</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.remove_weight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove layer by complete name</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – layer name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.remove_weight_partial_name">
+<code class="sig-name descname">remove_weight_partial_name</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partial_name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.remove_weight_partial_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove module by partial name (eg: conv).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>partial_name</strong> (<em>str</em>) – partial layer name</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.reset_momentum">
+<code class="sig-name descname">reset_momentum</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.reset_momentum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mask momentum buffers</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.sparse_init">
+<code class="sig-name descname">sparse_init</code><em class="property"> = 'random'</em><a class="headerlink" href="#sparselearning.core.Masking.sparse_init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.sparsify">
+<code class="sig-name descname">sparsify</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.sparsify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call sparsity init func
+(see sparselearning/funcs/init_scheme.py)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.state_dict">
+<code class="sig-name descname">state_dict</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict<a class="headerlink" href="#sparselearning.core.Masking.state_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.step">
+<code class="sig-name descname">step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs an optimizer step
+(i.e, no update to mask topology).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.to_module_device_">
+<code class="sig-name descname">to_module_device_</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.to_module_device_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send to module’s device</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.core.Masking.tolerance">
+<code class="sig-name descname">tolerance</code><em class="property"> = 1e-06</em><a class="headerlink" href="#sparselearning.core.Masking.tolerance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.truncate_weights">
+<code class="sig-name descname">truncate_weights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.truncate_weights" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform grow / prune / redistribution step</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.core.Masking.update_connections">
+<code class="sig-name descname">update_connections</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.core.Masking.update_connections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a mask update
+(i.e, update to mask topology).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="sparselearning.counting.html" class="btn btn-neutral float-right" title="sparselearning.counting" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../references.html" class="btn btn-neutral float-left" title="References" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

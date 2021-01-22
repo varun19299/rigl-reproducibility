@@ -1,0 +1,797 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>sparselearning.counting &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sparselearning.funcs" href="sparselearning.funcs.html" />
+    <link rel="prev" title="sparselearning package" href="sparselearning.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_code.html">Example Code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../main_results.html">Main Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../code_structure.html">Code Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="sparselearning.html">sparselearning package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="sparselearning.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">sparselearning.counting</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.counting.helper">sparselearning.counting.helper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.counting.inference_train_FLOPs">sparselearning.counting.inference_train_FLOPs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.counting.micronet_challenge">sparselearning.counting.micronet_challenge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.counting.ops">sparselearning.counting.ops</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-sparselearning.counting.print_stats">sparselearning.counting.print_stats</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.funcs.html">sparselearning.funcs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.tests.html">sparselearning.tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sparselearning.utils.html">sparselearning.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sparselearning.html#module-sparselearning.core">sparselearning.core</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../visualization/visualization.html">visualization package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models/models.html">models package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="sparselearning.html">sparselearning package</a> &raquo;</li>
+        
+      <li>sparselearning.counting</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/sparselearning/sparselearning.counting.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="sparselearning-counting">
+<h1>sparselearning.counting<a class="headerlink" href="#sparselearning-counting" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-sparselearning.counting.helper">
+<span id="sparselearning-counting-helper"></span><h2>sparselearning.counting.helper<a class="headerlink" href="#module-sparselearning.counting.helper" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sparselearning.counting.helper.get_pre_activations_dict">
+<code class="sig-prename descclassname">sparselearning.counting.helper.</code><code class="sig-name descname">get_pre_activations_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">net</span><span class="p">:</span> <span class="n">nn.Module</span></em>, <em class="sig-param"><span class="n">input_tensor</span><span class="p">:</span> <span class="n">Tensor</span></em><span class="sig-paren">)</span> &#x2192; Dict<span class="p">[</span>str<span class="p">, </span>Tensor<span class="p">]</span><a class="headerlink" href="#sparselearning.counting.helper.get_pre_activations_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find pre-activation dict for every possible module in network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>net</strong> (<em>nn.Module</em>) – Pytorch model</p></li>
+<li><p><strong>input_tensor</strong> (<em>Tensor</em>) – input tensor, supports only single input</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dictionary mapping layers to pre-activations</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Dict[str, Tensor]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.counting.inference_train_FLOPs">
+<span id="sparselearning-counting-inference-train-flops"></span><h2>sparselearning.counting.inference_train_FLOPs<a class="headerlink" href="#module-sparselearning.counting.inference_train_FLOPs" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sparselearning.counting.inference_train_FLOPs.Pruning_inference_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.inference_train_FLOPs.</code><code class="sig-name descname">Pruning_inference_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dense_FLOPs</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">decay</span><span class="p">:</span> <span class="n"><a class="reference internal" href="sparselearning.funcs.html#sparselearning.funcs.decay.MagnitudePruneDecay" title="sparselearning.funcs.decay.MagnitudePruneDecay">sparselearning.funcs.decay.MagnitudePruneDecay</a></span></em>, <em class="sig-param"><span class="n">total_steps</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">87891</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#sparselearning.counting.inference_train_FLOPs.Pruning_inference_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inference FLOPs for Iterative Pruning, Zhu and Gupta 2018.
+Note, assumes FLOPs propto average sparsity,
+which is approximately true in practice.</p>
+<p>For our report, we accurately calculate train FLOPs by evaluating FLOPs
+during each pruning iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dense_FLOPs</strong> (<em>int</em>) – FLOPs consumed for dense model’s forward pass</p></li>
+<li><p><strong>decay</strong> (<a class="reference internal" href="sparselearning.funcs.html#sparselearning.funcs.decay.MagnitudePruneDecay" title="sparselearning.funcs.decay.MagnitudePruneDecay"><em>sparselearning.funcs.decay.MagnitudePruneDecay</em></a>) – Pruning schedule used</p></li>
+<li><p><strong>total_steps</strong> (<em>int</em>) – Total train steps</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pruning inference FLOPs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.inference_train_FLOPs.Pruning_train_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.inference_train_FLOPs.</code><code class="sig-name descname">Pruning_train_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dense_FLOPs</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">decay</span><span class="p">:</span> <span class="n"><a class="reference internal" href="sparselearning.funcs.html#sparselearning.funcs.decay.MagnitudePruneDecay" title="sparselearning.funcs.decay.MagnitudePruneDecay">sparselearning.funcs.decay.MagnitudePruneDecay</a></span></em>, <em class="sig-param"><span class="n">total_steps</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">87891</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#sparselearning.counting.inference_train_FLOPs.Pruning_train_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train FLOPs for Iterative Pruning, Zhu and Gupta 2018.
+Note, assumes FLOPs propto average sparsity,
+which is approximately true in practice.</p>
+<p>For our report, we accurately calculate train FLOPs by evaluating FLOPs
+during each pruning iteration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dense_FLOPs</strong> (<em>int</em>) – FLOPs consumed for dense model’s forward pass</p></li>
+<li><p><strong>decay</strong> (<a class="reference internal" href="sparselearning.funcs.html#sparselearning.funcs.decay.MagnitudePruneDecay" title="sparselearning.funcs.decay.MagnitudePruneDecay"><em>sparselearning.funcs.decay.MagnitudePruneDecay</em></a>) – Pruning schedule used</p></li>
+<li><p><strong>total_steps</strong> (<em>int</em>) – Total train steps</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Pruning train FLOPs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.inference_train_FLOPs.RigL_train_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.inference_train_FLOPs.</code><code class="sig-name descname">RigL_train_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sparse_FLOPs</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">dense_FLOPs</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">mask_interval</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">100</span></em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#sparselearning.counting.inference_train_FLOPs.RigL_train_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train FLOPs for Rigging the Lottery (RigL), Evci et al. 2020.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sparse_FLOPs</strong> (<em>int</em>) – FLOPs consumed for sparse model’s forward pass</p></li>
+<li><p><strong>dense_FLOPs</strong> (<em>int</em>) – FLOPs consumed for dense model’s forward pass</p></li>
+<li><p><strong>mask_interval</strong> (<em>int</em>) – Mask update interval</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>RigL train FLOPs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.inference_train_FLOPs.SET_train_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.inference_train_FLOPs.</code><code class="sig-name descname">SET_train_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sparse_FLOPs</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">dense_FLOPs</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">mask_interval</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">100</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sparselearning.counting.inference_train_FLOPs.SET_train_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train FLOPs for Sparse Evolutionary Training (SET), Mocanu et al. 2018.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sparse_FLOPs</strong> (<em>int</em>) – FLOPs consumed for sparse model’s forward pass</p></li>
+<li><p><strong>dense_FLOPs</strong> (<em>int</em>) – FLOPs consumed for dense model’s forward pass</p></li>
+<li><p><strong>mask_interval</strong> (<em>int</em>) – Mask update interval</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>SET train FLOPs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.inference_train_FLOPs.SNFS_train_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.inference_train_FLOPs.</code><code class="sig-name descname">SNFS_train_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sparse_FLOPs</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">dense_FLOPs</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">mask_interval</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">100</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sparselearning.counting.inference_train_FLOPs.SNFS_train_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Train FLOPs for Sparse Networks from Scratch (SNFS), Dettmers et al. 2020.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sparse_FLOPs</strong> (<em>int</em>) – FLOPs consumed for sparse model’s forward pass</p></li>
+<li><p><strong>dense_FLOPs</strong> (<em>int</em>) – FLOPs consumed for dense model’s forward pass</p></li>
+<li><p><strong>mask_interval</strong> (<em>int</em>) – Mask update interval</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>SNFS train FLOPs</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.inference_train_FLOPs.model_inference_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.inference_train_FLOPs.</code><code class="sig-name descname">model_inference_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sparse_init</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'random'</span></em>, <em class="sig-param"><span class="n">density</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.2</span></em>, <em class="sig-param"><span class="n">model_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'wrn-22-2'</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="default_value">(1, 3, 32, 32)</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sparselearning.counting.inference_train_FLOPs.model_inference_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain inference FLOPs for a model.</p>
+<p>Only for models trained with a constant FLOP sparsifying technique.
+eg: SNFS, Pruning are not supported here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sparse_init</strong> (<em>str</em>) – Initialization scheme used (Random / ER / ERK)</p></li>
+<li><p><strong>density</strong> (<em>float</em>) – Overall parameter density (non-zero / capacity)</p></li>
+<li><p><strong>model_name</strong> (<em>str</em>) – model to use (WideResNet-22-2 or ResNet-50)</p></li>
+<li><p><strong>input_size</strong> (<em>Tuple</em>) – shape of input tensor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.inference_train_FLOPs.resnet50_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.inference_train_FLOPs.</code><code class="sig-name descname">resnet50_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sparse_init</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'random'</span></em>, <em class="sig-param"><span class="n">density</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.2</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">model_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'resnet50'</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="default_value">(1, 3, 32, 32)</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sparselearning.counting.inference_train_FLOPs.resnet50_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain inference FLOPs for a model.</p>
+<p>Only for models trained with a constant FLOP sparsifying technique.
+eg: SNFS, Pruning are not supported here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sparse_init</strong> (<em>str</em>) – Initialization scheme used (Random / ER / ERK)</p></li>
+<li><p><strong>density</strong> (<em>float</em>) – Overall parameter density (non-zero / capacity)</p></li>
+<li><p><strong>model_name</strong> (<em>str</em>) – model to use (WideResNet-22-2 or ResNet-50)</p></li>
+<li><p><strong>input_size</strong> (<em>Tuple</em>) – shape of input tensor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.inference_train_FLOPs.wrn_22_2_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.inference_train_FLOPs.</code><code class="sig-name descname">wrn_22_2_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sparse_init</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'random'</span></em>, <em class="sig-param"><span class="n">density</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0.2</span></em>, <em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">model_name</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'wrn-22-2'</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="default_value">(1, 3, 32, 32)</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sparselearning.counting.inference_train_FLOPs.wrn_22_2_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obtain inference FLOPs for a model.</p>
+<p>Only for models trained with a constant FLOP sparsifying technique.
+eg: SNFS, Pruning are not supported here.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sparse_init</strong> (<em>str</em>) – Initialization scheme used (Random / ER / ERK)</p></li>
+<li><p><strong>density</strong> (<em>float</em>) – Overall parameter density (non-zero / capacity)</p></li>
+<li><p><strong>model_name</strong> (<em>str</em>) – model to use (WideResNet-22-2 or ResNet-50)</p></li>
+<li><p><strong>input_size</strong> (<em>Tuple</em>) – shape of input tensor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.counting.micronet_challenge">
+<span id="sparselearning-counting-micronet-challenge"></span><h2>sparselearning.counting.micronet_challenge<a class="headerlink" href="#module-sparselearning.counting.micronet_challenge" title="Permalink to this headline">¶</a></h2>
+<p>Code taken from: <a class="reference external" href="https://github.com/google-research/google-research/blob/master/micronet_challenge/counting.py">https://github.com/google-research/google-research/blob/master/micronet_challenge/counting.py</a></p>
+<p>This module defines an API for counting parameters and operations.</p>
+<p>## Defining the Operation Count API
+- <cite>input_size</cite> is an int, since square image assumed.
+- <cite>strides</cite> is a tuple, but assumed to have same stride in both dimensions.
+- Supported <cite>paddings</cite> are <cite>same’ and `valid</cite>.
+- <cite>use_bias</cite> is boolean.
+- <cite>activation</cite> is one of the following <cite>relu</cite>, <cite>swish</cite>, <cite>sigmoid</cite>, None
+- kernel_shapes for <cite>Conv2D</cite> dimensions must be in the following order:</p>
+<blockquote>
+<div><p><cite>k_size, k_size, c_in, c_out</cite></p>
+</div></blockquote>
+<ul class="simple">
+<li><p>kernel_shapes for <cite>FullyConnected</cite> dimensions must be in the following order:
+<cite>c_in, c_out</cite></p></li>
+<li><p>kernel_shapes for <cite>DepthWiseConv2D</cite> dimensions must be like the following:
+<cite>k_size, k_size, c_in==c_out, 1</cite></p></li>
+</ul>
+<dl class="py class">
+<dt id="sparselearning.counting.micronet_challenge.Add">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">Add</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_size</span></em>, <em class="sig-param"><span class="n">n_channels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Operation definitions for elementwise multiplication and addition.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>kernel_shape: list, of length 2. Shape of the weight matrix.
+use_bias: bool, if true a bias term is added to the output.
+activation: str, type of activation applied to the output.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Add.input_size">
+<code class="sig-name descname">input_size</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Add.input_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Add.n_channels">
+<code class="sig-name descname">n_channels</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Add.n_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.counting.micronet_challenge.Conv2D">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">Conv2D</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_size</span></em>, <em class="sig-param"><span class="n">kernel_shape</span></em>, <em class="sig-param"><span class="n">strides</span></em>, <em class="sig-param"><span class="n">padding</span></em>, <em class="sig-param"><span class="n">use_bias</span></em>, <em class="sig-param"><span class="n">activation</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Conv2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Operation definition for 2D depthwise convolution.</p>
+<p>Only difference compared to Conv2D is the kernel_shape[3] = 1.</p>
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Conv2D.activation">
+<code class="sig-name descname">activation</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Conv2D.activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Conv2D.input_size">
+<code class="sig-name descname">input_size</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Conv2D.input_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Conv2D.kernel_shape">
+<code class="sig-name descname">kernel_shape</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Conv2D.kernel_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Conv2D.padding">
+<code class="sig-name descname">padding</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Conv2D.padding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Conv2D.strides">
+<code class="sig-name descname">strides</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Conv2D.strides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Conv2D.use_bias">
+<code class="sig-name descname">use_bias</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Conv2D.use_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.counting.micronet_challenge.DepthWiseConv2D">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">DepthWiseConv2D</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_size</span></em>, <em class="sig-param"><span class="n">kernel_shape</span></em>, <em class="sig-param"><span class="n">strides</span></em>, <em class="sig-param"><span class="n">padding</span></em>, <em class="sig-param"><span class="n">use_bias</span></em>, <em class="sig-param"><span class="n">activation</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.DepthWiseConv2D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Operation definition for Global Average Pooling.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>input_size: int, Dimensions of the input image (square assumed).
+n_channels: int, Number of output dimensions.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.DepthWiseConv2D.activation">
+<code class="sig-name descname">activation</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.DepthWiseConv2D.activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.DepthWiseConv2D.input_size">
+<code class="sig-name descname">input_size</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.DepthWiseConv2D.input_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.DepthWiseConv2D.kernel_shape">
+<code class="sig-name descname">kernel_shape</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.DepthWiseConv2D.kernel_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.DepthWiseConv2D.padding">
+<code class="sig-name descname">padding</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.DepthWiseConv2D.padding" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.DepthWiseConv2D.strides">
+<code class="sig-name descname">strides</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.DepthWiseConv2D.strides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.DepthWiseConv2D.use_bias">
+<code class="sig-name descname">use_bias</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.DepthWiseConv2D.use_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.counting.micronet_challenge.FullyConnected">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">FullyConnected</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kernel_shape</span></em>, <em class="sig-param"><span class="n">use_bias</span></em>, <em class="sig-param"><span class="n">activation</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.FullyConnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.FullyConnected.activation">
+<code class="sig-name descname">activation</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.FullyConnected.activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.FullyConnected.kernel_shape">
+<code class="sig-name descname">kernel_shape</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.FullyConnected.kernel_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.FullyConnected.use_bias">
+<code class="sig-name descname">use_bias</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.FullyConnected.use_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.counting.micronet_challenge.GlobalAvg">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">GlobalAvg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_size</span></em>, <em class="sig-param"><span class="n">n_channels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.GlobalAvg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<p>Operation definitions for elementwise multiplication and addition.</p>
+<dl class="simple">
+<dt>Attributes:</dt><dd><p>input_size: int, Dimensions of the input image (square assumed).
+n_channels: int, Number of output dimensions.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.GlobalAvg.input_size">
+<code class="sig-name descname">input_size</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.GlobalAvg.input_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.GlobalAvg.n_channels">
+<code class="sig-name descname">n_channels</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.GlobalAvg.n_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.counting.micronet_challenge.MicroNetCounter">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">MicroNetCounter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">all_ops</span></em>, <em class="sig-param"><span class="n">add_bits_base</span><span class="o">=</span><span class="default_value">32</span></em>, <em class="sig-param"><span class="n">mul_bits_base</span><span class="o">=</span><span class="default_value">32</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.MicroNetCounter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Counts operations using given information.</p>
+<dl class="py method">
+<dt id="sparselearning.counting.micronet_challenge.MicroNetCounter.print_summary">
+<code class="sig-name descname">print_summary</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sparsity</span></em>, <em class="sig-param"><span class="n">param_bits</span></em>, <em class="sig-param"><span class="n">add_bits</span></em>, <em class="sig-param"><span class="n">mul_bits</span></em>, <em class="sig-param"><span class="n">summarize_blocks</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.MicroNetCounter.print_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prints all operations with given options.</p>
+<dl>
+<dt>Args:</dt><dd><p>sparsity: float, between 0,1 defines how sparse each parametric layer is.
+param_bits: int, bits in which parameters are stored.
+add_bits: float, number of bits used for accumulator.
+mul_bits: float, number of bits inputs represented for multiplication.
+summarize_blocks: bool, if True counts within a block are aggregated and</p>
+<blockquote>
+<div><p>reported in a single line.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="sparselearning.counting.micronet_challenge.MicroNetCounter.process_counts">
+<code class="sig-name descname">process_counts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">total_params</span></em>, <em class="sig-param"><span class="n">total_mults</span></em>, <em class="sig-param"><span class="n">total_adds</span></em>, <em class="sig-param"><span class="n">mul_bits</span></em>, <em class="sig-param"><span class="n">add_bits</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.MicroNetCounter.process_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="sparselearning.counting.micronet_challenge.Scale">
+<em class="property">class </em><code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">Scale</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">input_size</span></em>, <em class="sig-param"><span class="n">n_channels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Scale.input_size">
+<code class="sig-name descname">input_size</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Scale.input_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="sparselearning.counting.micronet_challenge.Scale.n_channels">
+<code class="sig-name descname">n_channels</code><a class="headerlink" href="#sparselearning.counting.micronet_challenge.Scale.n_channels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.micronet_challenge.count_ops">
+<code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">count_ops</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">op</span></em>, <em class="sig-param"><span class="n">sparsity</span></em>, <em class="sig-param"><span class="n">param_bits</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.count_ops" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a operation class returns the flop and parameter statistics.</p>
+<dl>
+<dt>Args:</dt><dd><p>op: namedtuple, operation definition.
+sparsity: float, sparsity of parameterized operations. Sparsity only effects</p>
+<blockquote>
+<div><p>Conv and FC layers; since activations are dense.</p>
+</div></blockquote>
+<p>param_bits: int, number of bits required to represent a parameter.</p>
+</dd>
+<dt>Returns:</dt><dd><p>param_count: number of bits required to store parameters
+n_mults: number of multiplications made per input sample.
+n_adds: number of multiplications made per input sample.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.micronet_challenge.get_conv_output_size">
+<code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">get_conv_output_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">image_size</span></em>, <em class="sig-param"><span class="n">filter_size</span></em>, <em class="sig-param"><span class="n">padding</span></em>, <em class="sig-param"><span class="n">stride</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.get_conv_output_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the output size of convolution.</p>
+<p>The input, filter and the strides are assumed to be square.
+Arguments:</p>
+<blockquote>
+<div><p>image_size: int, Dimensions of the input image (square assumed).
+filter_size: int, Dimensions of the kernel (square assumed).
+padding: str, padding added to the input image. ‘same’ or ‘valid’
+stride: int, stride with which the kernel is applied (square assumed).</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int, output size.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.micronet_challenge.get_flops_per_activation">
+<code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">get_flops_per_activation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">activation</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.get_flops_per_activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of multiplication ands additions of an activation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>activation: str, type of activation applied to the output.</p>
+</dd>
+<dt>Returns:</dt><dd><p>n_muls, n_adds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.micronet_challenge.get_info">
+<code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">get_info</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">op</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an op extracts some common information.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="sparselearning.counting.micronet_challenge.get_sparse_size">
+<code class="sig-prename descclassname">sparselearning.counting.micronet_challenge.</code><code class="sig-name descname">get_sparse_size</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tensor_shape</span></em>, <em class="sig-param"><span class="n">param_bits</span></em>, <em class="sig-param"><span class="n">sparsity</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.micronet_challenge.get_sparse_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a tensor shape returns #bits required to store the tensor sparse.</p>
+<p>If sparsity is greater than 0, we do have to store a bit mask to represent
+sparsity.
+Args:</p>
+<blockquote>
+<div><p>tensor_shape: list&lt;int&gt;, shape of the tensor
+param_bits: int, number of bits the elements of the tensor represented in.
+sparsity: float, sparsity level. 0 means dense.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>int, number of bits required to represented the tensor in sparse format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.counting.ops">
+<span id="sparselearning-counting-ops"></span><h2>sparselearning.counting.ops<a class="headerlink" href="#module-sparselearning.counting.ops" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sparselearning.counting.ops.get_inference_FLOPs">
+<code class="sig-prename descclassname">sparselearning.counting.ops.</code><code class="sig-name descname">get_inference_FLOPs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">masking</span><span class="p">:</span> <span class="n">Masking</span></em>, <em class="sig-param"><span class="n">input_tensor</span><span class="p">:</span> <span class="n">Tensor</span></em>, <em class="sig-param"><span class="n">param_size</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">32</span></em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#sparselearning.counting.ops.get_inference_FLOPs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns total FLOPs consumed for a forward pass (inference FLOPs).
+Assumes support for sparse convolutions, sparse dense layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>masking</strong> (<a class="reference internal" href="sparselearning.html#sparselearning.core.Masking" title="sparselearning.core.Masking"><em>Masking</em></a>) – Masking instance, a wrapper on boolean masks</p></li>
+<li><p><strong>input_tensor</strong> (<em>torch.Tensor</em>) – Input to model, single input supported</p></li>
+<li><p><strong>param_size</strong> (<em>int</em>) – bits used for floating point operations (default 32)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>total FLOPs consumed for a forward pass</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-sparselearning.counting.print_stats">
+<span id="sparselearning-counting-print-stats"></span><h2>sparselearning.counting.print_stats<a class="headerlink" href="#module-sparselearning.counting.print_stats" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="sparselearning.counting.print_stats.print_stats">
+<code class="sig-prename descclassname">sparselearning.counting.print_stats.</code><code class="sig-name descname">print_stats</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">input_size</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="default_value">(1, 3, 32, 32)</span></em><span class="sig-paren">)</span><a class="headerlink" href="#sparselearning.counting.print_stats.print_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print FLOP statistics for (Dense, Pruning, RigL, SET, SNFS) models</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> (<em>str</em>) – Model to use (wrn-22-2 or resnet-50)</p></li>
+<li><p><strong>input_size</strong> (<em>Tuple</em><em>[</em><em>int</em><em>]</em>) – Shape of input tensor, single input only</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="sparselearning.funcs.html" class="btn btn-neutral float-right" title="sparselearning.funcs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="sparselearning.html" class="btn btn-neutral float-left" title="sparselearning package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

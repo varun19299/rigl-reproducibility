@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Example Code &mdash; SparseLearning 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Main Results" href="main_results.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> SparseLearning
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Documentation:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Example Code</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#train-wideresnet-22-2-with-rigl-on-cifar10">Train WideResNet-22-2 with RigL on CIFAR10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#train-resnet-50-with-snfs-on-cifar100">Train ResNet-50 with SNFS on CIFAR100</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#evaluate-wideresnet-22-2-with-rigl-on-cifar10">Evaluate WideResNet-22-2 with RigL on CIFAR10</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#evaluate-resnet-50-with-snfs-on-cifar100">Evaluate ResNet-50 with SNFS on CIFAR100</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="main_results.html">Main Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="code_structure.html">Code Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API Documentation:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="sparselearning/sparselearning.html">sparselearning package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization/visualization.html">visualization package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models/models.html">models package</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SparseLearning</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Example Code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/example_code.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="example-code">
+<h1>Example Code<a class="headerlink" href="#example-code" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="train-wideresnet-22-2-with-rigl-on-cifar10">
+<h2>Train WideResNet-22-2 with RigL on CIFAR10<a class="headerlink" href="#train-wideresnet-22-2-with-rigl-on-cifar10" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make cifar10.ERK.RigL <span class="nv">DENSITY</span><span class="o">=</span><span class="m">0</span>.2 <span class="nv">SEED</span><span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+<p>Change <code class="docutils literal notranslate"><span class="pre">DENSITY</span></code> incase you want to use a different density (1 - sparsity) level.
+See <code class="docutils literal notranslate"><span class="pre">outputs/CIFAR10/RigL_ERK/0.2/</span></code> for checkpoints etc.</p>
+</div>
+<div class="section" id="train-resnet-50-with-snfs-on-cifar100">
+<h2>Train ResNet-50 with SNFS on CIFAR100<a class="headerlink" href="#train-resnet-50-with-snfs-on-cifar100" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make cifar100.ERK.SNFS <span class="nv">DENSITY</span><span class="o">=</span><span class="m">0</span>.2 <span class="nv">SEED</span><span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+<p>See <code class="docutils literal notranslate"><span class="pre">outputs/CIFAR100/SNFS_ERK/0.2</span></code> for checkpoints etc.</p>
+</div>
+<div class="section" id="evaluate-wideresnet-22-2-with-rigl-on-cifar10">
+<h2>Evaluate WideResNet-22-2 with RigL on CIFAR10<a class="headerlink" href="#evaluate-wideresnet-22-2-with-rigl-on-cifar10" title="Permalink to this headline">¶</a></h2>
+<p>Either train WRN-22-2 with RigL as described above, or download checkpoints from <a class="reference external" href="https://drive.google.com/drive/folders/1f_q5pm5DR2a3GTGIa-xagWU3Nici8Lq-?usp=sharing/">here</a>.
+Place under <code class="docutils literal notranslate"><span class="pre">outputs/CIFAR10/RigL_ERK/0.2/+specific=cifar10_wrn_22_2_masking,seed=0</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make cifar10.ERK.RigL <span class="nv">DENSITY</span><span class="o">=</span><span class="m">0</span>.2 <span class="nv">SEED</span><span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="evaluate-resnet-50-with-snfs-on-cifar100">
+<h2>Evaluate ResNet-50 with SNFS on CIFAR100<a class="headerlink" href="#evaluate-resnet-50-with-snfs-on-cifar100" title="Permalink to this headline">¶</a></h2>
+<p>Either train ResNet-50 with SNFS as described above, or download checkpoints from <a class="reference external" href="https://drive.google.com/drive/folders/1iSooN25SiAsNWF4uKgYnU-9fU-wUp0Hc?usp=sharing/">here</a>.
+Place under <code class="docutils literal notranslate"><span class="pre">outputs/CIFAR100/SNFS_ERK/0.2/+specific=cifar100_resnet50_masking,seed=0</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make cifar10.ERK.RigL <span class="nv">DENSITY</span><span class="o">=</span><span class="m">0</span>.2 <span class="nv">SEED</span><span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="main_results.html" class="btn btn-neutral float-right" title="Main Results" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Anonymous.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

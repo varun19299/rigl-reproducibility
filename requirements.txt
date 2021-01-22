@@ -12,6 +12,7 @@ matplotlib
 multipledispatch
 numpy
 pytest
+
 torch
 torchvision
 tqdm
