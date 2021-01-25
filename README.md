@@ -132,9 +132,19 @@ It may be preferable to run specific make commands in parallel for this reason. 
 <p>
 
 Shown for 80% sparsity (20% density) on CIFAR10. For exhaustive results and their analysis refer to our report.
+
+<table>
+	<tr><th>Method</th><th>Accuracy (Test)</th><th>FLOPS (Train, Test)</th></tr>
+	<tr><td>Small Dense</td> <td>91.0 ± 0.07 </td> <td>0.20x, 0.20x</td></tr>
+	<tr><td>Pruning</td> <td>93.2 ± 0.27 </td> <td>0.41x, 0.27x</td></tr>
+	<tr><td>RigL</td> <td>92.6 ± 0.10 </td> <td>0.20x, 0.20x</td></tr>
+	<tr><td>RigL (ERK)</td> <td>93.1 ± 0.09 </td> <td>0.35x, 0.35x</td></tr>
+	<tr><td>RigL_2x</td> <td>93.0 ± 0.21 </td> <td>0.41x, 0.20x</td></tr>
+	<tr><td>RigL_2x (ERK)</td> <td>93.3 ± 0.09 </td> <td>0.70x, 0.35x</td></tr>
+</table>
+
 </p>
 </details>
-
 
 <details><summary><b>Visualization & Plotting Code</b></summary>
 <p>
