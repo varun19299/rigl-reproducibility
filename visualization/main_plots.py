@@ -31,7 +31,14 @@ methods = sorted(methods)
 
 
 def plot_col_vs_density(y_key, data, method, init, **plot_kwargs):
-    """Plot a column for a single method + init combination."""
+    """Plot a particular column vs density for a single method + init combination.
+
+    :param y_key: The name of the column to plot ("Mean Acc" or "Acc Seed 0" for example)
+    :param data: Pandas DataFrame
+    :param method: Method to plot
+    :param init: Initialization scheme ("Random" or "ERK")
+    :param plot_kwargs: Additional keyword arguments to pass through to the plt.plot call
+    """
 
     dat = data.loc[data["Method"] == method]
 
@@ -62,6 +69,14 @@ def plot_col_vs_density(y_key, data, method, init, **plot_kwargs):
 
 
 def plot_method(data, method, init, color):
+    """Plot the mean accuracy vs density of a method + init combination along with
+    marker plots for each seed.
+
+    :param data: Pandas DataFrame
+    :param method: Method to plot
+    :param init: Initialization scheme ("Random" or "ERK")
+    :param color: Color of the line plot and markers
+    """
     if method == "Pruning":
         init = "Random"
 
@@ -102,6 +117,17 @@ def plot_method(data, method, init, color):
 
 
 def create_plot_from_spec(data, plot_spec, ylimits, name):
+    """Create and save a plot using the data based on plot_spec.
+
+    The plot_spec is list of tuples with each tuple corresponding to one plot of
+    accuracy vs density. The tuple should have three entries -  the method, the
+    initialization scheme, and the color of the plot.
+
+    :param data: Pandas DataFrame containing data about runs
+    :param plot_spec: List of tuples (<method>, <init_scheme>, <color_of_line>)
+    :param ylimits: y limits of the plot
+    :param name: Name of save file
+    """
     plt.figure(figsize=figure_size)
 
     for method, init, color in plot_spec:
@@ -122,6 +148,7 @@ def create_plot_from_spec(data, plot_spec, ylimits, name):
 
 
 def cifar10plots():
+    """Create plots for the CIFAR10 dataset (Figs. 1a, 1b and 1c)."""
     dataset = "cifar10"
     csv_path = (
         f"{hydra.utils.get_original_cwd()}/outputs/csv/{dataset}_main_results.csv"
@@ -158,6 +185,7 @@ def cifar10plots():
 
 
 def cifar100plots():
+    """Create plots for the CIFAR100 dataset (Figs. 2a and 2b)."""
     dataset = "cifar100"
     csv_path = (
         f"{hydra.utils.get_original_cwd()}/outputs/csv/{dataset}_main_results.csv"
@@ -189,8 +217,10 @@ def cifar100plots():
 
 @hydra.main(config_name="config", config_path="../conf")
 def main(cfg: DictConfig):
-    cifar10plots()
-    cifar100plots()
+    if cfg.dataset.name == "CIFAR10":
+        cifar10plots()
+    if cfg.dataset.name == "CIFAR100":
+        cifar100plots()
 
 
 if __name__ == "__main__":
