@@ -29,3 +29,46 @@ Table of Results
 
 Shown for 80% sparsity (20% density) on CIFAR10. For exhaustive results and their analysis refer to our report.
 
+.. list-table::
+   :widths: 25 25 25
+   :header-rows: 1
+
+   * - Method
+     - Accuracy (Test)
+     - FLOPS (Train, Test)
+
+   * - Small Dense
+     - 91.0 ± 0.07
+     - 0.20x, 0.20x
+
+   * - Static
+     - 91.2 ± 0.16
+     - 0.20x, 0.20x
+
+   * - SET
+     - 92.7 ± 0.28
+     - 0.20x, 0.20x
+
+   * - RigL
+     - 92.6 ± 0.10
+     - 0.20x, 0.20x
+
+   * - SET (ERK)
+     - 92.9 ± 0.16
+     - 0.35x, 0.35x
+
+   * - RigL (ERK)
+     - 93.1 ± 0.09
+     - 0.35x, 0.35x
+
+   * - Pruning
+     - 93.2 ± 0.27
+     - 0.41x, 0.27x
+
+   * - RigL_2x
+     - 93.0 ± 0.21
+     - 0.41x, 0.20x
+
+   * - RigL_2x (ERK)
+     - 93.3 ± 0.09
+     - 0.70x, 0.35x

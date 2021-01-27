@@ -192,6 +192,57 @@ Eg: <code class="docutils literal notranslate"><span class="pre">cifar10.Random.
 <div class="section" id="table-of-results">
 <h2>Table of Results<a class="headerlink" href="#table-of-results" title="Permalink to this headline">¶</a></h2>
 <p>Shown for 80% sparsity (20% density) on CIFAR10. For exhaustive results and their analysis refer to our report.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Accuracy (Test)</p></th>
+<th class="head"><p>FLOPS (Train, Test)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Small Dense</p></td>
+<td><p>91.0 ± 0.07</p></td>
+<td><p>0.20x, 0.20x</p></td>
+</tr>
+<tr class="row-odd"><td><p>Static</p></td>
+<td><p>91.2 ± 0.16</p></td>
+<td><p>0.20x, 0.20x</p></td>
+</tr>
+<tr class="row-even"><td><p>SET</p></td>
+<td><p>92.7 ± 0.28</p></td>
+<td><p>0.20x, 0.20x</p></td>
+</tr>
+<tr class="row-odd"><td><p>RigL</p></td>
+<td><p>92.6 ± 0.10</p></td>
+<td><p>0.20x, 0.20x</p></td>
+</tr>
+<tr class="row-even"><td><p>SET (ERK)</p></td>
+<td><p>92.9 ± 0.16</p></td>
+<td><p>0.35x, 0.35x</p></td>
+</tr>
+<tr class="row-odd"><td><p>RigL (ERK)</p></td>
+<td><p>93.1 ± 0.09</p></td>
+<td><p>0.35x, 0.35x</p></td>
+</tr>
+<tr class="row-even"><td><p>Pruning</p></td>
+<td><p>93.2 ± 0.27</p></td>
+<td><p>0.41x, 0.27x</p></td>
+</tr>
+<tr class="row-odd"><td><p>RigL_2x</p></td>
+<td><p>93.0 ± 0.21</p></td>
+<td><p>0.41x, 0.20x</p></td>
+</tr>
+<tr class="row-even"><td><p>RigL_2x (ERK)</p></td>
+<td><p>93.3 ± 0.09</p></td>
+<td><p>0.70x, 0.35x</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
