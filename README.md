@@ -137,11 +137,14 @@ Shown for 80% sparsity (20% density) on CIFAR10. For exhaustive results and thei
 <table>
 	<tr><th>Method</th><th>Accuracy (Test)</th><th>FLOPS (Train, Test)</th></tr>
 	<tr><td>Small Dense</td> <td>91.0 ± 0.07 </td> <td>0.20x, 0.20x</td></tr>
-	<tr><td>Pruning</td> <td>93.2 ± 0.27 </td> <td>0.41x, 0.27x</td></tr>
+	<tr><td>Static</td> <td>91.2 ± 0.16 </td> <td>0.20x, 0.20x</td></tr>
+	<tr><td>SET</td> <td>92.7 ± 0.28 </td> <td>0.20x, 0.20x</td></tr>
 	<tr><td>RigL</td> <td>92.6 ± 0.10 </td> <td>0.20x, 0.20x</td></tr>
-	<tr><td>RigL (ERK)</td> <td>93.1 ± 0.09 </td> <td>0.35x, 0.35x</td></tr>
+	<tr><td>SET (ERK)</td> <td>92.9 ± 0.16 </td> <td>0.35x, 0.35x</td></tr>
+	<tr><td>RigL (ERK)</td> <td><b>93.1 ± 0.09</b> </td> <td>0.35x, 0.35x</td></tr>
+	<tr><td>Pruning</td> <td>93.2 ± 0.27 </td> <td>0.41x, 0.27x</td></tr>
 	<tr><td>RigL_2x</td> <td>93.0 ± 0.21 </td> <td>0.41x, 0.20x</td></tr>
-	<tr><td>RigL_2x (ERK)</td> <td>93.3 ± 0.09 </td> <td>0.70x, 0.35x</td></tr>
+	<tr><td>RigL_2x (ERK)</td> <td><b>93.3 ± 0.09</b> </td> <td>0.70x, 0.35x</td></tr>
 </table>
 
 </p>
