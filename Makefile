@@ -10,7 +10,7 @@ SEED := 0
 ## DENSITY : pass multiple densities via commandline
 DENSITY := 0.2
 
-.PHONY: help
+.PHONY: help docs
 
 .DEFAULT: help
 
@@ -18,6 +18,10 @@ DENSITY := 0.2
 install:
 	pip install -r requirements.txt --upgrade
 	pip install -e .
+
+## docs: build documentation
+docs.%:
+	$(MAKE) -C docs_src $*
 
 help : Makefile makefiles/*.mk
     ifeq ($(UNAME_S),Linux)

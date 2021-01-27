@@ -13,6 +13,9 @@ multipledispatch
 numpy
 pytest
 
+sphinx
+sphinx-rtd-theme
+
 torch
 torchvision
 tqdm

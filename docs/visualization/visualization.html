@@ -311,17 +311,33 @@ python visualization/erk_vs_random_FLOPs.py</p>
 <dl class="py function">
 <dt id="visualization.main_plots.cifar100plots">
 <code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">cifar100plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.cifar100plots" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create plots for the CIFAR100 dataset (Figs. 2a and 2b).</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="visualization.main_plots.cifar10plots">
 <code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">cifar10plots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.cifar10plots" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create plots for the CIFAR10 dataset (Figs. 1a, 1b and 1c).</p>
+</dd></dl>
 
 <dl class="py function">
 <dt id="visualization.main_plots.create_plot_from_spec">
 <code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">create_plot_from_spec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">plot_spec</span></em>, <em class="sig-param"><span class="n">ylimits</span></em>, <em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.create_plot_from_spec" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create and save a plot using the data based on plot_spec.</p>
+<p>The plot_spec is list of tuples with each tuple corresponding to one plot of
+accuracy vs density. The tuple should have three entries -  the method, the
+initialization scheme, and the color of the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Pandas DataFrame containing data about runs</p></li>
+<li><p><strong>plot_spec</strong> – List of tuples (&lt;method&gt;, &lt;init_scheme&gt;, &lt;color_of_line&gt;)</p></li>
+<li><p><strong>ylimits</strong> – y limits of the plot</p></li>
+<li><p><strong>name</strong> – Name of save file</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="visualization.main_plots.main">
@@ -331,13 +347,36 @@ python visualization/erk_vs_random_FLOPs.py</p>
 <dl class="py function">
 <dt id="visualization.main_plots.plot_col_vs_density">
 <code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">plot_col_vs_density</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y_key</span></em>, <em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">init</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">plot_kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.plot_col_vs_density" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot a column for a single method + init combination.</p>
+<dd><p>Plot a particular column vs density for a single method + init combination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_key</strong> – The name of the column to plot (“Mean Acc” or “Acc Seed 0” for example)</p></li>
+<li><p><strong>data</strong> – Pandas DataFrame</p></li>
+<li><p><strong>method</strong> – Method to plot</p></li>
+<li><p><strong>init</strong> – Initialization scheme (“Random” or “ERK”)</p></li>
+<li><p><strong>plot_kwargs</strong> – Additional keyword arguments to pass through to the plt.plot call</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="visualization.main_plots.plot_method">
 <code class="sig-prename descclassname">visualization.main_plots.</code><code class="sig-name descname">plot_method</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">method</span></em>, <em class="sig-param"><span class="n">init</span></em>, <em class="sig-param"><span class="n">color</span></em><span class="sig-paren">)</span><a class="headerlink" href="#visualization.main_plots.plot_method" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Plot the mean accuracy vs density of a method + init combination along with
+marker plots for each seed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – Pandas DataFrame</p></li>
+<li><p><strong>method</strong> – Method to plot</p></li>
+<li><p><strong>init</strong> – Initialization scheme (“Random” or “ERK”)</p></li>
+<li><p><strong>color</strong> – Color of the line plot and markers</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </div>
 <div class="section" id="module-visualization.main_results">
