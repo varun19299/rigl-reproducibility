@@ -163,6 +163,8 @@ class Masking(object):
 
     # stats
     mask_step: int = 0
+    
+    input_size: "Tuple" = (1, 3, 32, 32)
 
     def __post_init__(self):
         self.baseline_nonzero = 0
@@ -178,7 +180,6 @@ class Masking(object):
 
         # FLOPs
         self._dense_FLOPs = None
-        self._input_size = (1, 3, 32, 32)
         self._inference_FLOPs_collector = AverageValue()
 
         # Assertions
@@ -366,7 +367,7 @@ class Masking(object):
         :rtype: int
         """
         if not self._dense_FLOPs:
-            self._dense_FLOPs = get_inference_FLOPs(self, torch.rand(*self._input_size))
+            self._dense_FLOPs = get_inference_FLOPs(self, torch.rand(*self.input_size))
             return self._dense_FLOPs
         else:
             return self._dense_FLOPs
@@ -379,7 +380,7 @@ class Masking(object):
         :return: inference FLOPs
         :rtype: float
         """
-        return get_inference_FLOPs(self, torch.rand(*self._input_size))
+        return get_inference_FLOPs(self, torch.rand(*self.input_size))
 
     @torch.no_grad()
     def init(self, lottery_mask_path: "Path"):

@@ -8,6 +8,9 @@ import numpy as np
 
 from sparselearning.counting.inference_train_FLOPs import RigL_train_FLOPs, wrn_22_2_FLOPs, resnet50_FLOPs
 
+# GGplot (optional)
+# plt.style.use("ggplot")
+
 # Matplotlib font sizes
 SMALL_SIZE = 12
 MEDIUM_SIZE = 14

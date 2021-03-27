@@ -39,7 +39,7 @@ def print_stats(model_name: str, input_size: "Tuple" = (1, 3, 32, 32)):
     # Pruning
     T_start = 700
 
-    for density in [0.1, 0.2]:
+    for density in [0.05, 0.1, 0.2, 0.5]:
         Random_FLOPs = _model_FLOPs("random", density)
         ER_FLOPs = _model_FLOPs("erdos-renyi", density)
         ERK_FLOPs = _model_FLOPs("erdos-renyi-kernel", density)

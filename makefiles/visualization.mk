@@ -22,6 +22,10 @@ vis.erk_vs_random_FLOPs:
 vis.redist_inference_FLOPs:
 	${PYTHON} visualization/redist_inference_plot.py wandb.project=cifar100 dataset=CIFAR100
 
+## vis.inference_stats: estimate train and eval FLOPs (assuming final density is similar to initial)
+vis.inference_stats:
+	${PYTHON} sparselearning/counting/print_stats.py
+
 VIS_DEPS := vis.main_result.cifar10 vis.main_result.cifar100
 VIS_DEPS += vis.tuning.alpha_deltaT vis.tuning.lr
 VIS_DEPS += vis.erk_vs_random_FLOPs vis.redist_inference_FLOPs
