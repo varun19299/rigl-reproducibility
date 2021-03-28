@@ -1,5 +1,7 @@
 # [Reproducibilty Challenge] RigL
 
+[OpenReview](https://openreview.net/forum?id=riCIeP6LzEE) | [W&B Report](https://wandb.ai/ml-reprod-2020/cifar10/reports/Reproducibility-Challenge-Rigging-the-Lottery-Making-All-Tickets-Winners--Vmlldzo1MzM0NDQ) | [W&B Training logs](https://wandb.ai/ml-reprod-2020)
+
 This repository hosts source code for our reproducibility report on [Rigging the Lottery: Making all Tickets Winners](https://arxiv.org/abs/1911.11134), published at ICML 2020.
 
 
@@ -230,4 +232,4 @@ Syntax:
 
 1. Rigging the Lottery: Making All Tickets Winners, [Original Paper](https://arxiv.org/abs/1911.11134).
 
-2. Our report on OpenReview.
+2. Our report on [OpenReview](https://openreview.net/forum?id=riCIeP6LzEE).
