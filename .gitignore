@@ -1,5 +1,6 @@
 outputs/*
 slurm_outputs/*
+slurm_scripts/*
 
 sparselearning.egg-info/*
 
