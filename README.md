@@ -233,3 +233,7 @@ Syntax:
 1. Rigging the Lottery: Making All Tickets Winners, [Original Paper](https://arxiv.org/abs/1911.11134).
 
 2. Our report on [OpenReview](https://openreview.net/forum?id=riCIeP6LzEE).
+
+## Credits
+
+We built on [Tim Dettmer's sparselearning](https://github.com/TimDettmers/sparse_learning).
