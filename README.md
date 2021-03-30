@@ -1,6 +1,6 @@
 # [Reproducibilty Challenge] RigL
 
-[Arxiv](arxiv.org/abs/2103.15767) | [OpenReview](https://openreview.net/forum?id=riCIeP6LzEE) | [W&B Report](https://wandb.ai/ml-reprod-2020/cifar10/reports/Reproducibility-Challenge-Rigging-the-Lottery-Making-All-Tickets-Winners--Vmlldzo1MzM0NDQ) | [W&B Training logs](https://wandb.ai/ml-reprod-2020) | [Documentation](https://varun19299.github.io/rigl-reproducibility/)
+[Arxiv](https://arxiv.org/abs/2103.15767) | [OpenReview](https://openreview.net/forum?id=riCIeP6LzEE) | [W&B Report](https://wandb.ai/ml-reprod-2020/cifar10/reports/Reproducibility-Challenge-Rigging-the-Lottery-Making-All-Tickets-Winners--Vmlldzo1MzM0NDQ) | [W&B Training logs](https://wandb.ai/ml-reprod-2020) | [Documentation](https://varun19299.github.io/rigl-reproducibility/)
 
 This repository hosts source code for our reproducibility report on [Rigging the Lottery: Making all Tickets Winners](https://arxiv.org/abs/1911.11134), published at ICML 2020.
 
