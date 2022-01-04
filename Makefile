@@ -1,3 +1,15 @@
+ifeq (, $(shell which python))
+  $(error "Python not found in PATH - have you installed it?")
+endif
+
+PYTHON_REQUIRED_VERSION=3
+PYTHON_VERSION=$(shell python -V 2>&1 | cut -d ' ' -f 2 | cut -d . -f 1)
+PYTHON_FULL_VERSION=$(shell python -V 2>&1)
+
+ifneq ($(PYTHON_REQUIRED_VERSION), $(PYTHON_VERSION))
+  $(error "You are running $(PYTHON_FULL_VERSION). This repository requires Python $(PYTHON_REQUIRED_VERSION).")
+endif
+
 # Define macros
 UNAME_S := $(shell uname -s)
 PYTHON := python
