@@ -1,4 +1,4 @@
-#.PHONY: test
+.PHONY: test
 
 ## test_data.%: % in CIFAR10, CIFAR100, MNIST, Mini-Imagenet
 test_data.%:
