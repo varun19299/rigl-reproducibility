@@ -645,7 +645,10 @@ class Masking(object):
                 param_state["exp_avg_sq"] *= mask
 
             # SGD
-            elif "momentum_buffer" in param_state:
+            elif (
+                "momentum_buffer" in param_state
+                and param_state["momentum_buffer"] is not None
+            ):
                 param_state["momentum_buffer"] *= mask
 
     def sparsify(self, **kwargs):
