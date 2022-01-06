@@ -19,8 +19,4 @@ sphinx-rtd-theme
 torch
 torchvision
 tqdm
-# WandB joblib patch
-# See: https://github.com/wandb/client/issues/1525#issuecomment-749346781
-# Can revert to official release
-# once patched in
-git+git://github.com/wandb/client.git@task/joblib#egg=wandb
+wandb

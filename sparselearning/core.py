@@ -163,7 +163,7 @@ class Masking(object):
 
     # stats
     mask_step: int = 0
-    
+
     input_size: "Tuple" = (1, 3, 32, 32)
 
     def __post_init__(self):
@@ -199,16 +199,16 @@ class Masking(object):
 
     """
     Code flow:
-    
+
     1. add_module():
         * init()
         * optionally remove_...()
         * apply_mask()
-        
+
     2. step():
         * apply_mask()
         * prune_rate_decay()
-            
+
     3. update_connections():
         * truncate_weights()
             * prune
@@ -295,7 +295,7 @@ class Masking(object):
         self._inference_FLOPs_collector.add_value(self.inference_FLOPs)
         return self._inference_FLOPs_collector.smooth
 
-    def calc_redistributed_densities(self) -> "":
+    def calc_redistributed_densities(self):
         """
         Computes layer-wise density
         given a redistribution scheme.
@@ -469,7 +469,7 @@ class Masking(object):
     def global_prune(self):
         return "global" in self.prune_mode
 
-    def get_momentum_for_weight(self, weight:str)->"Tensor":
+    def get_momentum_for_weight(self, weight: str) -> "Tensor":
         """
         Return momentum from optimizer (SGD or Adam)
 
@@ -645,7 +645,10 @@ class Masking(object):
                 param_state["exp_avg_sq"] *= mask
 
             # SGD
-            elif "momentum_buffer" in param_state:
+            elif (
+                "momentum_buffer" in param_state
+                and param_state["momentum_buffer"] is not None
+            ):
                 param_state["momentum_buffer"] *= mask
 
     def sparsify(self, **kwargs):
